@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <TextView
+        android:text="Note:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/NameLabel" />
+    <EditText
+        android:id="@+id/txtNote"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/NameLabel"
+        android:imeOptions="actionNext"
+        android:maxLines="1"
+        android:layout_marginBottom="12dp"
+        android:hint="name" />
+    <TextView
+        android:id="@+id/ContentLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Content:"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtNote"
+        android:layout_marginTop="12dp" />
+    <EditText
+        android:inputType="textMultiLine"
+        android:id="@+id/txtContent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ContentLabel"
+        android:gravity="top|left"
+        android:lines="8"
+        android:minLines="4"
+        android:maxLines="8"
+        android:scrollbars="vertical"
+        android:imeOptions="actionDone"
+        android:hint="..." />
+    <CheckBox
+        android:id="@+id/chkDone"
+        android:layout_below="@+id/txtContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        android:layout_alignParentRight="true"
+        android:paddingRight="25dp" />
+    <Button
+        android:text="Add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chkDone"
+        android:id="@+id/addButton"
+        android:layout_alignParentLeft="true"
+        android:clickable="true" />
+</RelativeLayout>
