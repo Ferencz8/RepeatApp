@@ -10,6 +10,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
+using Repeat.Entities;
 
 namespace Repeat
 {
@@ -34,6 +35,11 @@ namespace Repeat
         {
             return null;// _notes.ElementAt(position);
         }
+
+		public Note GetItemAtPosition(int position)
+		{
+			return _notesList.ElementAt(position);
+		}
 
         public override long GetItemId(int position)
         {

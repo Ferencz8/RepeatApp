@@ -16,8 +16,8 @@ namespace Repeat
     public class MainActivity : Activity
     {
         DrawerLayout mDrawerLayout;
-        List<string> mLeftItems = new List<string>();
-        ArrayAdapter mLeftAdapter;
+        List<string> notebookItems = new List<string>();
+        SideMenuAdapter notebooksAdapter;
         ListView mLeftDrawer;
         ListView elements;
         Button addButton;
@@ -25,7 +25,7 @@ namespace Repeat
         ActionBarDrawerToggle mDrawerToggle;
 
 
-        protected override void OnCreate(Bundle bundle)
+		protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
@@ -41,8 +41,8 @@ namespace Repeat
             menuButton = FindViewById<Button>(Resource.Id.menuButton);
             //var ListAdapter = new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
 
-            mLeftItems.Add("First Left Item");
-            mLeftItems.Add("Second Left Item");
+            //notebookItems.Add("First Left Item");
+            //notebookItems.Add("Second Left Item");
             var ListAdapter = new MyCustomBaseAdapter(this);
 
             elements.Adapter = ListAdapter;
@@ -56,14 +56,25 @@ namespace Repeat
                 mDrawerLayout.OpenDrawer(mLeftDrawer);
             };
 
+			mLeftDrawer.ItemClick += listView_ItemClick;
+
             mDrawerToggle = new MyActionBarDrawerToggle(this, mDrawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
 
-            mLeftAdapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleListItem1, mLeftItems);
-            mLeftDrawer.Adapter = mLeftAdapter;
+			notebooksAdapter = new SideMenuAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
+            mLeftDrawer.Adapter = notebooksAdapter;
             mDrawerLayout.SetDrawerListener(mDrawerToggle);
         }
 
-        public override bool OnOptionsItemSelected(IMenuItem item)
+		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+		{
+			//Get our item from the list adapter
+			var item = this.notebooksAdapter.GetItemAtPosition(e.Position);
+
+			//Make a toast with the item name just to show it was clicked
+			Toast.MakeText(this, item.Name + " Clicked!", ToastLength.Short).Show();
+		}
+
+		public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (mDrawerToggle.OnOptionsItemSelected(item))
             {
