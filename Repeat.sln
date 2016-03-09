@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat", "Repeat\Repeat.csproj", "{C6A8E88F-B050-4CD7-8A54-50661A03FA90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.DAL", "Repeat.DAL\Repeat.DAL.csproj", "{9EEEA643-7D75-475A-9793-55D1580F207B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.Droid.DAL", "Repeat.Droid.DAL\Repeat.Droid.DAL.csproj", "{E7B2007F-F511-49A9-9C56-D9F963033F4B}"
 EndProject
 Global
@@ -21,10 +19,6 @@ Global
 		{C6A8E88F-B050-4CD7-8A54-50661A03FA90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6A8E88F-B050-4CD7-8A54-50661A03FA90}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6A8E88F-B050-4CD7-8A54-50661A03FA90}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{9EEEA643-7D75-475A-9793-55D1580F207B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EEEA643-7D75-475A-9793-55D1580F207B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EEEA643-7D75-475A-9793-55D1580F207B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EEEA643-7D75-475A-9793-55D1580F207B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
