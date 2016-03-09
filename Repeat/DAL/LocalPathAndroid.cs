@@ -9,14 +9,18 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Repeat.Droid.DAL;
+using System.IO;
 
-namespace Repeat.Entities
+namespace Repeat.DAL
 {
-	public class Notebook
+	public class LocalPathAndroid : LocalPath
 	{
+		public string OSPath { get; set; }
 
-		public int Id { get; set; }
-
-		public string Name { get; set; }
+		public bool FileExists(string path)
+		{
+			return File.Exists(path);
+		}
 	}
 }
