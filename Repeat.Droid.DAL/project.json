@@ -1,0 +1,8 @@
+﻿{
+  "frameworks": {
+    ".NETPortable,Version=v4.5,Profile=Profile111": {}
+  },
+  "dependencies": {
+    "SQLite.Net-PCL": "3.1.1"
+  }
+}

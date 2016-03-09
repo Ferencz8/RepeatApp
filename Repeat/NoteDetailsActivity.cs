@@ -36,20 +36,20 @@ namespace Repeat
             };
         }
 
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-        }
+        //protected override void OnDestroy()
+        //{
+        //    base.OnDestroy();
+        //}
 
-        protected override void OnStop()
-        {
-            base.OnStop();
-        }
+        //protected override void OnStop()
+        //{
+        //    base.OnStop();
+        //}
 
 
-        protected override void OnPause()
-        {
-            base.OnPause();
-        }
+        //protected override void OnPause()
+        //{
+        //    base.OnPause();
+        //}
     }
 }

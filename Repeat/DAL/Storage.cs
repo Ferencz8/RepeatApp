@@ -12,8 +12,9 @@ using Android.Widget;
 using Mono.Data.Sqlite;
 using Repeat.Entities;
 using Repeat.Droid.DAL;
-using Repeat.DAL;
 using System.IO;
+using Repeat.DAL;
+using SQLite.Net.Platform.XamarinAndroid;
 
 namespace Repeat
 {
@@ -26,16 +27,16 @@ namespace Repeat
 		static Storage()
 		{
 
-			var localPathAndroidObj = new LocalPathAndroid();
-			localPathAndroidObj.OSPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "sqlLiteDb.db3");
-			db = new Db(localPathAndroidObj);
+			Util.File = new AndroidFile();
+			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "sqlLiteDb.db3");
+			db = new Db(new SQLitePlatformAndroid(), path);
 		}
 
 	
 
 		internal static List<Notebook> GetNotebooks()
 		{
-			return db.SelectNotebooks("select * from notebooks;");
+			return db.Get<Notebook>();// db.SelectNotebooks("select * from notebooks;");
 		}
 
 		public static void AddItem(Note item)
@@ -43,18 +44,19 @@ namespace Repeat
 			if (item != null)
 			{
 
-				List<SqliteParameter> parameters = new List<SqliteParameter>() {
-					new SqliteParameter("@name", item.Name),
-					new SqliteParameter("@content", item.Content)
-				};
-				db.InsertQuery("insert into notes(Name, Content) values(@name, @content)", parameters);
+				//List<SqliteParameter> parameters = new List<SqliteParameter>() {
+				//	new SqliteParameter("@name", item.Name),
+				//	new SqliteParameter("@content", item.Content)
+				//};
+				db.Add(item);
+				//db.InsertQuery("insert into notes(Name, Content) values(@name, @content)", parameters);
 				//items.Add(item);
 			}
 		}
 
 		public static List<Note> GetItems()
 		{
-			return db.SelectQuery("select * from notes;");
+			return db.Get<Note>();// db.SelectQuery("select * from notes;");
 		}
 	}
 }

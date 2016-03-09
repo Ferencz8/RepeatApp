@@ -14,10 +14,8 @@ using System.IO;
 
 namespace Repeat.DAL
 {
-	public class LocalPathAndroid : LocalPath
+	public class AndroidFile : IFile
 	{
-		public string OSPath { get; set; }
-
 		public bool FileExists(string path)
 		{
 			return File.Exists(path);
