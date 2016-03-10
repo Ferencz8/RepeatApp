@@ -9,6 +9,9 @@ using System.Linq;
 using System.Collections.Generic;
 using Android.Support.V4.Widget;
 using Android.Support.V4.App;
+using Repeat.DAL;
+using System.IO;
+using SQLite.Net.Platform.XamarinAndroid;
 
 namespace Repeat
 {
@@ -24,6 +27,8 @@ namespace Repeat
         Button menuButton;
         ActionBarDrawerToggle mDrawerToggle;
 
+
+		int chosenNotebookId;
 
 		protected override void OnCreate(Bundle bundle)
         {
@@ -56,13 +61,24 @@ namespace Repeat
                 mDrawerLayout.OpenDrawer(mLeftDrawer);
             };
 
-			mLeftDrawer.ItemClick += listView_ItemClick;            
+			mLeftDrawer.ItemClick += listView_ItemClick;
+
+			InitializePlatformSpecificParameters();         
         }
+
+		private void InitializePlatformSpecificParameters()
+		{
+			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "repeatDb.db3");
+			Util.SQLitePlatform = new SQLitePlatformAndroid();
+			Util.DatabasePath = path;
+		}
 
 		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
 		{
 			//Get our item from the list adapter
 			var item = notebooksAdapter.GetItemAtPosition(e.Position);
+
+			chosenNotebookId = item.Id;
 
 			//Make a toast with the item name just to show it was clicked
 			Toast.MakeText(this, item.Name + " Clicked!", ToastLength.Short).Show();
@@ -91,7 +107,7 @@ namespace Repeat
         protected override void OnResume()
         {
             base.OnResume();
-			notes.Adapter = new NotesAdapter(this); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
+			notes.Adapter = new NotesAdapter(this, chosenNotebookId); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
         }
 
         //protected override void OnDestroy()

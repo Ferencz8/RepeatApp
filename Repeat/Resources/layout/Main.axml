@@ -35,7 +35,7 @@
 <!-- The left navigation drawer -->
     <ListView
         android:id="@+id/leftListView"
-        android:layout_width="300dp"
+        android:layout_width="700dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:choiceMode="singleChoice"

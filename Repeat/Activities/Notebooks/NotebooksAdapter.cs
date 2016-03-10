@@ -5,7 +5,9 @@ using System.Linq;
 using Android.App;
 using Android.Views;
 using Android.Widget;
-using Repeat.Entities;
+using Repeat.DAL.Entities;
+using Repeat.Droid.DAL.DependencyManagement;
+using Repeat.DAL.Repositories.Interfaces;
 
 namespace Repeat
 {
@@ -15,7 +17,7 @@ namespace Repeat
 		Activity _activity;
 		public NotebooksAdapter(Activity activity)
 		{
-			_notebooksList = Storage.GetNotebooks();
+			_notebooksList = Kernel.Get<INotebooksRepository>().Get();
 			_activity = activity;
 		}
 

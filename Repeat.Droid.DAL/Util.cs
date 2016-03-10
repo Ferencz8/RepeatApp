@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SQLite.Net.Interop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Repeat.Droid.DAL
+namespace Repeat.DAL
 {
 	public interface IFile
 	{
@@ -15,5 +16,9 @@ namespace Repeat.Droid.DAL
 	{
 
 		public static IFile File { get; set; }
+
+		public static ISQLitePlatform SQLitePlatform { get; set; }
+
+		public static string DatabasePath { get; set; }
 	}
 }

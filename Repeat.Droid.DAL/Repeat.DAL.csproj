@@ -35,6 +35,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Db.cs" />
+    <Compile Include="DependencyManagement\Kernel.cs" />
+    <Compile Include="DependencyManagement\RepositoryModule.cs" />
+    <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="Repositories\GenericRepository.cs" />
+    <Compile Include="Repositories\Interfaces\IGenericRepository.cs" />
+    <Compile Include="Repositories\Interfaces\INotebooksRepository.cs" />
+    <Compile Include="Repositories\Interfaces\INotesRepository.cs" />
+    <Compile Include="Repositories\NotebooksRepository.cs" />
+    <Compile Include="Repositories\NotesRepository.cs" />
+    <Compile Include="UnitOfWork.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Entities\Note.cs" />
     <Compile Include="Entities\Notebook.cs" />
@@ -42,9 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Db BackUp.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SQLiteNetExtensions">

@@ -1,21 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Android.App;
-using Android.Content;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Repeat.Entities;
+using Repeat.DAL.Entities;
+using Repeat.DAL.Repositories.Interfaces;
+using Repeat.Droid.DAL.DependencyManagement;
 
 namespace Repeat
 {
 	[Activity (Label = "NoteDetailsActivity")]
 	public class NoteDetailsActivity : Activity
 	{
+
+		INotesRepository _notesRepository;
+
         protected override void OnCreate (Bundle bundle)
 		{
             RequestWindowFeature(WindowFeatures.ActionBar);
@@ -30,9 +28,11 @@ namespace Repeat
 
             Button addButton = FindViewById<Button>(Resource.Id.addButton);
 
+
+			_notesRepository = Kernel.Get<INotesRepository>();
             addButton.Click += delegate {
-                Storage.AddItem(new Note() { Name = txtNote.Text, Content = txtContent.Text });
-                Finish();
+				_notesRepository.Add(new Note() { Name = txtNote.Text, Content = txtContent.Text });
+				Finish();
             };
         }
 
