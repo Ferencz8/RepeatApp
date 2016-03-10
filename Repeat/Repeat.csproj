@@ -79,16 +79,15 @@
     <Compile Include="DAL\Db.cs" />
     <Compile Include="DAL\AndroidFile.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="MyActionBarDrawerToggle.cs" />
-    <Compile Include="MyCustomBaseAdapter.cs" />
-    <Compile Include="NoteDetailsActivity.cs" />
+    <Compile Include="Activities\SideMenu\SideMenuDrawerToggle.cs" />
+    <Compile Include="Activities\Notes\NotesAdapter.cs" />
+    <Compile Include="Activities\Notes\NoteDetailsActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DAL\Storage.cs" />
-    <Compile Include="SideMenuAdapter.cs" />
+    <Compile Include="Activities\Notebooks\NotebooksAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GettingStarted.Xamarin" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -98,6 +97,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\NoteListItem.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\NotebookListItem.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>

@@ -17,9 +17,9 @@ namespace Repeat
     {
         DrawerLayout mDrawerLayout;
         List<string> notebookItems = new List<string>();
-        SideMenuAdapter notebooksAdapter;
+        NotebooksAdapter notebooksAdapter;
         ListView mLeftDrawer;
-        ListView elements;
+        ListView notes;
         Button addButton;
         Button menuButton;
         ActionBarDrawerToggle mDrawerToggle;
@@ -31,23 +31,23 @@ namespace Repeat
 
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
-
-            // Get our button from the layout resource,
-            // and attach an event to it
+			
             mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
             mLeftDrawer = FindViewById<ListView>(Resource.Id.leftListView);
             addButton = FindViewById<Button>(Resource.Id.addButton);
-            elements = FindViewById<ListView>(Resource.Id.elements);
+            notes = FindViewById<ListView>(Resource.Id.notes);
             menuButton = FindViewById<Button>(Resource.Id.menuButton);
-            //var ListAdapter = new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
 
-            //notebookItems.Add("First Left Item");
-            //notebookItems.Add("Second Left Item");
-            var ListAdapter = new MyCustomBaseAdapter(this);
+			
+			notes.Adapter = new NotesAdapter(this);
 
-            elements.Adapter = ListAdapter;
+			mDrawerToggle = new SideMenuDrawerToggle(this, mDrawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
+			mDrawerLayout.SetDrawerListener(mDrawerToggle);
 
-            addButton.Click += delegate
+			notebooksAdapter = new NotebooksAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
+			mLeftDrawer.Adapter = notebooksAdapter;
+
+			addButton.Click += delegate
             {
                 StartActivity(typeof(NoteDetailsActivity));
             };
@@ -56,19 +56,13 @@ namespace Repeat
                 mDrawerLayout.OpenDrawer(mLeftDrawer);
             };
 
-			mLeftDrawer.ItemClick += listView_ItemClick;
-
-            mDrawerToggle = new MyActionBarDrawerToggle(this, mDrawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
-
-			notebooksAdapter = new SideMenuAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
-            mLeftDrawer.Adapter = notebooksAdapter;
-            mDrawerLayout.SetDrawerListener(mDrawerToggle);
+			mLeftDrawer.ItemClick += listView_ItemClick;            
         }
 
 		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
 		{
 			//Get our item from the list adapter
-			var item = this.notebooksAdapter.GetItemAtPosition(e.Position);
+			var item = notebooksAdapter.GetItemAtPosition(e.Position);
 
 			//Make a toast with the item name just to show it was clicked
 			Toast.MakeText(this, item.Name + " Clicked!", ToastLength.Short).Show();
@@ -97,10 +91,7 @@ namespace Repeat
         protected override void OnResume()
         {
             base.OnResume();
-            var ListAdapter = new MyCustomBaseAdapter(this); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
-
-            elements.Adapter = ListAdapter;
-
+			notes.Adapter = new NotesAdapter(this); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
         }
 
         //protected override void OnDestroy()

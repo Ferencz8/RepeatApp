@@ -14,29 +14,35 @@ using Android.Support.V4.Widget;
 
 namespace Repeat
 {
-    public class MyActionBarDrawerToggle : ActionBarDrawerToggle
+    public class SideMenuDrawerToggle : ActionBarDrawerToggle
     {
         Activity mActivity;
+		ListView leftListView;
 
-        public MyActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int imageResource, int openDrawerDesc, int closeDrawerDesc)
+        public SideMenuDrawerToggle(Activity activity, DrawerLayout drawerLayout, int imageResource, int openDrawerDesc, int closeDrawerDesc)
             : base(activity, drawerLayout, imageResource, openDrawerDesc, closeDrawerDesc)
         {
             mActivity = activity;
         }
 
-        public override void OnDrawerOpened(Android.Views.View drawerView)
+        public override void OnDrawerOpened(View drawerView)
         {
             int drawerType = (int)drawerView.Tag;
 
             if (drawerType == 0)
             {
+				var drawerList = drawerView as ListView;
+				if(drawerList != null)
+				{
+					drawerList.Adapter = new NotebooksAdapter(mActivity);
+				}
                 //Left Drawer
                 base.OnDrawerOpened(drawerView);
                 mActivity.ActionBar.Title = "Please Select From List";
             }
         }
 
-        public override void OnDrawerClosed(Android.Views.View drawerView)
+        public override void OnDrawerClosed(View drawerView)
         {
             int drawerType = (int)drawerView.Tag;
 
@@ -48,7 +54,7 @@ namespace Repeat
             }
         }
 
-        public override void OnDrawerSlide(Android.Views.View drawerView, float slideOffset)
+        public override void OnDrawerSlide(View drawerView, float slideOffset)
         {
             int drawerType = (int)drawerView.Tag;
 

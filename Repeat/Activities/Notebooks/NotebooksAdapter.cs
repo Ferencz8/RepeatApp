@@ -1,24 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Java.Lang;
 using Repeat.Entities;
 
 namespace Repeat
 {
-	public class SideMenuAdapter : BaseAdapter
+	public class NotebooksAdapter : BaseAdapter
 	{
 		private List<Notebook> _notebooksList;
 		Activity _activity;
-		public SideMenuAdapter(Activity activity)
+		public NotebooksAdapter(Activity activity)
 		{
 			_notebooksList = Storage.GetNotebooks();
 			_activity = activity;
@@ -49,7 +44,11 @@ namespace Repeat
 
 		public override View GetView(int position, View convertView, ViewGroup parent)
 		{
-			var view = convertView ?? _activity.LayoutInflater.Inflate(Android.Resource.Layout.SimpleListItem1, parent, false);
+			var view = convertView ?? _activity.LayoutInflater.Inflate(Resource.Layout.NotebookListItem, parent, false);
+
+			var notebookName = view.FindViewById<TextView>(Resource.Id.NotebookName);
+			notebookName.Text = _notebooksList[position].Name;
+
 			return view;
 		}
 	}

@@ -27,7 +27,7 @@
             android:orientation="vertical"
             android:layout_below="@+id/menuButton">
             <ListView
-                android:id="@+id/elements"
+                android:id="@+id/notes"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -35,11 +35,9 @@
 <!-- The left navigation drawer -->
     <ListView
         android:id="@+id/leftListView"
-        android:layout_width="500dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:choiceMode="singleChoice"
-        android:divider="#D2D2D2"
-        android:dividerHeight="2dp"
-        android:background="#F2F2F2" />
+        android:background="@android:color/white" />
 </android.support.v4.widget.DrawerLayout>

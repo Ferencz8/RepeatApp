@@ -20,7 +20,6 @@ namespace Repeat
 {
 	public static class Storage
 	{
-		//static List<string> items = new List<string> { "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers" };
 		private static Db db;
 
 
@@ -28,35 +27,23 @@ namespace Repeat
 		{
 
 			Util.File = new AndroidFile();
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "sqlLiteDb.db3");
+			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "repeatDb.db3");
 			db = new Db(new SQLitePlatformAndroid(), path);
 		}
 
-	
-
 		internal static List<Notebook> GetNotebooks()
 		{
-			return db.Get<Notebook>();// db.SelectNotebooks("select * from notebooks;");
+			return db.Get<Notebook>();
 		}
 
 		public static void AddItem(Note item)
 		{
-			if (item != null)
-			{
-
-				//List<SqliteParameter> parameters = new List<SqliteParameter>() {
-				//	new SqliteParameter("@name", item.Name),
-				//	new SqliteParameter("@content", item.Content)
-				//};
-				db.Add(item);
-				//db.InsertQuery("insert into notes(Name, Content) values(@name, @content)", parameters);
-				//items.Add(item);
-			}
+			db.Add(item);
 		}
 
 		public static List<Note> GetItems()
 		{
-			return db.Get<Note>();// db.SelectQuery("select * from notes;");
+			return db.Get<Note>();
 		}
 	}
 }

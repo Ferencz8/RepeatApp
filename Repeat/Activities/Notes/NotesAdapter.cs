@@ -1,24 +1,18 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Java.Lang;
 using Repeat.Entities;
 
 namespace Repeat
 {
-    public class MyCustomBaseAdapter : BaseAdapter
+	public class NotesAdapter : BaseAdapter
     {
         private List<Note> _notesList;
         Activity _activity;
-        public MyCustomBaseAdapter(Activity activity)
+        public NotesAdapter(Activity activity)
         {
             _notesList = Storage.GetItems();
             _activity = activity;
