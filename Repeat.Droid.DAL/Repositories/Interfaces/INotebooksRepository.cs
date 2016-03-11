@@ -8,5 +8,7 @@ namespace Repeat.DAL.Repositories.Interfaces
 {
 	public interface INotebooksRepository : IGenericRepository<Notebook>
 	{
+
+		Notebook GetByName(string notebookName);
 	}
 }

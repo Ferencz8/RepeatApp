@@ -14,11 +14,14 @@ namespace Repeat
 {
 	public class NotebooksAdapter : BaseAdapter
 	{
-		private List<Notebook> _notebooksList;
+		List<Notebook> _notebooksList;
 		Activity _activity;
+		INotebooksRepository notebooksRepository;
+
 		public NotebooksAdapter(Activity activity)
 		{
-			_notebooksList = Kernel.Get<INotebooksRepository>().Get();
+			notebooksRepository = Kernel.Get<INotebooksRepository>();
+			_notebooksList = notebooksRepository.Get();
 			_activity = activity;
 		}
 
@@ -53,6 +56,11 @@ namespace Repeat
 			notebookName.Text = _notebooksList[position].Name;
 
 			return view;
+		}
+
+		public void RefreshContent()
+		{
+			_notebooksList = notebooksRepository.Get();
 		}
 	}
 }

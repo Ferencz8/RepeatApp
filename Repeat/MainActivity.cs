@@ -12,21 +12,25 @@ using Android.Support.V4.App;
 using Repeat.DAL;
 using System.IO;
 using SQLite.Net.Platform.XamarinAndroid;
+using Repeat.Droid.DAL.DependencyManagement;
+using Repeat.DAL.Repositories.Interfaces;
 
 namespace Repeat
 {
 	[Activity(Label = "Repeat", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : Activity
 	{
-		DrawerLayout mDrawerLayout;
+		DrawerLayout drawerLayout;
 		List<string> notebookItems = new List<string>();
 		NotebooksAdapter notebooksAdapter;
-		ListView mLeftDrawer;
+		NotesAdapter notesAdapter;
+		ListView notebooks;
 		ListView notes;
-		Button addButton;
+		Button addNoteButton;
 		Button menuButton;
-		ActionBarDrawerToggle mDrawerToggle;
-
+		Button addNotebookButton;
+		ActionBarDrawerToggle drawerToggle;
+		LinearLayout leftSideMenu;
 
 		int chosenNotebookId;
 
@@ -39,37 +43,76 @@ namespace Repeat
 			// Set our view from the "main" layout resource
 			SetContentView(Resource.Layout.Main);
 
-			mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
-			mLeftDrawer = FindViewById<ListView>(Resource.Id.leftListView);
-			addButton = FindViewById<Button>(Resource.Id.addButton);
+			drawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
+			notebooks = FindViewById<ListView>(Resource.Id.notebooks);
+			leftSideMenu  = FindViewById<LinearLayout>(Resource.Id.leftSideMenu);
+			addNoteButton = FindViewById<Button>(Resource.Id.addButton);
 			notes = FindViewById<ListView>(Resource.Id.notes);
 			menuButton = FindViewById<Button>(Resource.Id.menuButton);
-
+			addNotebookButton = FindViewById<Button>(Resource.Id.addNotebookButton);
 			
-			mDrawerToggle = new SideMenuDrawerToggle(this, mDrawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
-			mDrawerLayout.SetDrawerListener(mDrawerToggle);
+			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
+			drawerLayout.SetDrawerListener(drawerToggle);
+			drawerLayout.CloseDrawer(leftSideMenu);
 
 			notebooksAdapter = new NotebooksAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
-			mLeftDrawer.Adapter = notebooksAdapter;
+			notebooks.Adapter = notebooksAdapter;
 			chosenNotebookId = notebooksAdapter.GetItemAtPosition(0).Id;
 
-			notes.Adapter = new NotesAdapter(this, chosenNotebookId);
+			notesAdapter = new NotesAdapter(this, chosenNotebookId);
+			notes.Adapter = notesAdapter;
 
-			addButton.Click += delegate
+			addNoteButton.Click += delegate
 			{
-				// StartActivity(typeof(NoteDetailsActivity));
-				Intent intent = new Intent(this, typeof(NoteDetailsActivity));
-				Bundle notesBundle = new Bundle();
-				notesBundle.PutInt("notebookId", chosenNotebookId);
-				intent.PutExtras(notesBundle);
-				StartActivity(intent,notesBundle);
+				StartNoteDetailsActivity();
 			};
 			menuButton.Click += delegate
 			{
-				mDrawerLayout.OpenDrawer(mLeftDrawer);
+				//mDrawerLayout.OpenDrawer(mLeftDrawer);
+				drawerLayout.OpenDrawer(leftSideMenu);
 			};
 
-			mLeftDrawer.ItemClick += listView_ItemClick;
+			notebooks.ItemClick += listView_ItemClick;
+
+			addNotebookButton.Click += delegate
+			{
+
+				var builder = new AlertDialog.Builder(this);
+				builder.SetTitle("Add Notebook");
+				EditText edit = new EditText(this);
+				builder.SetView(edit);
+				builder.SetPositiveButton("Save", (sender, args) => 
+				{
+					/* do stuff on OK */
+					string notebookName = edit.Text;
+
+					//TODO:: TempSolution maybe add one more layer for handling CRUD operations
+					var repo = Kernel.Get<INotebooksRepository>();
+					int rowschanged = repo.Add(new DAL.Entities.Notebook()
+					{
+						Name = notebookName,
+					});
+					if(rowschanged == 1)
+					{
+						chosenNotebookId = repo.GetByName(notebookName).Id;
+					}
+					notebooksAdapter.RefreshContent();
+					notebooksAdapter.NotifyDataSetChanged();
+
+					notesAdapter.RefreshContent(chosenNotebookId);
+					notes.Adapter = notesAdapter;
+				});
+				builder.Show();
+			};
+		}
+
+		private void StartNoteDetailsActivity()
+		{
+			Intent intent = new Intent(this, typeof(NoteDetailsActivity));
+			Bundle notesBundle = new Bundle();
+			notesBundle.PutInt("notebookId", chosenNotebookId);
+			intent.PutExtras(notesBundle);
+			StartActivity(intent, notesBundle);
 		}
 
 		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
@@ -79,13 +122,15 @@ namespace Repeat
 
 			chosenNotebookId = item.Id;
 
+			notesAdapter.RefreshContent(chosenNotebookId);
+			notes.Adapter = notesAdapter;
 			//Make a toast with the item name just to show it was clicked
 			Toast.MakeText(this, item.Name + " Clicked!", ToastLength.Short).Show();
 		}
 
 		public override bool OnOptionsItemSelected(IMenuItem item)
 		{
-			if (mDrawerToggle.OnOptionsItemSelected(item))
+			if (drawerToggle.OnOptionsItemSelected(item))
 			{
 			}
 
@@ -93,7 +138,7 @@ namespace Repeat
 			{
 				case Resource.Id.menuButton:
 					{
-						mDrawerLayout.OpenDrawer(mLeftDrawer);
+						drawerLayout.OpenDrawer(notebooks);
 					}
 
 					return true;

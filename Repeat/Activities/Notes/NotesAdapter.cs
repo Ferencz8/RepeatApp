@@ -8,22 +8,24 @@ using Repeat.DAL.Entities;
 using Repeat.Droid.DAL.DependencyManagement;
 using Repeat.DAL;
 using Repeat.DAL.Repositories.Interfaces;
+using System;
 
 namespace Repeat
 {
 	public class NotesAdapter : BaseAdapter
 	{
-		private List<Note> _notesList;
+		List<Note> _notesList;
 		Activity _activity;
+		INotesRepository notesRepisotory;
 		public NotesAdapter(Activity activity, int notebookId = 0)
 		{
-			var notesRepo = Kernel.Get<INotesRepository>();
+			notesRepisotory = Kernel.Get<INotesRepository>();
 			var notebooksRepository = Kernel.Get<INotebooksRepository>();
 			if (notebookId == 0)
 			{
 				notebookId = notebooksRepository.Get().First().Id;
 			}
-			_notesList = notesRepo.GetNotesByNotebookId(notebookId);
+			_notesList = notesRepisotory.GetNotesByNotebookId(notebookId);
 
 			_activity = activity;
 		}
@@ -61,6 +63,12 @@ namespace Repeat
 			noteName.Text = _notesList[position].Name;
 			noteContent.Text = _notesList[position].Content;
 			return view;
+		}
+
+		public void RefreshContent(int chosenNotebookId)
+		{
+			_notesList.Clear();
+			_notesList = notesRepisotory.GetNotesByNotebookId(chosenNotebookId);
 		}
 	}
 }
