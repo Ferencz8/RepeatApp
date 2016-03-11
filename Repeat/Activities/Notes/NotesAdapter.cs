@@ -7,6 +7,7 @@ using Android.Widget;
 using Repeat.DAL.Entities;
 using Repeat.Droid.DAL.DependencyManagement;
 using Repeat.DAL;
+using Repeat.DAL.Repositories.Interfaces;
 
 namespace Repeat
 {
@@ -16,16 +17,14 @@ namespace Repeat
 		Activity _activity;
 		public NotesAdapter(Activity activity, int notebookId = 0)
 		{
-			//if notebookId == 0 then bring back all notes
-			var notesRepo = Kernel.Get<IUnitOfWork>().NotesRepository;
+			var notesRepo = Kernel.Get<INotesRepository>();
+			var notebooksRepository = Kernel.Get<INotebooksRepository>();
 			if (notebookId == 0)
 			{
-				_notesList = notesRepo.Get();
+				notebookId = notebooksRepository.Get().First().Id;
 			}
-			else
-			{
-				_notesList = notesRepo.GetNotesByNotebookId(notebookId);
-			}
+			_notesList = notesRepo.GetNotesByNotebookId(notebookId);
+
 			_activity = activity;
 		}
 

@@ -44,7 +44,6 @@
     <Compile Include="Repositories\Interfaces\INotesRepository.cs" />
     <Compile Include="Repositories\NotebooksRepository.cs" />
     <Compile Include="Repositories\NotesRepository.cs" />
-    <Compile Include="UnitOfWork.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Entities\Note.cs" />
     <Compile Include="Entities\Notebook.cs" />

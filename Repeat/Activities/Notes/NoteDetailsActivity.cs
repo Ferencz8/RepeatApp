@@ -13,9 +13,12 @@ namespace Repeat
 	{
 
 		INotesRepository _notesRepository;
+		int chosenNotebookId;
 
         protected override void OnCreate (Bundle bundle)
 		{
+			chosenNotebookId = Intent.GetIntExtra("notebookId", 0);
+
             RequestWindowFeature(WindowFeatures.ActionBar);
             ActionBar.SetHomeButtonEnabled(true);
             base.OnCreate (bundle);
@@ -31,7 +34,7 @@ namespace Repeat
 
 			_notesRepository = Kernel.Get<INotesRepository>();
             addButton.Click += delegate {
-				_notesRepository.Add(new Note() { Name = txtNote.Text, Content = txtContent.Text });
+				_notesRepository.Add(new Note() { Name = txtNote.Text, Content = txtContent.Text, NotebookId = chosenNotebookId });
 				Finish();
             };
         }

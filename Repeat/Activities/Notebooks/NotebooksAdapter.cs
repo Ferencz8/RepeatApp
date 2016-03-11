@@ -8,6 +8,7 @@ using Android.Widget;
 using Repeat.DAL.Entities;
 using Repeat.Droid.DAL.DependencyManagement;
 using Repeat.DAL.Repositories.Interfaces;
+using Repeat.DAL;
 
 namespace Repeat
 {

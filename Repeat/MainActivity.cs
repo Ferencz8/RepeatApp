@@ -15,62 +15,61 @@ using SQLite.Net.Platform.XamarinAndroid;
 
 namespace Repeat
 {
-    [Activity(Label = "Repeat", MainLauncher = true, Icon = "@drawable/icon")]
-    public class MainActivity : Activity
-    {
-        DrawerLayout mDrawerLayout;
-        List<string> notebookItems = new List<string>();
-        NotebooksAdapter notebooksAdapter;
-        ListView mLeftDrawer;
-        ListView notes;
-        Button addButton;
-        Button menuButton;
-        ActionBarDrawerToggle mDrawerToggle;
+	[Activity(Label = "Repeat", MainLauncher = true, Icon = "@drawable/icon")]
+	public class MainActivity : Activity
+	{
+		DrawerLayout mDrawerLayout;
+		List<string> notebookItems = new List<string>();
+		NotebooksAdapter notebooksAdapter;
+		ListView mLeftDrawer;
+		ListView notes;
+		Button addButton;
+		Button menuButton;
+		ActionBarDrawerToggle mDrawerToggle;
 
 
 		int chosenNotebookId;
 
 		protected override void OnCreate(Bundle bundle)
-        {
-            base.OnCreate(bundle);
+		{
+			StartUp.Configure();
 
-            // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
+			base.OnCreate(bundle);
+
+			// Set our view from the "main" layout resource
+			SetContentView(Resource.Layout.Main);
+
+			mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
+			mLeftDrawer = FindViewById<ListView>(Resource.Id.leftListView);
+			addButton = FindViewById<Button>(Resource.Id.addButton);
+			notes = FindViewById<ListView>(Resource.Id.notes);
+			menuButton = FindViewById<Button>(Resource.Id.menuButton);
+
 			
-            mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
-            mLeftDrawer = FindViewById<ListView>(Resource.Id.leftListView);
-            addButton = FindViewById<Button>(Resource.Id.addButton);
-            notes = FindViewById<ListView>(Resource.Id.notes);
-            menuButton = FindViewById<Button>(Resource.Id.menuButton);
-
-			
-			notes.Adapter = new NotesAdapter(this);
-
 			mDrawerToggle = new SideMenuDrawerToggle(this, mDrawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
 			mDrawerLayout.SetDrawerListener(mDrawerToggle);
 
 			notebooksAdapter = new NotebooksAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
 			mLeftDrawer.Adapter = notebooksAdapter;
+			chosenNotebookId = notebooksAdapter.GetItemAtPosition(0).Id;
+
+			notes.Adapter = new NotesAdapter(this, chosenNotebookId);
 
 			addButton.Click += delegate
-            {
-                StartActivity(typeof(NoteDetailsActivity));
-            };
-            menuButton.Click += delegate
-            {
-                mDrawerLayout.OpenDrawer(mLeftDrawer);
-            };
+			{
+				// StartActivity(typeof(NoteDetailsActivity));
+				Intent intent = new Intent(this, typeof(NoteDetailsActivity));
+				Bundle notesBundle = new Bundle();
+				notesBundle.PutInt("notebookId", chosenNotebookId);
+				intent.PutExtras(notesBundle);
+				StartActivity(intent,notesBundle);
+			};
+			menuButton.Click += delegate
+			{
+				mDrawerLayout.OpenDrawer(mLeftDrawer);
+			};
 
 			mLeftDrawer.ItemClick += listView_ItemClick;
-
-			InitializePlatformSpecificParameters();         
-        }
-
-		private void InitializePlatformSpecificParameters()
-		{
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "repeatDb.db3");
-			Util.SQLitePlatform = new SQLitePlatformAndroid();
-			Util.DatabasePath = path;
 		}
 
 		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
@@ -85,45 +84,45 @@ namespace Repeat
 		}
 
 		public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (mDrawerToggle.OnOptionsItemSelected(item))
-            {
-            }
+		{
+			if (mDrawerToggle.OnOptionsItemSelected(item))
+			{
+			}
 
-            switch (item.ItemId)
-            {
-                case Resource.Id.menuButton:
-                    {
-                        mDrawerLayout.OpenDrawer(mLeftDrawer);
-                    }
+			switch (item.ItemId)
+			{
+				case Resource.Id.menuButton:
+					{
+						mDrawerLayout.OpenDrawer(mLeftDrawer);
+					}
 
-                    return true;
+					return true;
 
-                default:
-                    return base.OnOptionsItemSelected(item);
-            }
-        }
+				default:
+					return base.OnOptionsItemSelected(item);
+			}
+		}
 
-        protected override void OnResume()
-        {
-            base.OnResume();
+		protected override void OnResume()
+		{
+			base.OnResume();
 			notes.Adapter = new NotesAdapter(this, chosenNotebookId); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
-        }
+		}
 
-        //protected override void OnDestroy()
-        //{
-        //    base.OnDestroy();
-        //}
+		//protected override void OnDestroy()
+		//{
+		//    base.OnDestroy();
+		//}
 
-        //protected override void OnStop()
-        //{
-        //    base.OnStop();
-        //}
+		//protected override void OnStop()
+		//{
+		//    base.OnStop();
+		//}
 
-        //protected override void OnPause()
-        //{
-        //    base.OnPause();
-        //}
-    }
+		//protected override void OnPause()
+		//{
+		//    base.OnPause();
+		//}
+	}
 }
 

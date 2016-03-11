@@ -15,14 +15,16 @@ namespace Repeat.Droid.DAL.DependencyManagement
 	{
 		public override void Load()
 		{
-			Bind<INotebooksRepository>().To<NotebooksRepository>();
-			Bind<INotesRepository>().To<NotesRepository>();
+			var db = new Db(Util.SQLitePlatform, Util.DatabasePath);
+
+			Bind<INotebooksRepository>().To<NotebooksRepository>().WithConstructorArgument("db", db);
+			Bind<INotesRepository>().To<NotesRepository>().WithConstructorArgument("db", db);
 
 
 			//http://stackoverflow.com/questions/25667834/constructor-with-multiple-arguments-with-ninject
-			Bind<IUnitOfWork>().To<UnitOfWork>().InSingletonScope()
-				.WithConstructorArgument("sqlLitePlatform", Util.SQLitePlatform)
-				.WithConstructorArgument("databasePath", Util.DatabasePath);
+			//Bind<IUnitOfWork>().To<UnitOfWork>().InSingletonScope()
+			//	.WithConstructorArgument("sqlLitePlatform", Util.SQLitePlatform)
+			//	.WithConstructorArgument("databasePath", Util.DatabasePath);
 		}
 	}
 }
