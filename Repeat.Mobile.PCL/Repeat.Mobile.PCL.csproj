@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E7B2007F-F511-49A9-9C56-D9F963033F4B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Repeat.Mobile.PCL</RootNamespace>
+    <AssemblyName>Repeat.Mobile.PCL</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="APICallers\GenericAPICaller.cs" />
+    <Compile Include="APICallers\Interfaces\IGenericAPICaller.cs" />
+    <Compile Include="APICallers\Interfaces\INoteAPICaller.cs" />
+    <Compile Include="APICallers\Interfaces\INotebookAPICaller.cs" />
+    <Compile Include="APICallers\NoteAPICaller.cs" />
+    <Compile Include="APICallers\NotebookAPICaller.cs" />
+    <Compile Include="Common\APIRoutes.cs" />
+    <Compile Include="Common\HttpClientExtensions.cs" />
+    <Compile Include="DAL\Db.cs" />
+    <Compile Include="DAL\Enums\SyncStatus.cs" />
+    <Compile Include="DependencyManagement\APICallerModule.cs" />
+    <Compile Include="DependencyManagement\Kernel.cs" />
+    <Compile Include="DependencyManagement\RepositoryModule.cs" />
+    <Compile Include="DAL\IUnitOfWork.cs" />
+    <Compile Include="DAL\Repositories\GenericRepository.cs" />
+    <Compile Include="DAL\Repositories\Interfaces\IGenericRepository.cs" />
+    <Compile Include="DAL\Repositories\Interfaces\INotebooksRepository.cs" />
+    <Compile Include="DAL\Repositories\Interfaces\INotesRepository.cs" />
+    <Compile Include="DAL\Repositories\NotebooksRepository.cs" />
+    <Compile Include="DAL\Repositories\NotesRepository.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="DAL\Entities\Note.cs" />
+    <Compile Include="DAL\Entities\Notebook.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SQLiteNetExtensions">
+      <HintPath>..\libs\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -3,9 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat", "Repeat\Repeat.csproj", "{C6A8E88F-B050-4CD7-8A54-50661A03FA90}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mobile", "Mobile", "{428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.DAL", "Repeat.Droid.DAL\Repeat.DAL.csproj", "{E7B2007F-F511-49A9-9C56-D9F963033F4B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotebooksAPI", "NotebooksAPI", "{913D5D55-C22D-4063-91A7-C44A26A21728}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SyncronizerService", "SyncronizerService", "{C04327B6-4D45-4BF7-A77C-64786DA90AF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.Mobile", "Repeat.Mobile\Repeat.Mobile.csproj", "{C6A8E88F-B050-4CD7-8A54-50661A03FA90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.Mobile.PCL", "Repeat.Mobile.PCL\Repeat.Mobile.PCL.csproj", "{E7B2007F-F511-49A9-9C56-D9F963033F4B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Repeat.NotebooksAPI", "Repeat.NotebooksAPI\Repeat.NotebooksAPI.xproj", "{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI.Domain", "Repeat.NotebooksAPI.Domain\Repeat.NotebooksAPI.Domain.csproj", "{28C09761-DF8C-4115-829F-FC3C7CC47063}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI.Infrastructure", "Repeat.NotebooksAPI.Infrastructure\Repeat.NotebooksAPI.Infrastructure.csproj", "{3DB71F52-8281-4039-BC5F-A66395E38AF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService", "Repeat.SyncronizerService\Repeat.SyncronizerService.csproj", "{8CC68A1E-0006-450F-9894-6AE502DC0AC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,8 +37,32 @@ Global
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB71F52-8281-4039-BC5F-A66395E38AF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB71F52-8281-4039-BC5F-A66395E38AF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB71F52-8281-4039-BC5F-A66395E38AF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB71F52-8281-4039-BC5F-A66395E38AF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C6A8E88F-B050-4CD7-8A54-50661A03FA90} = {428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}
+		{E7B2007F-F511-49A9-9C56-D9F963033F4B} = {428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}
+		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E} = {913D5D55-C22D-4063-91A7-C44A26A21728}
+		{28C09761-DF8C-4115-829F-FC3C7CC47063} = {913D5D55-C22D-4063-91A7-C44A26A21728}
+		{3DB71F52-8281-4039-BC5F-A66395E38AF9} = {913D5D55-C22D-4063-91A7-C44A26A21728}
+		{8CC68A1E-0006-450F-9894-6AE502DC0AC6} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
 	EndGlobalSection
 EndGlobal

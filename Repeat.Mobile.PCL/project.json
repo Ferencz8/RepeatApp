@@ -1,0 +1,11 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "Newtonsoft.Json": "7.0.1",
+    "Portable.Ninject": "3.3.1",
+    "SQLite.Net-PCL": "3.1.1"
+  },
+  "frameworks": {
+    ".NETPortable,Version=v4.5,Profile=Profile7": {}
+  }
+}

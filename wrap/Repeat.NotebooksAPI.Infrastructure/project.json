@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net451": {
+      "wrappedProject": "../../Repeat.NotebooksAPI.Infrastructure/Repeat.NotebooksAPI.Infrastructure.csproj",
+      "bin": {
+        "assembly": "../../Repeat.NotebooksAPI.Infrastructure/obj/{configuration}/Repeat.NotebooksAPI.Infrastructure.dll",
+        "pdb": "../../Repeat.NotebooksAPI.Infrastructure/obj/{configuration}/Repeat.NotebooksAPI.Infrastructure.pdb"
+      },
+      "dependencies": {
+        "EntityFramework": "6.1.3",
+        "Repeat.NotebooksAPI.Domain": "1.0.0-*"
+      }
+    }
+  }
+}
