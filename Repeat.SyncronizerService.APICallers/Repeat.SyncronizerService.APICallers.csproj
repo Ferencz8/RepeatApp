@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8CC68A1E-0006-450F-9894-6AE502DC0AC6}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{B628016F-0073-4D3B-B6B3-9069BFDB26A4}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Repeat.SyncronizerService</RootNamespace>
-    <AssemblyName>Repeat.SyncronizerService</AssemblyName>
+    <RootNamespace>Repeat.SyncronizerService.APICallers</RootNamespace>
+    <AssemblyName>Repeat.SyncronizerService.APICallers</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,34 +30,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RabbitMQ.Client, Version=3.6.1.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
-      <HintPath>..\packages\RabbitMQ.Client.3.6.1\lib\net45\RabbitMQ.Client.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Config.cs" />
-    <Compile Include="Common\ObjectConverter.cs" />
-    <Compile Include="Interfaces\IQueue.cs" />
-    <Compile Include="RabbitMQ.cs" />
-    <Compile Include="Syncher.cs" />
+    <Compile Include="Interfaces\INoteAPICaller.cs" />
+    <Compile Include="Interfaces\INotebookAPICaller.cs" />
+    <Compile Include="NoteAPICaller.cs" />
+    <Compile Include="NotebookAPICaller.cs" />
+    <Compile Include="CentralAPICaller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Repeat.GenericLibs.PCL\Repeat.GenericLibs.PCL.csproj">
       <Project>{b9cbf137-1b87-44d7-9907-1d9eb30d63bd}</Project>
       <Name>Repeat.GenericLibs.PCL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Repeat.SyncronizerService.APICallers\Repeat.SyncronizerService.APICallers.csproj">
-      <Project>{b628016f-0073-4d3b-b6b3-9069bfdb26a4}</Project>
-      <Name>Repeat.SyncronizerService.APICallers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Repeat.SyncronizerService.DAL\Repeat.SyncronizerService.DAL.csproj">
       <Project>{8020d6f3-2d55-4b77-8b2d-699fbe807008}</Project>

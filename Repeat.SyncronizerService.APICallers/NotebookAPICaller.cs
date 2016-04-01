@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
-using Repeat.Mobile.PCL.Common;
-using Repeat.Mobile.PCL.DAL.Entities;
-using Repeat.Mobile.PCL.APICallers;
-using Repeat.Mobile.PCL.APICallers.Interfaces;
 using Repeat.GenericLibs.PCL.APICallers;
+using Repeat.SyncronizerService.DAL.DTOs;
+using Repeat.SyncronizerService.APICallers.Interfaces;
 
-namespace Repeat.Mobile.PCL.APICallers
+namespace Repeat.SyncronizerService.APICallers
 {
 	public class NotebookAPICaller : GenericAPICaller<Notebook>, INotebookAPICaller
 	{
@@ -19,7 +16,7 @@ namespace Repeat.Mobile.PCL.APICallers
 
 		}
 
-		public Task<List<Note>> GetNotes(string apiRoute)
+		public Task<List<Note>> GetNotes(string apiRoute, Int64 notebookId, DateTime? lastSyncDate = null)
 		{
 			throw new NotImplementedException();
 		}

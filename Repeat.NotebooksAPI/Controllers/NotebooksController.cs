@@ -50,13 +50,21 @@ namespace Repeat.NotebooksAPI.Controllers
 		// GET api/notebooks/5/notes
 		[Route("{notebookId}/notes")]
 		[HttpGet("{notebookId}")]
-		public JsonResult GetNotes(Int64 notebookId)
+		public JsonResult GetNotes(Int64 notebookId, DateTime? lastSyncDate)
 		{
 			List<Note> notes = new List<Note>();
+
 			var notebook = _unitOfWork.NotebooksRepository.GetByID(notebookId);
 			if (notebook != null)
 			{
-				notes = notebook.Notes;
+				if (!lastSyncDate.HasValue)
+				{
+					notes = notebook.Notes;
+				}
+				else
+				{
+					notes = notebook.Notes.Where(n => n.ModifiedDate > lastSyncDate).ToList();
+				}
 			}
 			return Json(notes, _jsonSerializerSettings);
 		}

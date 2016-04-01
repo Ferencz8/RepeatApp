@@ -5,11 +5,11 @@
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E7B2007F-F511-49A9-9C56-D9F963033F4B}</ProjectGuid>
+    <ProjectGuid>{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Repeat.Mobile.PCL</RootNamespace>
-    <AssemblyName>Repeat.Mobile.PCL</AssemblyName>
+    <RootNamespace>Repeat.GenericLibsPCL</RootNamespace>
+    <AssemblyName>Repeat.GenericLibsPCL</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,43 +35,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="APICallers\GenericAPICaller.cs" />
+    <Compile Include="APICallers\HttpClientExtensions.cs" />
     <Compile Include="APICallers\Interfaces\IGenericAPICaller.cs" />
-    <Compile Include="APICallers\Interfaces\INoteAPICaller.cs" />
-    <Compile Include="APICallers\Interfaces\INotebookAPICaller.cs" />
-    <Compile Include="APICallers\NoteAPICaller.cs" />
-    <Compile Include="APICallers\NotebookAPICaller.cs" />
-    <Compile Include="Common\APIRoutes.cs" />
-    <Compile Include="Common\HttpClientExtensions.cs" />
-    <Compile Include="DAL\Db.cs" />
-    <Compile Include="DAL\Enums\SyncStatus.cs" />
-    <Compile Include="DependencyManagement\APICallerModule.cs" />
-    <Compile Include="DependencyManagement\Kernel.cs" />
-    <Compile Include="DependencyManagement\RepositoryModule.cs" />
-    <Compile Include="DAL\IUnitOfWork.cs" />
-    <Compile Include="DAL\Repositories\GenericRepository.cs" />
-    <Compile Include="DAL\Repositories\Interfaces\IGenericRepository.cs" />
-    <Compile Include="DAL\Repositories\Interfaces\INotebooksRepository.cs" />
-    <Compile Include="DAL\Repositories\Interfaces\INotesRepository.cs" />
-    <Compile Include="DAL\Repositories\NotebooksRepository.cs" />
-    <Compile Include="DAL\Repositories\NotesRepository.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="DAL\Entities\Note.cs" />
-    <Compile Include="DAL\Entities\Notebook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="SQLiteNetExtensions">
-      <HintPath>..\libs\SQLiteNetExtensions.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Repeat.GenericLibs.PCL\Repeat.GenericLibs.PCL.csproj">
-      <Project>{b9cbf137-1b87-44d7-9907-1d9eb30d63bd}</Project>
-      <Name>Repeat.GenericLibs.PCL</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Repositories\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

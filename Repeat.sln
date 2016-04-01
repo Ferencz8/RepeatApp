@@ -21,6 +21,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI.Infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService", "Repeat.SyncronizerService\Repeat.SyncronizerService.csproj", "{8CC68A1E-0006-450F-9894-6AE502DC0AC6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService.DAL", "Repeat.SyncronizerService.DAL\Repeat.SyncronizerService.DAL.csproj", "{8020D6F3-2D55-4B77-8B2D-699FBE807008}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GenericLibraries", "GenericLibraries", "{7568F4E6-28E0-4810-84D4-493F2C31FD34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.GenericLibs.PCL", "Repeat.GenericLibs.PCL\Repeat.GenericLibs.PCL.csproj", "{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService.APICallers", "Repeat.SyncronizerService.APICallers\Repeat.SyncronizerService.APICallers.csproj", "{B628016F-0073-4D3B-B6B3-9069BFDB26A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +61,18 @@ Global
 		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CC68A1E-0006-450F-9894-6AE502DC0AC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8020D6F3-2D55-4B77-8B2D-699FBE807008}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8020D6F3-2D55-4B77-8B2D-699FBE807008}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8020D6F3-2D55-4B77-8B2D-699FBE807008}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8020D6F3-2D55-4B77-8B2D-699FBE807008}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +84,8 @@ Global
 		{28C09761-DF8C-4115-829F-FC3C7CC47063} = {913D5D55-C22D-4063-91A7-C44A26A21728}
 		{3DB71F52-8281-4039-BC5F-A66395E38AF9} = {913D5D55-C22D-4063-91A7-C44A26A21728}
 		{8CC68A1E-0006-450F-9894-6AE502DC0AC6} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
+		{8020D6F3-2D55-4B77-8B2D-699FBE807008} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
+		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD} = {7568F4E6-28E0-4810-84D4-493F2C31FD34}
+		{B628016F-0073-4D3B-B6B3-9069BFDB26A4} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
 	EndGlobalSection
 EndGlobal

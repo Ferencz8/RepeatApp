@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repeat.SyncronizerService.Interfaces
+namespace Repeat.SyncronizerService.DAL.DTOs
 {
-	public interface ISubscriber
+	public enum SyncStatus
 	{
+		Yes = 1,
+		No = 2
 	}
 }

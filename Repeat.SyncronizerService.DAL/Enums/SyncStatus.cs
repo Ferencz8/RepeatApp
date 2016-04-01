@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repeat.SyncronizerService.Interfaces
+namespace Repeat.SyncronizerService.DAL.Enums
 {
-	interface IPublisher
+	public enum SyncStatus
 	{
+		Running = 0,
+		Stopped
 	}
 }

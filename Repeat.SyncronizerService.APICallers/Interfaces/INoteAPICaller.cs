@@ -1,7 +1,7 @@
 ﻿using Repeat.GenericLibs.PCL.APICallers.Interfaces;
-using Repeat.Mobile.PCL.DAL.Entities;
+using Repeat.SyncronizerService.DAL.DTOs;
 
-namespace Repeat.Mobile.PCL.APICallers.Interfaces
+namespace Repeat.SyncronizerService.APICallers.Interfaces
 {
 	public interface INoteAPICaller : IGenericAPICaller<Note>
 	{
