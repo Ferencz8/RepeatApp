@@ -9,7 +9,7 @@ namespace Repeat.SyncronizerService.DAL.DTOs
 	public class SyncResult
 	{
 
-		public Guid UserId { get; set; }
+		public string UserId { get; set; }
 
 		public bool Result { get; set; }
 	}

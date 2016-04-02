@@ -11,7 +11,7 @@ namespace Repeat.SyncronizerService.DAL.DTOs
 {
 	public class Notebook
 	{
-		public Guid Id { get; set; }
+		public Int64 Id { get; set; }
 
 		public string Name { get; set; }
 

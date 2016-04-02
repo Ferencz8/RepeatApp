@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 namespace Repeat.NotebooksAPI.Domain.Entities
 {
-
-	//https://stackoverflow.com/questions/262547/reasons-not-to-use-an-auto-incrementing-number-for-a-primary-key
-	//https://stackoverflow.com/questions/932102/what-data-type-is-recommended-for-id-columns
 	public class Notebook
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Guid Id { get; set; }
+		public Int64 Id { get; set; }//TODO:: check if it is or not better to use a key of type int
+
 
 		[StringLength(100)]
 		[Index(IsUnique = true)]

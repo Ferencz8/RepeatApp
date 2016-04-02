@@ -7,9 +7,9 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 {
 	public class Notebook
 	{
-		[PrimaryKey]
+		[PrimaryKey, AutoIncrement]
 		//[JsonIgnore]
-		public Guid Id { get; set; }
+		public int Id { get; set; }
 
 		[Unique]
 		public string Name { get; set; }

@@ -11,7 +11,6 @@ using System.Linq;
 
 namespace Repeat.SyncronizerService
 {
-	//TODO:: implement a solution for when the sync service might become unavailable
 	public class Syncher
 	{
 		public static void Main(string[] args)
@@ -32,10 +31,7 @@ namespace Repeat.SyncronizerService
 		public void Launch()
 		{
 
-			//TODO:: check behaviour when multiple accounts are used on the same type of device - maybe instead of using a Device as a string 
-			//an id should be set for each device and it should be sent along when sync request is made. Also this device id should maybe be kept 
-			//in UserService db ? or on the specific platform db(if so then a device specification should be made along with the id 
-			//eg: Android - 12349687521, Android - 5325252) -> so that when sync process starts this id will be temporarily/permanently stored in the db
+
 			using (IQueue _queue = new RabbitMQ())
 			{
 				_queue.ProcessMessage<RequestSync>(Config.RabbitMQ_PrepareSyncQueue, Process_PrepareSyncQueue);
@@ -81,38 +77,30 @@ namespace Repeat.SyncronizerService
 
 					foreach (var notebook in message.Notebooks)
 					{
-						//CHECK iF notebooks exists -> if not simply add it
-						Notebook apiNotebook = await _apiCaller.NotebookAPICaller.GetById("",notebook.Id);
-						if (apiNotebook != null)
+						//todo:: CHECK iF notebooks exists -> if not simply add it
+						List<Note> apiNotes = await _apiCaller.NotebookAPICaller.GetNotes("", notebook.Id, userLastSync.LastSyncDate);
+												
+						foreach(var apiNote in apiNotes)
 						{
-							List<Note> apiNotes = await _apiCaller.NotebookAPICaller.GetNotes("", notebook.Id, userLastSync.LastSyncDate);
-
-							foreach (var apiNote in apiNotes)
+							if (notebook.Notes.Exists(n => n.Id.Equals(apiNote.Id)))
 							{
-								if (notebook.Notes.Exists(n => n.Id.Equals(apiNote.Id)))
-								{
-									//insert note in api & maybe as extra feature mark the note as conflict
+								//Todo:: insert note in api & mark the note as conflict
 
-									notesToBeInserted.Add(apiNote);
+								notesToBeInserted.Add(apiNote);
+							}
+							else
+							{
+								//if note exists in api -> update else -> insert
+								Note apiNoteCheck = await _apiCaller.NoteAPICaller.GetById("", apiNote.Id);
+								if(apiNoteCheck != null)
+								{
+									notesToBeUpdated.Add(apiNote);
 								}
 								else
 								{
-									//if note exists in api -> update else -> insert
-									Note apiNoteCheck = await _apiCaller.NoteAPICaller.GetById("", apiNote.Id);
-									if (apiNoteCheck != null)
-									{
-										notesToBeUpdated.Add(apiNote);
-									}
-									else
-									{
-										notesToBeInserted.Add(apiNote);
-									}
+									notesToBeInserted.Add(apiNote);
 								}
 							}
-						}
-						else
-						{
-							_apiCaller.NotebookAPICaller.Add("", notebook);
 						}
 					}
 
