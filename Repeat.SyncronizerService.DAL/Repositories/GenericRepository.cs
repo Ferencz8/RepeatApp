@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL.Repositories
 {
-	//TODO:: externalize this class <- this is duplicate code
 	public class GenericRepository<TEntity> : IGenericRepository<TEntity>
 		where TEntity : class
 	{

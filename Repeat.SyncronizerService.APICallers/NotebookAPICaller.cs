@@ -16,7 +16,7 @@ namespace Repeat.SyncronizerService.APICallers
 
 		}
 
-		public Task<List<Note>> GetNotes(string apiRoute, Int64 notebookId, DateTime? lastSyncDate = null)
+		public Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null)
 		{
 			throw new NotImplementedException();
 		}

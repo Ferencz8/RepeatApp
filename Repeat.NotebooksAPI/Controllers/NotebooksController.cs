@@ -73,6 +73,7 @@ namespace Repeat.NotebooksAPI.Controllers
 		[HttpPost]
 		public void Post([FromBody]Notebook notebook)
 		{
+			//TODO:: check here the notes should also be added to the db
 			_unitOfWork.NotebooksRepository.Add(notebook);
 			_unitOfWork.Save();
 		}

@@ -13,9 +13,9 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Int64 Id { get; set; }
+		public Guid Id { get; set; }
 
-		public Int64 NotebookId { get; set; }
+		public Guid NotebookId { get; set; }
 
 		[ForeignKey("NotebookId")]
 		public Notebook Notebook { get; set; }

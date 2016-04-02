@@ -7,12 +7,12 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 {
     public class Note
     {
-		[PrimaryKey, AutoIncrement]
+		[PrimaryKey]
 		//[JsonIgnore]
-		public int Id { get; set; }
+		public Guid Id { get; set; }
 
 		[ForeignKey(typeof(Notebook))]
-		public int NotebookId { get; set; }
+		public Guid NotebookId { get; set; }
 
 		[OneToOne]
 		public Notebook Notebook { get; set; }

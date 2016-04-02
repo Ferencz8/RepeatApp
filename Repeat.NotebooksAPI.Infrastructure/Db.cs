@@ -22,9 +22,7 @@ namespace Repeat.NotebooksAPI.Infrastructure
 		{
 			Database.SetInitializer(new DbInitializer());
 		}
-
-
-		//TODO:: find out what the IDbSet does
+		
 		public IDbSet<Note> Notes { get; set; }
 
 		public IDbSet<Notebook> Notebooks { get; set; }
