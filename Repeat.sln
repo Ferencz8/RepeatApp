@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.Mobile", "Repeat.Mob
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.Mobile.PCL", "Repeat.Mobile.PCL\Repeat.Mobile.PCL.csproj", "{E7B2007F-F511-49A9-9C56-D9F963033F4B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Repeat.NotebooksAPI", "Repeat.NotebooksAPI\Repeat.NotebooksAPI.xproj", "{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI.Domain", "Repeat.NotebooksAPI.Domain\Repeat.NotebooksAPI.Domain.csproj", "{28C09761-DF8C-4115-829F-FC3C7CC47063}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI.Infrastructure", "Repeat.NotebooksAPI.Infrastructure\Repeat.NotebooksAPI.Infrastructure.csproj", "{3DB71F52-8281-4039-BC5F-A66395E38AF9}"
@@ -29,7 +27,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.GenericLibs.PCL", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService.APICallers", "Repeat.SyncronizerService.APICallers\Repeat.SyncronizerService.APICallers.csproj", "{B628016F-0073-4D3B-B6B3-9069BFDB26A4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xamarin.Stomp.Shared", "Xamarin.Stomp.Shared\Xamarin.Stomp.Shared.shproj", "{0688E24C-C0D3-4156-ADB2-E8093D79B7B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.NotebooksAPI", "Repeat.NotebooksAPI\Repeat.NotebooksAPI.csproj", "{2FE8BD5A-1778-44A5-B7E4-146938B76A17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repeat.SyncronizerService.DTOs", "Repeat.SyncronizerService.DTOs\Repeat.SyncronizerService.DTOs.csproj", "{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Xamarin.Stomp.Shared\Xamarin.Stomp.Shared.projitems*{c6a8e88f-b050-4cd7-8a54-50661a03fa90}*SharedItemsImports = 4
+		Xamarin.Stomp.Shared\Xamarin.Stomp.Shared.projitems*{0688e24c-c0d3-4156-adb2-e8093d79b7b1}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -45,10 +53,6 @@ Global
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28C09761-DF8C-4115-829F-FC3C7CC47063}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -73,6 +77,14 @@ Global
 		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B628016F-0073-4D3B-B6B3-9069BFDB26A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FE8BD5A-1778-44A5-B7E4-146938B76A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FE8BD5A-1778-44A5-B7E4-146938B76A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FE8BD5A-1778-44A5-B7E4-146938B76A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FE8BD5A-1778-44A5-B7E4-146938B76A17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,12 +92,14 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C6A8E88F-B050-4CD7-8A54-50661A03FA90} = {428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}
 		{E7B2007F-F511-49A9-9C56-D9F963033F4B} = {428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}
-		{B73596E7-7EBA-4A7C-95CD-75F5C9F2911E} = {913D5D55-C22D-4063-91A7-C44A26A21728}
 		{28C09761-DF8C-4115-829F-FC3C7CC47063} = {913D5D55-C22D-4063-91A7-C44A26A21728}
 		{3DB71F52-8281-4039-BC5F-A66395E38AF9} = {913D5D55-C22D-4063-91A7-C44A26A21728}
 		{8CC68A1E-0006-450F-9894-6AE502DC0AC6} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
 		{8020D6F3-2D55-4B77-8B2D-699FBE807008} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
 		{B9CBF137-1B87-44D7-9907-1D9EB30D63BD} = {7568F4E6-28E0-4810-84D4-493F2C31FD34}
 		{B628016F-0073-4D3B-B6B3-9069BFDB26A4} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
+		{0688E24C-C0D3-4156-ADB2-E8093D79B7B1} = {428E1B84-B7AB-47FF-8FFB-1C98CA0492CD}
+		{2FE8BD5A-1778-44A5-B7E4-146938B76A17} = {913D5D55-C22D-4063-91A7-C44A26A21728}
+		{37B25BDA-9969-40A8-9ED7-2977C0E6A0DF} = {C04327B6-4D45-4BF7-A77C-64786DA90AF6}
 	EndGlobalSection
 EndGlobal
