@@ -1,6 +1,7 @@
 ﻿using Repeat.SyncronizerService.DAL.Entities;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL
 {
-	public class Db : DbContext
+	public class DbSync : DbContext
 	{
 
-		public Db()
-			: base("Sync")
+		public DbSync()
+			: base("name=Db")
 		{
 
 		}
 
-		static Db()
+		static DbSync()
 		{
 			Database.SetInitializer(new DbInitializer());
 		}

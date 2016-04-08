@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Repeat.GenericLibs.PCL.APICallers;
-using Repeat.SyncronizerService.DAL.DTOs;
+using Repeat.SyncronizerService.DTOs;
 using Repeat.SyncronizerService.APICallers.Interfaces;
+using Newtonsoft.Json;
+using System.Configuration;
 
 namespace Repeat.SyncronizerService.APICallers
 {
@@ -11,14 +13,30 @@ namespace Repeat.SyncronizerService.APICallers
 	{
 
 		public NotebookAPICaller()
-			:base("http://www.repeat.somee.com/")
+			:base(ConfigurationManager.AppSettings["NotebookAPI-Address"])
 		{
-
 		}
 
-		public Task<List<Note>> GetNotes(string apiRoute, Int64 notebookId, DateTime? lastSyncDate = null)
+		public async Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null)
 		{
-			throw new NotImplementedException();
+			List<Note> elements = new List<Note>();
+			try
+			{
+				var client = HttpClientExtensions.GetAPIClient(_apiURL);
+				string date = !lastSyncDate.HasValue ? string.Empty : "?lastSyncDate=" + lastSyncDate.Value.ToShortDateString();
+
+				var response = await client.GetAsync(_apiURL + string.Format(apiRoute, notebookId) + date);
+				if (response != null)
+				{
+					string str = await response.Content.ReadAsStringAsync();
+					elements = JsonConvert.DeserializeObject<List<Note>>(str, _settings);
+				}
+			}
+			catch (Exception e)
+			{
+				//TODO LOG
+			}
+			return elements;
 		}
 	}
 }

@@ -33,9 +33,7 @@ namespace Repeat.SyncronizerService
 
 		public RabbitMQ()
 		{
-			RabbitMQ queue = new RabbitMQ();
-
-			_connection = queue.Connection;
+			_connection = this.Connection;
 
 			_channel = _connection.CreateModel();
 		}
@@ -44,7 +42,7 @@ namespace Repeat.SyncronizerService
 		{
 			DeclareQueue(queueName);
 
-			var body = ObjectConverter.ObjectToByteArray(message);//Encoding.UTF8.GetBytes(message.ToString());
+			var body = ObjectConverter.ObjectToByteArray(message);
 
 			_channel.BasicPublish(exchange: "",
 								 routingKey: queueName,
@@ -61,7 +59,7 @@ namespace Repeat.SyncronizerService
 			consumer.Received += (model, ea) =>
 			{
 				var body = ea.Body;
-				T message = ObjectConverter.ByteArrayToObject<T>(body);
+				T message = ObjectConverter.JSONToObject<T>(body);
 				actionOnMessage(message);
 			};
 			_channel.BasicConsume(queue: queueName, noAck: true, consumer: consumer);
@@ -77,7 +75,7 @@ namespace Repeat.SyncronizerService
 		private void DeclareQueue(string queueName)
 		{
 			_channel.QueueDeclare(queue: queueName,
-				durable: false,
+				durable: true,
 				exclusive: false,
 				autoDelete: false,
 				arguments: null);
@@ -89,7 +87,7 @@ namespace Repeat.SyncronizerService
 			{
 				UserName = Config.RabbitMQUsername,
 				Password = Config.RabbitMQPassword,
-				HostName = Config.RabbitMQUsername,
+				HostName = Config.RabbitMQHostName,
 				Port = Int32.Parse(Config.RabbitMQPort),
 				VirtualHost = Config.RabbitMQVirtualHost,
 			};

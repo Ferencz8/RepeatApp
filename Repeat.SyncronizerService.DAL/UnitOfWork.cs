@@ -11,7 +11,7 @@ namespace Repeat.SyncronizerService.DAL
 	public class UnitOfWork : IUnitOfWork
 	{
 
-		Db _db = new Db();
+		DbSync _db = new DbSync();
 		IDevicesRepository _devicesRepository;
 		IUsersLastSyncRepository _usersLastSyncRepository;
 

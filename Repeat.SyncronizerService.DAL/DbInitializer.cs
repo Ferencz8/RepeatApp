@@ -9,30 +9,40 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL
 {
-	public class DbInitializer : CreateDatabaseIfNotExists<Db>
+	public class DbInitializer : CreateDatabaseIfNotExists<DbSync>
 	{
 		public DbInitializer() : base()
 		{
 
 		}
 
-		protected override void Seed(Db context)
+		protected override void Seed(DbSync context)
 		{
 			base.Seed(context);
 
 			Initialize(context);
 		}
 
-		private void Initialize(Db context)
+		private void Initialize(DbSync context)
 		{
+
+
 			Device device = new Device()
 			{
 				Id = Guid.NewGuid(),
-				Name = "Android",
+				Name = "ANDROID",
+			};
+
+			UserLastSync user = new UserLastSync()
+			{
+				UserId = Guid.Empty,
+				Device = device,
+				LastSyncDate = DateTime.Now.AddDays(-30),
+				SyncStatus = Enums.SyncStatus.Stopped,
 			};
 
 			context.Devices.Add(device);
-
+			context.UsersLastSync.Add(user);
 			try
 			{
 				context.SaveChanges();

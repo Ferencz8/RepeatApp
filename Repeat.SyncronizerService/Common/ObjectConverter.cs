@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,28 +13,26 @@ namespace Repeat.SyncronizerService.Common
 	{
 		//https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
 		// Convert an object to a byte array
-		public static byte[] ObjectToByteArray(Object obj)
+		private static JsonSerializerSettings _settings = new JsonSerializerSettings()
 		{
-			BinaryFormatter bf = new BinaryFormatter();
-			using (var ms = new MemoryStream())
-			{
-				bf.Serialize(ms, obj);
-				return ms.ToArray();
-			}
+			ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+		};
+
+		public static byte[] ObjectToByteArray(object obj)
+		{
+			var messageAsJson = JsonConvert.SerializeObject(obj, _settings);
+
+			return Encoding.UTF8.GetBytes(messageAsJson);
 		}
 
 		// Convert a byte array to an Object
-		public static T ByteArrayToObject<T>(byte[] arrBytes)
+		public static T JSONToObject<T>(byte[] arrBytes)
 			where T : class
 		{
-			using (var memStream = new MemoryStream())
-			{
-				var binForm = new BinaryFormatter();
-				memStream.Write(arrBytes, 0, arrBytes.Length);
-				memStream.Seek(0, SeekOrigin.Begin);
-				var obj = binForm.Deserialize(memStream) as T;				
-				return obj;
-			}
+
+			var messageAsJson = Encoding.UTF8.GetString(arrBytes);
+
+			return JsonConvert.DeserializeObject<T>(messageAsJson, _settings);
 		}
 	}
 }

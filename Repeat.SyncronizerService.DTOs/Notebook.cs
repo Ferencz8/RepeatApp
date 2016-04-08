@@ -1,17 +1,14 @@
-﻿using Repeat.SyncronizerService.DAL.DTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repeat.SyncronizerService.DAL.DTOs
+namespace Repeat.SyncronizerService.DTOs
 {
 	public class Notebook
 	{
-		public Int64 Id { get; set; }
+		public Guid Id { get; set; }
 
 		public string Name { get; set; }
 
@@ -23,6 +20,6 @@ namespace Repeat.SyncronizerService.DAL.DTOs
 
 		public bool Deleted { get; set; }
 
-		public DateTime DeletedDate { get; set; }
+		public DateTime? DeletedDate { get; set; }
 	}
 }

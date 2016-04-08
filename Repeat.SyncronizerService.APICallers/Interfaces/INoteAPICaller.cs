@@ -1,5 +1,5 @@
 ﻿using Repeat.GenericLibs.PCL.APICallers.Interfaces;
-using Repeat.SyncronizerService.DAL.DTOs;
+using Repeat.SyncronizerService.DTOs;
 
 namespace Repeat.SyncronizerService.APICallers.Interfaces
 {

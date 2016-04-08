@@ -9,16 +9,15 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL.Repositories
 {
-	//TODO:: externalize this class <- this is duplicate code
 	public class GenericRepository<TEntity> : IGenericRepository<TEntity>
 		where TEntity : class
 	{
 		//http://www.asp.net/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
 		//http://www.codeproject.com/Articles/814768/CRUD-Operations-Using-the-Generic-Repository-Patte
-		Db _db;
+		DbSync _db;
 		DbSet<TEntity> _dbSet;
 
-		public GenericRepository(Db db)
+		public GenericRepository(DbSync db)
 		{
 			_db = db;
 			_dbSet = _db.Set<TEntity>();

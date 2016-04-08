@@ -11,7 +11,7 @@ namespace Repeat.SyncronizerService.DAL.Repositories
 	public class DevicesRepository : GenericRepository<Device>, IDevicesRepository
 	{
 
-		public DevicesRepository(Db db)
+		public DevicesRepository(DbSync db)
 			: base(db)
 		{
 

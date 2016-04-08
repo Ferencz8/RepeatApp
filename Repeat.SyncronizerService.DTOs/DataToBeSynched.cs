@@ -4,15 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repeat.SyncronizerService.DAL.DTOs
+namespace Repeat.SyncronizerService.DTOs
 {
-	public class DataInfoToBeSynched
+	public class DataToBeSynched : SyncRequest
 	{
 
-		public Guid UserId { get; set; }
-
 		public List<Notebook> Notebooks { get; set; }
-
-		public string Device { get; set; }
 	}
 }

@@ -1,5 +1,5 @@
-﻿using Repeat.SyncronizerService.DAL.DTOs;
-using Repeat.SyncronizerService.DAL.Entities;
+﻿using Repeat.SyncronizerService.DAL.Entities;
+using Repeat.SyncronizerService.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,6 @@ namespace Repeat.SyncronizerService.DAL.Repositories.Interfaces
 {
 	public interface IUsersLastSyncRepository : IGenericRepository<UserLastSync>
 	{
-		UserLastSync GetUserLastSyncFor(RequestSync message);
+		UserLastSync GetUserLastSyncFor(SyncRequest message);
 	}
 }

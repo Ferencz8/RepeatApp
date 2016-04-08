@@ -8,7 +8,7 @@ namespace Repeat.SyncronizerService.DAL.Enums
 {
 	public enum SyncStatus
 	{
-		Running = 0,
-		Stopped
+		Stopped = 0,
+		Running = 1,
 	}
 }

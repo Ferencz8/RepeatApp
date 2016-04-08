@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repeat.SyncronizerService.DAL.DTOs
+namespace Repeat.SyncronizerService.DTOs
 {
-	public class RequestSync
+	public class SyncRequest
 	{
 
 		public Guid UserId { get; set; }

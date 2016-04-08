@@ -1,4 +1,4 @@
-﻿using Repeat.SyncronizerService.DAL.DTOs;
+﻿using Repeat.SyncronizerService.DTOs;
 using Repeat.SyncronizerService.DAL.Entities;
 using Repeat.SyncronizerService.DAL.Repositories.Interfaces;
 using System;
@@ -11,15 +11,15 @@ namespace Repeat.SyncronizerService.DAL.Repositories
 {
 	public class UsersLastSyncRepository : GenericRepository<UserLastSync>, IUsersLastSyncRepository
 	{
-		private Db _db;
+		private DbSync _db;
 
-		public UsersLastSyncRepository(Db db)
+		public UsersLastSyncRepository(DbSync db)
 			: base(db)
 		{
 			_db = db;
 		}
 
-		public UserLastSync GetUserLastSyncFor(RequestSync message)
+		public UserLastSync GetUserLastSyncFor(SyncRequest message)
 		{
 			return _db.UsersLastSync.FirstOrDefault(n => n.UserId.Equals(message.UserId) && n.Device.Name.Equals(message.Device));
 		}
