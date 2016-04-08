@@ -13,7 +13,7 @@ namespace Repeat.NotebooksAPI.Infrastructure
 		//http://www.entityframeworktutorial.net/EntityFramework4.3/dbcontext-vs-objectcontext.aspx
 
 		public Db()
-			:base("Repeat")
+			:base("name=Repeat")
 		{
 
 		}

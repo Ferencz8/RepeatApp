@@ -13,25 +13,29 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Int64 Id { get; set; }
+		public Guid Id { get; set; }
 
-		public Int64 NotebookId { get; set; }
+		[Required]
+		public Guid NotebookId { get; set; }
 
 		[ForeignKey("NotebookId")]
 		public Notebook Notebook { get; set; }
 
+		[Required]
 		public string Name { get; set; }
 
 		public string Content { get; set; }
-		
+
+		[Required]
 		public DateTime CreatedDate { get; set; }
 
+		[Required]
 		public DateTime ModifiedDate { get; set; }
 
 		public SyncStatus SyncStatus { get; set; }
 
 		public bool Deleted { get; set; }
 
-		public DateTime DeletedDate { get; set; }
+		public DateTime? DeletedDate { get; set; }
 	}
 }

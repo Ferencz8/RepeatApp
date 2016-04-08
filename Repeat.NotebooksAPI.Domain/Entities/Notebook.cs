@@ -11,22 +11,23 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 	public class Notebook
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Int64 Id { get; set; }//TODO:: check if it is or not better to use a key of type int
+		public Guid Id { get; set; }
 
-
+		[Required]
 		[StringLength(100)]
 		[Index(IsUnique = true)]
 		public string Name { get; set; }
 
 		public virtual List<Note> Notes { get; set; }
-		
+
+		[Required]
 		public DateTime CreatedDate { get; set; }
 
+		[Required]
 		public DateTime ModifiedDate { get; set; }
 
 		public bool Deleted { get; set; }
 
-		public DateTime DeletedDate { get; set; }
+		public DateTime? DeletedDate { get; set; }
 	}
 }
