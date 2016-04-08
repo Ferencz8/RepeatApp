@@ -2,6 +2,7 @@ using Repeat.Mobile.PCL.DAL;
 using System.IO;
 using SQLite.Net.Platform.XamarinAndroid;
 using Repeat.Mobile.PCL;
+using Repeat.Mobile.PCL.Common;
 
 namespace Repeat.Mobile
 {
@@ -15,9 +16,8 @@ namespace Repeat.Mobile
 
 		private static void SetUpDatabase()
 		{
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "repeatDb.db3");
-			Util.SQLitePlatform = new SQLitePlatformAndroid();
-			Util.DatabasePath = path;
+			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), Configs.DatabaseName);
+			Util.CreateConnection(new SQLitePlatformAndroid(), path);
 		}
 	}
 }

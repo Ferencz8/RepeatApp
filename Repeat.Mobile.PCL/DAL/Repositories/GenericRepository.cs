@@ -1,4 +1,5 @@
 ﻿using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
+using SQLite.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,9 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 	public class GenericRepository<T> : IGenericRepository<T>
 		where T : class
 	{
-		Db _db;
+		SQLiteConnection _db;
 
-		public GenericRepository(Db db)
+		public GenericRepository(SQLiteConnection db)
 		{
 			_db = db;
 		}

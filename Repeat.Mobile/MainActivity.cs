@@ -17,6 +17,8 @@ using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.Activities.Notebooks;
 using Repeat.Mobile.Activities.Notes;
 using Repeat.Mobile.Activities.SideMenu;
+using Repeat.Mobile.PCL.DAL.Entities;
+using Repeat.Mobile.Sync;
 
 namespace Repeat.Mobile
 {
@@ -31,11 +33,12 @@ namespace Repeat.Mobile
 		ListView notes;
 		Button addNoteButton;
 		Button menuButton;
+		Button syncButton;
 		Button addNotebookButton;
 		ActionBarDrawerToggle drawerToggle;
 		LinearLayout leftSideMenu;
 
-		int chosenNotebookId;
+		Guid chosenNotebookId;
 
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -52,6 +55,7 @@ namespace Repeat.Mobile
 			addNoteButton = FindViewById<Button>(Resource.Id.addButton);
 			notes = FindViewById<ListView>(Resource.Id.notes);
 			menuButton = FindViewById<Button>(Resource.Id.menuButton);
+			syncButton = FindViewById<Button>(Resource.Id.syncButton);
 			addNotebookButton = FindViewById<Button>(Resource.Id.addNotebookButton);
 			
 			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
@@ -60,7 +64,7 @@ namespace Repeat.Mobile
 
 			notebooksAdapter = new NotebooksAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
 			notebooks.Adapter = notebooksAdapter;
-			chosenNotebookId = notebooksAdapter.GetItemAtPosition(0).Id;
+			chosenNotebookId = Guid.Parse(notebooksAdapter.GetItemAtPosition(0).Id);
 
 			notesAdapter = new NotesAdapter(this, chosenNotebookId);
 			notes.Adapter = notesAdapter;
@@ -73,6 +77,10 @@ namespace Repeat.Mobile
 			{
 				//mDrawerLayout.OpenDrawer(mLeftDrawer);
 				drawerLayout.OpenDrawer(leftSideMenu);
+			};
+			syncButton.Click += delegate
+			{
+				Syncronizer.GetSyncher().StartSynching();
 			};
 
 			notebooks.ItemClick += listView_ItemClick;
@@ -91,13 +99,16 @@ namespace Repeat.Mobile
 
 					//TODO:: TempSolution maybe add one more layer for handling CRUD operations
 					var repo = Kernel.Get<INotebooksRepository>();
-					int rowschanged = repo.Add(new PCL.DAL.Entities.Notebook()
+					int rowschanged = repo.Add(new Notebook()
 					{
+						Id = Guid.NewGuid().ToString(),
 						Name = notebookName,
+						CreatedDate = DateTime.Now,
+						ModifiedDate = DateTime.Now,
 					});
 					if(rowschanged == 1)
 					{
-						chosenNotebookId = repo.GetByName(notebookName).Id;
+						chosenNotebookId = Guid.Parse(repo.GetByName(notebookName).Id);
 					}
 					notebooksAdapter.RefreshContent();
 					notebooksAdapter.NotifyDataSetChanged();
@@ -113,7 +124,7 @@ namespace Repeat.Mobile
 		{
 			Intent intent = new Intent(this, typeof(NoteDetailsActivity));
 			Bundle notesBundle = new Bundle();
-			notesBundle.PutInt("notebookId", chosenNotebookId);
+			notesBundle.PutString("notebookId", chosenNotebookId.ToString());
 			intent.PutExtras(notesBundle);
 			StartActivity(intent, notesBundle);
 		}
@@ -123,7 +134,7 @@ namespace Repeat.Mobile
 			//Get our item from the list adapter
 			var item = notebooksAdapter.GetItemAtPosition(e.Position);
 
-			chosenNotebookId = item.Id;
+			chosenNotebookId = Guid.Parse(item.Id);
 
 			notesAdapter.RefreshContent(chosenNotebookId);
 			notes.Adapter = notesAdapter;

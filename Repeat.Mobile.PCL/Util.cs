@@ -1,4 +1,6 @@
-﻿using SQLite.Net.Interop;
+﻿using Repeat.Mobile.PCL.DAL.Entities;
+using SQLite.Net;
+using SQLite.Net.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,19 +8,37 @@ using System.Text;
 
 namespace Repeat.Mobile.PCL
 {
-	public interface IFile
-	{
-
-		bool FileExists(string path);
-	}
 
 	public static class Util
 	{
 
-		public static IFile File { get; set; }
+		private static SQLiteConnection _connection;
 
-		public static ISQLitePlatform SQLitePlatform { get; set; }
+		public static void CreateConnection(ISQLitePlatform sqlitePlatform, string databasePath)
+		{
+			if (_connection == null)
+			{
+				_connection = new SQLiteConnection(sqlitePlatform, databasePath);
 
-		public static string DatabasePath { get; set; }
+				_connection.CreateTable<Notebook>();
+				_connection.CreateTable<Note>();
+				if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks add a default one
+				{
+					_connection.Insert(new Notebook()
+					{
+						Id = Guid.NewGuid().ToString(),
+						Name = "First Notebook",
+						CreatedDate = DateTime.Now,
+						ModifiedDate = DateTime.Now,
+					});
+				}
+
+			}
+		}
+
+		public static SQLiteConnection GetDbConnection()
+		{
+			return _connection;
+		}
 	}
 }

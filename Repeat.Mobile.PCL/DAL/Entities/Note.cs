@@ -7,22 +7,29 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 {
     public class Note
     {
-		[PrimaryKey, AutoIncrement]
+		[PrimaryKey]
 		//[JsonIgnore]
-		public int Id { get; set; }
+		public string Id { get; set; }
 
-		[ForeignKey(typeof(Notebook))]
-		public int NotebookId { get; set; }
+		[ForeignKey(typeof(Notebook)), NotNull]
+		public string NotebookId { get; set; }
 
-		[OneToOne]
+		[OneToMany]
 		public Notebook Notebook { get; set; }
 
+		[NotNull]
 		public string Name { get; set; }
 
         public string Content { get; set; }
 
+		[NotNull]
 		public DateTime CreatedDate { get; set; }
 
+		[NotNull]
 		public DateTime ModifiedDate { get; set; }
+
+		public bool Deleted { get; set; }
+
+		public DateTime? DeletedDate { get; set; }
 	}
 }

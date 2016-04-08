@@ -14,7 +14,7 @@ namespace Repeat.Mobile.PCL.APICallers
 	{
 
 		public NotebookAPICaller()
-			:base("http://www.repeat.somee.com/")
+			:base(Configs.NotebookAPI_Url)
 		{
 
 		}

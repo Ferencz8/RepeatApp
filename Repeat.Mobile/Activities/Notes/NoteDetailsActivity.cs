@@ -5,6 +5,7 @@ using Android.Widget;
 using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
+using System;
 
 namespace Repeat.Mobile.Activities.Notes
 {
@@ -13,11 +14,11 @@ namespace Repeat.Mobile.Activities.Notes
 	{
 
 		INotesRepository _notesRepository;
-		int chosenNotebookId;
+		Guid chosenNotebookId;
 
         protected override void OnCreate (Bundle bundle)
 		{
-			chosenNotebookId = Intent.GetIntExtra("notebookId", 0);
+			chosenNotebookId = Guid.Parse(Intent.GetStringExtra("notebookId"));
 
             RequestWindowFeature(WindowFeatures.ActionBar);
             ActionBar.SetHomeButtonEnabled(true);
@@ -34,7 +35,15 @@ namespace Repeat.Mobile.Activities.Notes
 
 			_notesRepository = Kernel.Get<INotesRepository>();
             addButton.Click += delegate {
-				_notesRepository.Add(new Note() { Name = txtNote.Text, Content = txtContent.Text, NotebookId = chosenNotebookId });
+				_notesRepository.Add(new Note()
+				{
+					Id = Guid.NewGuid().ToString(),
+					Name = txtNote.Text,
+					Content = txtContent.Text,
+					NotebookId = chosenNotebookId.ToString(),
+					CreatedDate = DateTime.Now,
+					ModifiedDate = DateTime.Now,
+				});
 				Finish();
             };
         }

@@ -10,5 +10,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories.Interfaces
 	{
 
 		Notebook GetByName(string notebookName);
+
+		List<Notebook> GetNotebooksWithNotesByLastModifiedDateForNotes(DateTime lastModifiedDate);
 	}
 }

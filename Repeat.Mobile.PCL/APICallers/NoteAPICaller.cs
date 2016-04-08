@@ -1,5 +1,6 @@
 ﻿using Repeat.GenericLibs.PCL.APICallers;
 using Repeat.Mobile.PCL.APICallers.Interfaces;
+using Repeat.Mobile.PCL.Common;
 using Repeat.Mobile.PCL.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Repeat.Mobile.PCL.APICallers
 	{
 
 		public NoteAPICaller()
-			: base("http://www.repeat.somee.com/")
+			: base(Configs.NotebookAPI_Url)
 		{
 
 		}

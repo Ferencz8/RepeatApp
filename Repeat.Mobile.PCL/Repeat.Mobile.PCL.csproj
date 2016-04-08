@@ -34,16 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="APICallers\GenericAPICaller.cs" />
-    <Compile Include="APICallers\Interfaces\IGenericAPICaller.cs" />
     <Compile Include="APICallers\Interfaces\INoteAPICaller.cs" />
     <Compile Include="APICallers\Interfaces\INotebookAPICaller.cs" />
     <Compile Include="APICallers\NoteAPICaller.cs" />
     <Compile Include="APICallers\NotebookAPICaller.cs" />
-    <Compile Include="Common\APIRoutes.cs" />
-    <Compile Include="Common\HttpClientExtensions.cs" />
-    <Compile Include="DAL\Db.cs" />
-    <Compile Include="DAL\Enums\SyncStatus.cs" />
+    <Compile Include="Common\Configs.cs" />
+    <Compile Include="DAL\UnitOfWork.cs" />
     <Compile Include="DependencyManagement\APICallerModule.cs" />
     <Compile Include="DependencyManagement\Kernel.cs" />
     <Compile Include="DependencyManagement\RepositoryModule.cs" />
@@ -66,6 +62,9 @@
     <Reference Include="SQLiteNetExtensions">
       <HintPath>..\libs\SQLiteNetExtensions.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Socket.IO">
+      <HintPath>..\Repeat.Mobile\bin\Debug\Xamarin.Socket.IO.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Repeat.GenericLibs.PCL\Repeat.GenericLibs.PCL.csproj">
@@ -73,6 +72,7 @@
       <Name>Repeat.GenericLibs.PCL</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

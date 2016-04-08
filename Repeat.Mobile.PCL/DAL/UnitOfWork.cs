@@ -3,23 +3,20 @@ using Ninject.Parameters;
 using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
-using SQLite.Net.Platform.XamarinAndroid;
+using SQLite.Net;
 
-namespace Repeat.Mobile
+namespace Repeat.Mobile.PCL.DAL
 {
 	public class UnitOfWork : IUnitOfWork
 	{
 
 		INotesRepository _notesRepository;
 		INotebooksRepository _notebookRepository;
-
-		Db _db;
+		SQLiteConnection _db;
 
 		public UnitOfWork()
 		{
-
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "repeatDb.db3");
-			_db = new Db(new SQLitePlatformAndroid(), path);
+			_db = Util.GetDbConnection();
 		}
 
 		public INotesRepository NotesRepository
@@ -28,7 +25,7 @@ namespace Repeat.Mobile
 			{
 				if(_notesRepository == null)
 				{
-					_notesRepository = Kernel.Get<INotesRepository>(new ConstructorArgument("db", _db));//new NotesRepository(_db);
+					_notesRepository = Kernel.Get<INotesRepository>(new ConstructorArgument("db", _db));
 				}
 
 				return _notesRepository;
@@ -41,7 +38,7 @@ namespace Repeat.Mobile
 			{
 				if(_notebookRepository == null)
 				{
-					_notebookRepository = Kernel.Get<INotebooksRepository>(new ConstructorArgument("db", _db)); ;//new NotebooksRepository(_db);
+					_notebookRepository = Kernel.Get<INotebooksRepository>(new ConstructorArgument("db", _db)); ;
 				}
 
 				return _notebookRepository;

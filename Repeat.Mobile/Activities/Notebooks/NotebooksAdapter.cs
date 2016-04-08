@@ -6,9 +6,7 @@ using Android.App;
 using Android.Views;
 using Android.Widget;
 using Repeat.Mobile.PCL.DAL.Entities;
-using Repeat.Mobile.PCL.DAL.DependencyManagement;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
-using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DependencyManagement;
 
 namespace Repeat.Mobile.Activities.Notebooks
@@ -46,7 +44,7 @@ namespace Repeat.Mobile.Activities.Notebooks
 
 		public override long GetItemId(int position)
 		{
-			return _notebooksList[position].Id;
+			return 0;// _notebooksList[position].Id;
 		}
 
 		public override View GetView(int position, View convertView, ViewGroup parent)

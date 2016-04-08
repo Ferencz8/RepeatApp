@@ -43,6 +43,10 @@
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Ninject, Version=3.0.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.Ninject.3.3.1\lib\monoandroid\Ninject.dll</HintPath>
       <Private>True</Private>
@@ -58,6 +62,10 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocket4Net.0.14.1\lib\monoandroid23\WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Xamarin.Android.Support.Design, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.Android.Support.Design.23.2.0-beta1\lib\MonoAndroid43\Xamarin.Android.Support.Design.dll</HintPath>
       <Private>True</Private>
@@ -80,7 +88,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\AndroidFile.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Activities\SideMenu\SideMenuDrawerToggle.cs" />
     <Compile Include="Activities\Notes\NotesAdapter.cs" />
@@ -89,12 +96,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Activities\Notebooks\NotebooksAdapter.cs" />
     <Compile Include="StartUp.cs" />
-    <Compile Include="Synchronizer\HttpClientExtensions.cs" />
-    <Compile Include="Synchronizer\INotebookSync.cs" />
-    <Compile Include="Synchronizer\Synchronizer.cs" />
-    <Compile Include="UnitOfWork.cs" />
+    <Compile Include="Syncronizer\DTOs\DataToBeSynched.cs" />
+    <Compile Include="Syncronizer\DTOs\SyncRequest.cs" />
+    <Compile Include="Syncronizer\DTOs\SyncRequestResponse.cs" />
+    <Compile Include="Syncronizer\DTOs\SyncResult.cs" />
+    <Compile Include="Syncronizer\Syncronizer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -154,6 +163,8 @@
       <Name>Repeat.Mobile.PCL</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\Xamarin.Stomp.Shared\Xamarin.Stomp.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.
