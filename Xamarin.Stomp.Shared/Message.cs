@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,22 @@ namespace Xamarin.StompClient
 		public object Body
 		{
 			get { return _body; }
+		}
+
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(Command + "\n");
+			
+			foreach(var header in Headers)
+			{
+				sb.Append(header.Key + ":" + header.Value);
+			}
+
+			sb.Append("\n" + JsonConvert.SerializeObject(Body));
+
+			return sb.ToString();
 		}
 	}
 }

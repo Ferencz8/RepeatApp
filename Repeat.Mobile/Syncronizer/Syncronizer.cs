@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Repeat.Mobile.PCL.Common;
 using Repeat.Mobile.PCL.DAL;
+using Repeat.Mobile.PCL.DependencyManagement;
+using Repeat.Mobile.PCL.Logging;
 using Repeat.Mobile.Sync.DTOs;
 using System;
 using System.Collections.Generic;
@@ -62,6 +64,8 @@ namespace Repeat.Mobile.Sync
 				{
 					//here I should unsubscribe from the SyncReqeustQueue 
 					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateForNotes(n.LastSyncDate);
+					Kernel.Get<ILog>().Info(Guid.Empty, "NotebooksWithNotesByLastModifiedDateForNotes received");
+
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
 					{

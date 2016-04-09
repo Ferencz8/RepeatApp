@@ -19,6 +19,8 @@ using Repeat.Mobile.Activities.Notes;
 using Repeat.Mobile.Activities.SideMenu;
 using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.Sync;
+using Xamarin;
+using Repeat.Mobile.PCL.Logging;
 
 namespace Repeat.Mobile
 {
@@ -70,7 +72,7 @@ namespace Repeat.Mobile
 			notes.Adapter = notesAdapter;
 
 			addNoteButton.Click += delegate
-			{
+			{								
 				StartNoteDetailsActivity();
 			};
 			menuButton.Click += delegate
@@ -80,6 +82,9 @@ namespace Repeat.Mobile
 			};
 			syncButton.Click += delegate
 			{
+
+				Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
+
 				Syncronizer.GetSyncher().StartSynching();
 			};
 

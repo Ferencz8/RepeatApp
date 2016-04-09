@@ -8,6 +8,8 @@ using WebSocket4Net;
 using Xamarin.Stomp.Shared;
 using Xamarin.StompClient.Interfaces;
 using Newtonsoft.Json;
+using Repeat.Mobile.PCL.DependencyManagement;
+using Repeat.Mobile.PCL.Logging;
 
 namespace Xamarin.StompClient
 {
@@ -44,6 +46,8 @@ namespace Xamarin.StompClient
 			//TODO:: implement error handler for websocket
 			//TODO::implement global error handler
 			System.Diagnostics.Debug.WriteLine(e.Exception.ToString());
+
+			Kernel.Get<ILog>().Exception(Guid.Empty, e.Exception, "WebSocket ErrorHandler Exception");
 		}
 
 		public void Connect(Dictionary<string, string> authenticationHeaders = null)
@@ -71,18 +75,25 @@ namespace Xamarin.StompClient
 			{
 				case MessageCommand.Connected:
 					{
+						Kernel.Get<ILog>().Info(Guid.Empty, "WebSocket CONNECTED.");
+
 						foreach (var ms in _messagesToBeSent)
 						{
 							_webSocket.Send(ms);
+
+							Kernel.Get<ILog>().Info(Guid.Empty, "SENT Message: " + ms);
 						}
 					}
 					break;
 				case MessageCommand.Message:
 					{
+						Kernel.Get<ILog>().Info(Guid.Empty, "RECEIVED Message: " + messageReceived.ToString());
+
+
 						var destinationHeader = messageReceived.Headers["destination"];
-						//TODO:: here convert according to  _subscribedHandlers[destinationHeader].Key the object 
-						Type type = _subscribedHandlers[destinationHeader].Key;
-						var deserializedObj = JsonConvert.DeserializeObject(messageReceived.Body.ToString(), type);
+
+						Type receivedBodyType = _subscribedHandlers[destinationHeader].Key;
+						var deserializedObj = JsonConvert.DeserializeObject(messageReceived.Body.ToString(), receivedBodyType);
 						_subscribedHandlers[destinationHeader].Value.DynamicInvoke(deserializedObj);
 					}
 					break;
@@ -104,6 +115,8 @@ namespace Xamarin.StompClient
 			if (_webSocket.State == WebSocketState.Open)
 			{
 				_webSocket.Send(msgToBeSnet);
+
+				Kernel.Get<ILog>().Info(Guid.Empty, "Published Message: "+ msgToBeSnet);
 			}
 			else
 			{
@@ -123,6 +136,9 @@ namespace Xamarin.StompClient
 				if (_webSocket.State == WebSocketState.Open)
 				{
 					_webSocket.Send(serializedMessage);
+
+
+					Kernel.Get<ILog>().Info(Guid.Empty, "Subscribed Message: " + serializedMessage);
 				}
 				else
 				{

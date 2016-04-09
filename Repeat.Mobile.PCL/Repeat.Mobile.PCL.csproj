@@ -42,6 +42,7 @@
     <Compile Include="DAL\UnitOfWork.cs" />
     <Compile Include="DependencyManagement\APICallerModule.cs" />
     <Compile Include="DependencyManagement\Kernel.cs" />
+    <Compile Include="DependencyManagement\LoggingModule.cs" />
     <Compile Include="DependencyManagement\RepositoryModule.cs" />
     <Compile Include="DAL\IUnitOfWork.cs" />
     <Compile Include="DAL\Repositories\GenericRepository.cs" />
@@ -50,6 +51,8 @@
     <Compile Include="DAL\Repositories\Interfaces\INotesRepository.cs" />
     <Compile Include="DAL\Repositories\NotebooksRepository.cs" />
     <Compile Include="DAL\Repositories\NotesRepository.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\Log.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="DAL\Entities\Note.cs" />
     <Compile Include="DAL\Entities\Notebook.cs" />
