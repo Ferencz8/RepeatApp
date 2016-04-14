@@ -1,4 +1,5 @@
 ﻿using Repeat.Mobile.PCL.DAL.Entities;
+using Repeat.Mobile.PCL.Logging;
 using SQLite.Net;
 using SQLite.Net.Interop;
 using System;
@@ -12,9 +13,12 @@ namespace Repeat.Mobile.PCL
 	public static class Util
 	{
 
+		public static ILog Log { get; set; }
+
+
 		private static SQLiteConnection _connection;
 
-		public static void CreateConnection(ISQLitePlatform sqlitePlatform, string databasePath)
+		public static void CreateDbConnection(ISQLitePlatform sqlitePlatform, string databasePath)
 		{
 			if (_connection == null)
 			{

@@ -39,6 +39,7 @@
     <Compile Include="APICallers\NoteAPICaller.cs" />
     <Compile Include="APICallers\NotebookAPICaller.cs" />
     <Compile Include="Common\Configs.cs" />
+    <Compile Include="Common\ObjectConverter.cs" />
     <Compile Include="DAL\UnitOfWork.cs" />
     <Compile Include="DependencyManagement\APICallerModule.cs" />
     <Compile Include="DependencyManagement\Kernel.cs" />

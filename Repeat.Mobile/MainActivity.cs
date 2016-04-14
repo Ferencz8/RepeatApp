@@ -21,11 +21,13 @@ using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.Sync;
 using Xamarin;
 using Repeat.Mobile.PCL.Logging;
+using Repeat.AppLayer;
+using Repeat.Mobile.PCL.Common;
 
 namespace Repeat.Mobile
 {
 	[Activity(Label = "Repeat", MainLauncher = true, Icon = "@drawable/icon")]
-	public class MainActivity : Activity
+	public class MainActivity : ActivityBase
 	{
 		DrawerLayout drawerLayout;
 		List<string> notebookItems = new List<string>();
@@ -44,7 +46,7 @@ namespace Repeat.Mobile
 
 		protected override void OnCreate(Bundle bundle)
 		{
-			StartUp.Configure();
+			var currentApp = App.Current;
 
 			base.OnCreate(bundle);
 
@@ -71,80 +73,103 @@ namespace Repeat.Mobile
 			notesAdapter = new NotesAdapter(this, chosenNotebookId);
 			notes.Adapter = notesAdapter;
 
-			addNoteButton.Click += delegate
-			{								
-				StartNoteDetailsActivity();
-			};
-			menuButton.Click += delegate
-			{
-				//mDrawerLayout.OpenDrawer(mLeftDrawer);
-				drawerLayout.OpenDrawer(leftSideMenu);
-			};
-			syncButton.Click += delegate
-			{
+			addNoteButton.Click += AddNoteButton_Click;
 
-				Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
+			menuButton.Click += MenuButton_Click;
 
-				Syncronizer.GetSyncher().StartSynching();
-			};
+			syncButton.Click += SyncButton_Click;
 
-			notebooks.ItemClick += listView_ItemClick;
+			addNotebookButton.Click += AddNotebookButton_Click;
 
-			addNotebookButton.Click += delegate
-			{
+			notebooks.ItemClick += Notebooks_ItemClick; ;
 
-				var builder = new AlertDialog.Builder(this);
-				builder.SetTitle("Add Notebook");
-				EditText edit = new EditText(this);
-				builder.SetView(edit);
-				builder.SetPositiveButton("Save", (sender, args) => 
-				{
-					/* do stuff on OK */
-					string notebookName = edit.Text;
-
-					//TODO:: TempSolution maybe add one more layer for handling CRUD operations
-					var repo = Kernel.Get<INotebooksRepository>();
-					int rowschanged = repo.Add(new Notebook()
-					{
-						Id = Guid.NewGuid().ToString(),
-						Name = notebookName,
-						CreatedDate = DateTime.Now,
-						ModifiedDate = DateTime.Now,
-					});
-					if(rowschanged == 1)
-					{
-						chosenNotebookId = Guid.Parse(repo.GetByName(notebookName).Id);
-					}
-					notebooksAdapter.RefreshContent();
-					notebooksAdapter.NotifyDataSetChanged();
-
-					notesAdapter.RefreshContent(chosenNotebookId);
-					notes.Adapter = notesAdapter;
-				});
-				builder.Show();
-			};
+			notes.ItemClick += Notes_ItemClick;
 		}
 
-		private void StartNoteDetailsActivity()
+		
+
+		private void AddNoteButton_Click(object sender, EventArgs e)
 		{
+			//StartNoteDetailsActivity
 			Intent intent = new Intent(this, typeof(NoteDetailsActivity));
 			Bundle notesBundle = new Bundle();
 			notesBundle.PutString("notebookId", chosenNotebookId.ToString());
+			notesBundle.PutString("action", "ADD");
 			intent.PutExtras(notesBundle);
 			StartActivity(intent, notesBundle);
 		}
 
-		void listView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+		private void MenuButton_Click(object sender, EventArgs e)
+		{
+			//mDrawerLayout.OpenDrawer(mLeftDrawer);
+			drawerLayout.OpenDrawer(leftSideMenu);
+		}
+
+		private void SyncButton_Click(object sender, EventArgs e)
+		{
+			Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
+
+			Toast.MakeText(this, "Sync Started!", ToastLength.Short).Show();
+
+			Syncronizer.GetSyncher().StartSynching();
+		}
+
+		private void AddNotebookButton_Click(object sender, EventArgs e)
+		{
+			var builder = new AlertDialog.Builder(this);
+			builder.SetTitle("Add Notebook");
+			EditText edit = new EditText(this);
+			builder.SetView(edit);
+			builder.SetPositiveButton("Save", (alertDialogSender, args) =>
+			{
+				/* do stuff on OK */
+				string notebookName = edit.Text;
+
+				//TODO:: TempSolution maybe add one more layer for handling CRUD operations
+				var repo = Kernel.Get<INotebooksRepository>();
+				int rowschanged = repo.Add(new Notebook()
+				{
+					Id = Guid.NewGuid().ToString(),
+					Name = notebookName,
+					CreatedDate = DateTime.Now,
+					ModifiedDate = DateTime.Now,
+				});
+				if (rowschanged == 1)
+				{
+					chosenNotebookId = Guid.Parse(repo.GetByName(notebookName).Id);
+				}
+				notebooksAdapter.RefreshContent();
+				notebooksAdapter.NotifyDataSetChanged();
+
+				RefreshNotesListContent();
+			});
+			builder.Show();
+		}
+
+		private void Notes_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+		{
+			Note noteClicked = notesAdapter.GetItemAtPosition(e.Position);
+
+			//StartNoteDetailsActivity
+			Intent intent = new Intent(this, typeof(NoteDetailsActivity));
+			Bundle notesBundle = new Bundle();
+			notesBundle.PutString("notebookId", chosenNotebookId.ToString());
+			notesBundle.PutString("action", "EDIT");
+			notesBundle.PutString("note", ObjectConverter.ToJSON(noteClicked));
+			intent.PutExtras(notesBundle);
+			StartActivity(intent, notesBundle);
+		}
+
+		private void Notebooks_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
 		{
 			//Get our item from the list adapter
 			var item = notebooksAdapter.GetItemAtPosition(e.Position);
 
 			chosenNotebookId = Guid.Parse(item.Id);
 
-			notesAdapter.RefreshContent(chosenNotebookId);
-			notes.Adapter = notesAdapter;
+			RefreshNotesListContent();
 			//Make a toast with the item name just to show it was clicked
-			Toast.MakeText(this, item.Name + " Clicked!", ToastLength.Short).Show();
+			Toast.MakeText(this, item.Name + " Chosen!", ToastLength.Short).Show();
 		}
 
 		public override bool OnOptionsItemSelected(IMenuItem item)
@@ -170,7 +195,7 @@ namespace Repeat.Mobile
 		protected override void OnResume()
 		{
 			base.OnResume();
-			notes.Adapter = new NotesAdapter(this, chosenNotebookId); // new ArrayAdapter<String>(this, Android.Resource.Layout.SimpleListItem1, Storage.GetItems().Select(n => n.Name).ToList());
+			RefreshNotesListContent();
 		}
 
 		//protected override void OnDestroy()
@@ -183,10 +208,18 @@ namespace Repeat.Mobile
 		//    base.OnStop();
 		//}
 
-		//protected override void OnPause()
-		//{
-		//    base.OnPause();
-		//}
+		protected override void OnPause()
+		{
+			base.OnPause();
+		}
+
+
+
+		private void RefreshNotesListContent()
+		{
+			notesAdapter.RefreshContent(chosenNotebookId);
+			notes.Adapter = notesAdapter;
+		}
 	}
 }
 

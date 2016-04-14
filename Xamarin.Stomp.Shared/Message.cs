@@ -29,6 +29,10 @@ namespace Xamarin.StompClient
 		public Dictionary<string, string> Headers
 		{
 			get { return _headers; }
+			protected set
+			{
+
+			}
 		}
 
 		public object Body

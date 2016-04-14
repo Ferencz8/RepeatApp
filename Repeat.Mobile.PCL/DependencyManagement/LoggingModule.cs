@@ -12,7 +12,7 @@ namespace Repeat.Mobile.PCL.DependencyManagement
 	{
 		public override void Load()
 		{
-			Bind<ILog>().To<Log>();
+			Bind<ILog>().To(Util.Log.GetType());
 		}
 	}
 }

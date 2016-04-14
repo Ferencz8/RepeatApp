@@ -15,7 +15,7 @@ namespace Xamarin.StompClient
 				 "SEND", 
 				 new Dictionary<string, string>()
 				 {
-				 	{ "destination", destination }
+				 	{ "destination", "/queue/" + destination }
 				 }, 
 				 body)
 		{

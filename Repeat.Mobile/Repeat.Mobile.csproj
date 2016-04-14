@@ -43,6 +43,7 @@
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -90,6 +91,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppLayer\ActivityBase.cs" />
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Activities\SideMenu\SideMenuDrawerToggle.cs" />
     <Compile Include="Activities\Notes\NotesAdapter.cs" />
@@ -97,7 +100,7 @@
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Activities\Notebooks\NotebooksAdapter.cs" />
-    <Compile Include="StartUp.cs" />
+    <Compile Include="App.cs" />
     <Compile Include="Syncronizer\DTOs\DataToBeSynched.cs" />
     <Compile Include="Syncronizer\DTOs\SyncRequest.cs" />
     <Compile Include="Syncronizer\DTOs\SyncRequestResponse.cs" />

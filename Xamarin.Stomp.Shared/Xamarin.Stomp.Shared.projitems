@@ -9,6 +9,11 @@
     <Import_RootNamespace>Xamarin.Stomp.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ACKMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DisconnectMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ACKHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Eventing\DeliverEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Eventing\EventingMessageConsumer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IOutgoingMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IStompClient.cs" />

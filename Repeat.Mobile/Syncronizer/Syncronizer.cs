@@ -12,15 +12,23 @@ using System.Text;
 using System.Threading.Tasks;
 using WebSocket4Net;
 using Xamarin.StompClient;
+using Xamarin.StompClient.Interfaces;
 
 namespace Repeat.Mobile.Sync
 {
 	public class Syncronizer
 	{
+
+		enum SyncStatus
+		{
+			Finished = 0,
+			Started			
+		}
 		private WebSocket _webSocket;
-		private StompClient _client;
+		private IStompClient _client;
 		private IUnitOfWork _unitOfWork;
-		
+		private volatile SyncStatus _syncStatus;
+
 		private static Syncronizer _syncher;
 
 
@@ -30,6 +38,37 @@ namespace Repeat.Mobile.Sync
 			_unitOfWork = new UnitOfWork();
 
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
+		}
+
+		private void StartWebSocketMonitoringTask()
+		{
+			Task.Factory.StartNew(() =>
+			{
+				Task.Delay(TimeSpan.FromMinutes(2));//first wait until a connection is made
+
+				//here check if connection is open every x second(should be incremental)
+				//if connection is lost reconnect
+				double sleepTime = 5;
+				while (_syncStatus != SyncStatus.Finished)
+				{
+
+					Task.Delay(TimeSpan.FromSeconds(sleepTime)).Wait();
+					if (!_client.Connected)
+					{
+						_client.Dispose();
+						_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
+
+						Kernel.Get<ILog>().Info(Guid.Empty, "Atempting to connect again");
+
+						StartSynching();
+					}
+					else
+					{
+						Kernel.Get<ILog>().Info(Guid.Empty, "Connection Status: " + _client.Connected);
+						sleepTime = sleepTime == 80 ? 5 : sleepTime * 2;
+					}
+				}
+			});
 		}
 
 		//Singleton
@@ -46,43 +85,54 @@ namespace Repeat.Mobile.Sync
 
 		public async void StartSynching()
 		{
-			this.Connect();
-
-			//here I should use the logged in user and device specific identification
-			SyncRequest request = new SyncRequest()
+			//TODO:: maybe try a few times...and if it does not work display message to user
+			if (await this.Connect())
 			{
-				UserId = Guid.Empty,
-			};
-			_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
 
-
-			//TODO:: check if I can use a task to await the response outside the event
-			//create here a task...start it in the Action...and also await it here
-			_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
-			{
-				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
+				//if the process started for the first time
+				if (_syncStatus == SyncStatus.Finished)
 				{
-					//here I should unsubscribe from the SyncReqeustQueue 
-					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateForNotes(n.LastSyncDate);
-					Kernel.Get<ILog>().Info(Guid.Empty, "NotebooksWithNotesByLastModifiedDateForNotes received");
-
-
-					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
-					{
-						UserId = n.UserId,
-						Notebooks = notebooks,
-					});
-
-					_client.Subscribe<SyncResult>(Configs.RabbitMQ_SyncResultQueue, syn =>
-					{
-						//TODO:: display message to the user that the sync was a succes/failure
-						System.Diagnostics.Debug.WriteLine(syn.UserId + syn.Device + syn.Result);
-					});
+					StartWebSocketMonitoringTask();
 				}
-			});
+				_syncStatus = SyncStatus.Started;
+
+
+				//here I should use the logged in user and device specific identification
+				SyncRequest request = new SyncRequest()
+				{
+					UserId = Guid.Empty,
+				};
+
+				_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
+				{
+					if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
+					{
+
+						//here I should unsubscribe from the SyncReqeustQueue 
+						var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateForNotes(n.LastSyncDate);
+
+						_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
+						{
+							UserId = n.UserId,
+							Notebooks = notebooks,
+						});
+					}
+				}, true);
+
+				_client.Subscribe<SyncResult>(Configs.RabbitMQ_SyncResultQueue, syn =>
+				{
+					Kernel.Get<ILog>().Info(Guid.Empty, "Sync FINISHED");
+					//TODO:: display message to the user that the sync was a succes/failure
+
+					_syncStatus = SyncStatus.Finished;
+					_client.Dispose();
+				}, true);
+
+				_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
+			}
 		}
 
-		private void Connect()
+		private async Task<bool> Connect()
 		{
 			if (!_client.Connected)
 			{
@@ -91,10 +141,25 @@ namespace Repeat.Mobile.Sync
 					{"login", Configs.RabbitMQ_Login },
 					{"passcode", Configs.RabbitMQ_Password},
 					{"host", Configs.RabbitMQ_Host },
-					{ "accept-version", Configs.RabbitMQ_AcceptVersion },
+					{"accept-version", Configs.RabbitMQ_AcceptVersion },
+					{"heart-beat", "10000,10000" }//I hardcoded 10000 inside the StompClient code
 				};
-				_client.Connect(headers);
+				return await _client.Connect(60, headers,
+					() => Kernel.Get<ILog>().Info(Guid.Empty, "CONNECTED to WebSocket."),
+					(obj, args) =>
+					{
+
+						Kernel.Get<ILog>().Exception(Guid.Empty, args.Exception, "WebSocket ErrorHandler Exception");
+						if (args.Exception.Message.ToLower().Contains("the socket is not connected") && _syncStatus == SyncStatus.Started)
+						{
+							Kernel.Get<ILog>().Info(Guid.Empty, "Reconnecting");
+
+							StartSynching();
+						}
+					});
 			}
+
+			return true;
 		}
 	}
 }

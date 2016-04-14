@@ -51,7 +51,7 @@ namespace Xamarin.StompClient
 
 		public IMessage Deserialize(string serializedMessage)
 		{
-			if (!string.IsNullOrEmpty(serializedMessage))
+			if (!string.IsNullOrWhiteSpace(serializedMessage))
 			{
 				string[] parts = serializedMessage.Split('\n').Where(n => !string.IsNullOrEmpty(n)).ToArray();
 				string command = parts[0];

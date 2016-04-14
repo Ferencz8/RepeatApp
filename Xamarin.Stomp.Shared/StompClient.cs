@@ -10,23 +10,33 @@ using Xamarin.StompClient.Interfaces;
 using Newtonsoft.Json;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.Logging;
+using System.Threading;
+using Xamarin.Stomp.Shared.Eventing;
+using System.Runtime.Remoting.Contexts;
 
 namespace Xamarin.StompClient
 {
+	//used to create a lock for every method, property
+	//[Synchronization]
 	public class StompClient : IStompClient
 	{
-		//TODO:: check the heart-beat header meaning??
+		static readonly object _obj = new object();
+		bool _disposed = false;
+
 		WebSocket _webSocket;
 		IMessage _authenticationMessage;
-		MessageSerializer _messageSerializer = new MessageSerializer();
-		Dictionary<string, KeyValuePair<Type, Delegate>> _subscribedHandlers = new Dictionary<string, KeyValuePair<Type, Delegate>>();
-		Queue<string> _messagesToBeSent = new Queue<string>();
+		MessageSerializer _messageSerializer;
+		List<EventingMessageConsumer> _subscribedConsumers;
+		Action _onConnectedCallback;
 
 		public bool Connected
 		{
 			get
 			{
-				return _webSocket.State == WebSocketState.Open ? true : false;
+				lock (_obj)
+				{
+					return _webSocket.State == WebSocketState.Open ? true : false;
+				}
 			}
 		}
 
@@ -34,31 +44,158 @@ namespace Xamarin.StompClient
 		{
 			_webSocket = new WebSocket(address);
 
+			_messageSerializer = new MessageSerializer();
+
+
 			_webSocket.Opened += new EventHandler(Websocket_Opened);
 
 			_webSocket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(Websocket_MessageReceived);
-
-			_webSocket.Error += new EventHandler<ErrorEventArgs>(WebSocket_ErrorHandler);
 		}
 
-		private void WebSocket_ErrorHandler(object sender, ErrorEventArgs e)
-		{
-			//TODO:: implement error handler for websocket
-			//TODO::implement global error handler
-			System.Diagnostics.Debug.WriteLine(e.Exception.ToString());
 
-			Kernel.Get<ILog>().Exception(Guid.Empty, e.Exception, "WebSocket ErrorHandler Exception");
+		public async Task<bool> Connect(
+			int timeoutSeconds = 60,
+			Dictionary<string, string> authenticationHeaders = null,
+			Action onConnectedCallBack = null,
+			Action<object, ErrorEventArgs> onErrorCallBack = null)
+		{
+
+			HandleConnectionParameters(authenticationHeaders, onConnectedCallBack, onErrorCallBack);
+
+
+			//if the connection is lost all the subscribtion messages need to be sent again
+			_subscribedConsumers = new List<EventingMessageConsumer>();
+
+
+			_webSocket.Open();
+
+			//wait until Connected becomes true or the max waiting time elapses
+			await Task.Run(delegate
+			{
+				while (!Connected && timeoutSeconds >= 0)
+				{
+					Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+
+					timeoutSeconds--;
+				}
+			});
+
+			return Connected;
 		}
 
-		public void Connect(Dictionary<string, string> authenticationHeaders = null)
+
+		public bool Publish(string queueName, object messageBody)
 		{
+			if (!Connected)
+			{
+				return false;
+			}
+
+			var sendMessage = new SendMessage(queueName, messageBody);
+			string msgToBeSnet = _messageSerializer.Serialize(sendMessage);
+
+			_webSocket.Send(msgToBeSnet);
+
+			Kernel.Get<ILog>().Info(Guid.Empty, "PUBLISHED on " + queueName);
+
+			return true;
+		}
+
+		public bool Subscribe<T>(string queueName, Action<T> eventOnMessageReceived, bool useAckowledgment = false) where T : class
+		{
+			if (!Connected)
+			{
+				return false;
+			}
+
+			if (_subscribedConsumers.Exists(n => n.QueueName.Equals(queueName)))
+			{
+				//remove existing event handler
+				EventingMessageConsumer consumerToBeRemoved = _subscribedConsumers.FirstOrDefault(n => n.QueueName.Equals(queueName));
+
+				_subscribedConsumers.Remove(consumerToBeRemoved);
+			}
+			else
+			{
+				//subscribe message should be sent only once
+				SubscribeMessage subscribeMessage = new SubscribeMessage(queueName, useAckowledgment);
+				string serializedMessage = _messageSerializer.Serialize(subscribeMessage);
+
+				_webSocket.Send(serializedMessage);
+			}
+
+
+			EventingMessageConsumer consumer = new EventingMessageConsumer("/queue/" + queueName, useAckowledgment);
+
+			consumer.OnMessageReceived += (obj, args) =>
+			{
+				//Kernel.Get<ILog>().Info(Guid.Empty, "HANDLER EXECUTED!!! " + queueName);
+
+				T objConverted = JsonConvert.DeserializeObject<T>(args.Message.Body.ToString());
+				
+				eventOnMessageReceived(objConverted);
+
+				if (consumer.UseACKnowledgement)
+				{
+					SendACKMessage(args.Message.Headers["message-id"]);
+				}
+			};
+
+			_subscribedConsumers.Add(consumer);
+
+			//Kernel.Get<ILog>().Info(Guid.Empty, "SUBSCRIBED on " + queueName);
+
+			return true;
+		}
+
+		/// <summary>
+		/// This Heart Beat task will use send a heart beat every 10 seconds. 
+		/// </summary>
+		/// <param name="serverHeartBeat"></param>
+		private void StartHeartBeatTask()
+		{
+
+			Task.Factory.StartNew(() =>
+			{
+				while (Connected)
+				{
+					Task.Delay(TimeSpan.FromSeconds(7)).Wait();
+
+					_webSocket.Send("\n");
+				}
+			});
+		}
+
+		private void SendACKMessage(string messageId)
+		{
+			string msgToBeSnet = _messageSerializer.Serialize(new ACKMessage(messageId));
+
+			_webSocket.Send(msgToBeSnet);
+		}
+
+		private void HandleConnectionParameters(Dictionary<string, string> authenticationHeaders, Action onConnectedCallBack, Action<object, ErrorEventArgs> onErrorCallBack)
+		{
+
 			if (authenticationHeaders != null)
 			{
 				_authenticationMessage = new Message(MessageCommand.Connect, authenticationHeaders, null);
 			}
 
-			_webSocket.Open();
+			if (onConnectedCallBack != null)
+			{
+				_onConnectedCallback = onConnectedCallBack;
+			}
+
+			if (onErrorCallBack != null)
+			{
+				_webSocket.Error += new EventHandler<ErrorEventArgs>(onErrorCallBack);
+			}
+			else
+			{
+				_webSocket.Error += new EventHandler<ErrorEventArgs>(WebSocket_ErrorHandler);
+			}
 		}
+
 
 		private void Websocket_Opened(object sender, EventArgs e)
 		{
@@ -75,76 +212,61 @@ namespace Xamarin.StompClient
 			{
 				case MessageCommand.Connected:
 					{
-						Kernel.Get<ILog>().Info(Guid.Empty, "WebSocket CONNECTED.");
+						StartHeartBeatTask();
 
-						foreach (var ms in _messagesToBeSent)
+						if (_onConnectedCallback != null)
 						{
-							_webSocket.Send(ms);
-
-							Kernel.Get<ILog>().Info(Guid.Empty, "SENT Message: " + ms);
+							_onConnectedCallback();
 						}
 					}
 					break;
 				case MessageCommand.Message:
 					{
-						Kernel.Get<ILog>().Info(Guid.Empty, "RECEIVED Message: " + messageReceived.ToString());
+						Kernel.Get<ILog>().Info(Guid.Empty, "RECEIVED Message: on " + messageReceived.Headers["destination"]);
 
-
-						var destinationHeader = messageReceived.Headers["destination"];
-
-						Type receivedBodyType = _subscribedHandlers[destinationHeader].Key;
-						var deserializedObj = JsonConvert.DeserializeObject(messageReceived.Body.ToString(), receivedBodyType);
-						_subscribedHandlers[destinationHeader].Value.DynamicInvoke(deserializedObj);
+						var consumer = _subscribedConsumers.FirstOrDefault(n => n.QueueName.Equals(messageReceived.Headers["destination"]));
+						if (consumer != null)
+						{
+							consumer.FireUpEventHanlder(sender, new DeliverEventArgs(messageReceived));
+						}
 					}
 					break;
 				default: break;
 			}
 		}
 
+		private void WebSocket_ErrorHandler(object sender, ErrorEventArgs e)
+		{
+
+		}
+
+
 		public void Disconnect()
 		{
-			throw new NotImplementedException();
+			string serializedMsg = _messageSerializer.Serialize(new DisconnectMessage());
+			_webSocket.Send(serializedMsg);
 		}
 
-		public void Publish(string queueName, object messageBody)
+		public void Dispose()
 		{
-			//TODO::this messages first should be added to a queue and only if connection is CONNECTED then they should be published
-
-			var sendMessage = new SendMessage("/queue/" + queueName, messageBody);
-			string msgToBeSnet = _messageSerializer.Serialize(sendMessage);
-			if (_webSocket.State == WebSocketState.Open)
-			{
-				_webSocket.Send(msgToBeSnet);
-
-				Kernel.Get<ILog>().Info(Guid.Empty, "Published Message: "+ msgToBeSnet);
-			}
-			else
-			{
-				_messagesToBeSent.Enqueue(msgToBeSnet);
-			}
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
-		public void Subscribe<T>(string queueName, Action<T> eventOnMessageReceived) where T : class
+		// Protected implementation of Dispose pattern.
+		protected virtual void Dispose(bool disposing)
 		{
-			string key = "/queue/" + queueName;
-			if (!_subscribedHandlers.ContainsKey(key))
+			if (_disposed)
+				return;
+
+			if (disposing)
 			{
-				_subscribedHandlers.Add(key, new KeyValuePair<Type, Delegate>(typeof(T), eventOnMessageReceived));
-
-				var subscribeMessage = new SubscribeMessage("/queue/" + queueName);
-				string serializedMessage = _messageSerializer.Serialize(subscribeMessage);
-				if (_webSocket.State == WebSocketState.Open)
-				{
-					_webSocket.Send(serializedMessage);
-
-
-					Kernel.Get<ILog>().Info(Guid.Empty, "Subscribed Message: " + serializedMessage);
-				}
-				else
-				{
-					_messagesToBeSent.Enqueue(serializedMessage);
-				}
+				Disconnect();
 			}
+
+			// Free any unmanaged objects here.
+			//
+			_disposed = true;
 		}
 	}
 }
