@@ -11,9 +11,9 @@ namespace Repeat.GenericLibs.PCL.APICallers.Interfaces
 
 		void Add(string apiRoute, T obj);
 
-		Task<List<T>> Get(string apiRoute);
+		Task<List<T>> GetList(string apiRoute);
 
-		Task<T> GetById(string apiRoute, object id);
+		Task<T> Get(string apiRoute);
 
 		void Update(string apiRoute, T obj);
 

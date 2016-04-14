@@ -26,12 +26,14 @@ namespace Repeat.GenericLibs.PCL.APICallers
 		{
 			try
 			{
-				var client = HttpClientExtensions.GetAPIClient(_apiURL);
-				var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
-				var response = await client.PostAsync(apiRoute, stringContent);
-				if (response != null)
+				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
-					//TODO:: do smth with the response
+					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
+					var response = await client.PostAsync(apiRoute, stringContent);
+					if (response != null)
+					{
+						//TODO:: do smth with the response
+					}
 				}
 			}
 			catch (Exception e)
@@ -45,17 +47,19 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			throw new NotImplementedException();
 		}
 
-		public async Task<List<T>> Get(string apiRoute)
+		public async Task<List<T>> GetList(string apiRoute)
 		{
 			List<T> elements = new List<T>();
 			try
 			{
-				var client = HttpClientExtensions.GetAPIClient(_apiURL);
-				var response = await client.GetAsync(apiRoute);
-				if (response != null)
+				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
-					string str = await response.Content.ReadAsStringAsync();
-					elements = JsonConvert.DeserializeObject<List<T>>(str, _settings);
+					var response = await client.GetAsync(apiRoute);
+					if (response != null)
+					{
+						string str = await response.Content.ReadAsStringAsync();
+						elements = JsonConvert.DeserializeObject<List<T>>(str, _settings);
+					}
 				}
 			}
 			catch (Exception e)
@@ -65,17 +69,19 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			return elements;
 		}
 
-		public async Task<T> GetById(string apiRoute, object id)
+		public async Task<T> Get(string apiRoute)
 		{
 			T element = default(T);
 			try
 			{
-				var client = HttpClientExtensions.GetAPIClient(_apiURL);
-				var response = await client.GetAsync(apiRoute + "/" + id);
-				if (response != null)
+				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
-					string str = await response.Content.ReadAsStringAsync();
-					element = JsonConvert.DeserializeObject<T>(str, _settings);
+					var response = await client.GetAsync(apiRoute);
+					if (response != null)
+					{
+						string str = await response.Content.ReadAsStringAsync();
+						element = JsonConvert.DeserializeObject<T>(str, _settings);
+					}
 				}
 			}
 			catch (Exception e)
@@ -89,12 +95,14 @@ namespace Repeat.GenericLibs.PCL.APICallers
 		{
 			try
 			{
-				var client = HttpClientExtensions.GetAPIClient(_apiURL);
-				var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
-				var response = await client.PutAsync(apiRoute, stringContent);
-				if (response != null)
+				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
-					//TODO:: do smth with the response
+					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
+					var response = await client.PutAsync(apiRoute, stringContent);
+					if (response != null)
+					{
+						//TODO:: do smth with the response
+					}
 				}
 			}
 			catch (Exception e)
