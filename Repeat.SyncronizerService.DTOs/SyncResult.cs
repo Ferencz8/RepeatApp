@@ -9,5 +9,10 @@ namespace Repeat.SyncronizerService.DTOs
 	public class SyncResult : SyncRequest
 	{
 		public bool Result { get; set; }
+
+		public new DataToBeSynched Clone()
+		{
+			return base.Clone<DataToBeSynched>();
+		}
 	}
 }

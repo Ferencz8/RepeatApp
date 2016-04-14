@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL
 {
-	public interface IUnitOfWork
+	public interface IUnitOfWork : IDisposable
 	{
 
 		IDevicesRepository DevicesRepository { get; }

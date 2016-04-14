@@ -75,9 +75,14 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Config.cs" />
     <Compile Include="Common\ObjectConverter.cs" />
     <Compile Include="Interfaces\IQueue.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="RabbitMQ.cs" />
+    <Compile Include="Strategies\DataToBeSynchedQueueProcessorStrategy.cs" />
+    <Compile Include="Strategies\IQueueProcessorStrategy.cs" />
+    <Compile Include="Strategies\PrepareSyncQueueProcessorStrategy.cs" />
     <Compile Include="Syncher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -85,7 +90,9 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Repeat.SyncronizerService.APICallers\Repeat.SyncronizerService.APICallers.csproj">
@@ -113,6 +120,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

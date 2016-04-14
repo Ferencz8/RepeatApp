@@ -18,7 +18,7 @@ namespace Repeat.SyncronizerService.Common
 			ReferenceLoopHandling = ReferenceLoopHandling.Ignore
 		};
 
-		public static byte[] ObjectToByteArray(object obj)
+		public static byte[] Object_To_JSON_To_ByteArray(object obj)
 		{
 			var messageAsJson = JsonConvert.SerializeObject(obj, _settings);
 
@@ -26,7 +26,7 @@ namespace Repeat.SyncronizerService.Common
 		}
 
 		// Convert a byte array to an Object
-		public static T JSONToObject<T>(byte[] arrBytes)
+		public static T ByteArray_To_JSON_To_Object<T>(byte[] arrBytes)
 			where T : class
 		{
 

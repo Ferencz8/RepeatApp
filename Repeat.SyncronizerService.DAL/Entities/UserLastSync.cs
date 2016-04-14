@@ -1,4 +1,5 @@
 ﻿using Repeat.SyncronizerService.DAL.Enums;
+using Repeat.SyncronizerService.DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DAL.Entities
 {
-	public class UserLastSync
+	public class UserLastSync : Prototype<UserLastSync>
 	{
 		[Key, Column(Order = 0)]
 		public Guid UserId { get; set; }

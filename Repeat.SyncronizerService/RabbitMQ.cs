@@ -1,11 +1,15 @@
-﻿using RabbitMQ.Client;
+﻿using Newtonsoft.Json;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using Repeat.SyncronizerService.Common;
+using Repeat.SyncronizerService.DTOs;
 using Repeat.SyncronizerService.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,21 +19,26 @@ namespace Repeat.SyncronizerService
 	{
 		private IConnection _connection;
 		private IModel _channel;
+		private bool _disposed;
+		private static readonly object _obj = new object();
 
 
 		public IConnection Connection
 		{
 			get
 			{
-				if(_connection == null)
+				lock (_obj)
 				{
-					_connection = CreateMQConnection();
-				}
+					if (_connection == null)
+					{
+						_connection = CreateMQConnection();
+					}
 
-				return _connection;
+					return _connection;
+				}
 			}
 		}
-		
+
 
 		public RabbitMQ()
 		{
@@ -40,37 +49,36 @@ namespace Repeat.SyncronizerService
 
 		public void SendMessage<T>(string queueName, T message)
 		{
-			DeclareQueue(queueName);
+			lock (_obj)
+			{
+				DeclareQueue(queueName);
 
-			var body = ObjectConverter.ObjectToByteArray(message);
+				var body = ObjectConverter.Object_To_JSON_To_ByteArray(message);
 
-			_channel.BasicPublish(exchange: "",
-								 routingKey: queueName,
-								 basicProperties: null,
-								 body: body);
+				_channel.BasicPublish(exchange: "",
+									 routingKey: queueName,
+									 basicProperties: null,
+									 body: body);
+			}
 		}
 
-		public void ProcessMessage<T>(string queueName, Action<T> actionOnMessage)
+		public void ProcessMessage<T>(string queueName, Action<IQueue, T> actionOnMessage)
 			where T : class
 		{
-			DeclareQueue(queueName);
-
-			var consumer = new EventingBasicConsumer(_channel);
-			consumer.Received += (model, ea) =>
+			lock (_obj)
 			{
-				var body = ea.Body;
-				T message = ObjectConverter.JSONToObject<T>(body);
-				actionOnMessage(message);
-			};
-			_channel.BasicConsume(queue: queueName, noAck: true, consumer: consumer);
+				DeclareQueue(queueName);
+
+				var consumer = new EventingBasicConsumer(_channel);
+				consumer.Received += (model, ea) =>
+				{
+					var body = ea.Body;
+					T message = ObjectConverter.ByteArray_To_JSON_To_Object<T>(body);
+					actionOnMessage(this, message);
+				};
+				_channel.BasicConsume(queue: queueName, noAck: true, consumer: consumer);
+			}
 		}
-
-		public void Dispose()
-		{
-			throw new NotImplementedException();
-		}
-
-
 
 		private void DeclareQueue(string queueName)
 		{
@@ -91,8 +99,50 @@ namespace Repeat.SyncronizerService
 				Port = Int32.Parse(Config.RabbitMQPort),
 				VirtualHost = Config.RabbitMQVirtualHost,
 			};
+			//TODO:: if no connection can be made...send an email ??
+			while (true)
+			{
+				try
+				{
+					return factory.CreateConnection();
+				}
+				catch (BrokerUnreachableException unreacheable)
+				{
+					Log.Info(unreacheable.ToString());
+				}
+			}
+		}
 
-			return factory.CreateConnection();
+
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			if (disposing)
+			{
+				// Free any other managed objects here.
+				if (!_channel.IsClosed)
+				{
+					_channel.Close();
+				}
+				_channel.Dispose();
+				if (_connection.IsOpen)
+				{
+					_connection.Close();
+				}
+				_connection.Dispose();
+			}
+
+			// Free any unmanaged objects here.
+			_disposed = true;
 		}
 	}
 }

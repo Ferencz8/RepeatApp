@@ -25,7 +25,7 @@ namespace Repeat.SyncronizerService.APICallers
 				var client = HttpClientExtensions.GetAPIClient(_apiURL);
 				string date = !lastSyncDate.HasValue ? string.Empty : "?lastSyncDate=" + lastSyncDate.Value.ToShortDateString();
 
-				var response = await client.GetAsync(_apiURL + string.Format(apiRoute, notebookId) + date);
+				var response = await client.GetAsync(_apiURL + string.Format(apiRoute, notebookId, lastSyncDate));
 				if (response != null)
 				{
 					string str = await response.Content.ReadAsStringAsync();

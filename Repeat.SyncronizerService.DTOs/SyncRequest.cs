@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.DTOs
 {
-	public class SyncRequest
+	public class SyncRequest : Prototype<SyncRequest>
 	{
 
 		public Guid UserId { get; set; }

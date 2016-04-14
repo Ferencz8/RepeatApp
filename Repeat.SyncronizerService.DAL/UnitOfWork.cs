@@ -10,7 +10,7 @@ namespace Repeat.SyncronizerService.DAL
 {
 	public class UnitOfWork : IUnitOfWork
 	{
-
+		bool _disposed;
 		DbSync _db = new DbSync();
 		IDevicesRepository _devicesRepository;
 		IUsersLastSyncRepository _usersLastSyncRepository;
@@ -44,6 +44,27 @@ namespace Repeat.SyncronizerService.DAL
 		public void Save()
 		{
 			_db.SaveChanges();
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			if (disposing)
+			{
+				// Free any other managed objects here.
+				_db.Database.Connection.Dispose();
+			}
+
+			// Free any unmanaged objects here.
+			_disposed = true;
 		}
 	}
 }

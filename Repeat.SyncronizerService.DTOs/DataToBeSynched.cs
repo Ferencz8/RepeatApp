@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +10,10 @@ namespace Repeat.SyncronizerService.DTOs
 	{
 
 		public List<Notebook> Notebooks { get; set; }
+
+		public new DataToBeSynched Clone()
+		{
+			return base.Clone<DataToBeSynched>();
+		}
 	}
 }
