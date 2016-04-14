@@ -12,7 +12,7 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 	public class Note
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public Guid Id { get; set; }
 
 		[Required]
