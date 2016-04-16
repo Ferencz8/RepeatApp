@@ -47,8 +47,8 @@ namespace Repeat.NotebooksAPI.Controllers
 			if (note.Id == Guid.Empty)
 			{
 				note.Id = Guid.NewGuid();
-				note.CreatedDate = DateTime.Now;
-				note.ModifiedDate = DateTime.Now;
+				note.CreatedDate = DateTime.UtcNow;
+				note.ModifiedDate = DateTime.UtcNow;
 			}
 			_unitOfWork.NotesRepository.Add(note);
 			_unitOfWork.Save();

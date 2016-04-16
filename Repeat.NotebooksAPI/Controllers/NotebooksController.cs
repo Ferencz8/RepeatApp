@@ -76,8 +76,8 @@ namespace Repeat.NotebooksAPI.Controllers
 			if(notebook.Id == Guid.Empty)
 			{
 				notebook.Id = Guid.NewGuid();
-				notebook.CreatedDate = DateTime.Now;
-				notebook.ModifiedDate = DateTime.Now;
+				notebook.CreatedDate = DateTime.UtcNow;
+				notebook.ModifiedDate = DateTime.UtcNow;
 			}
 			_unitOfWork.NotebooksRepository.Add(notebook);
 			_unitOfWork.Save();
