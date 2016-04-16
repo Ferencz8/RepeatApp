@@ -3,15 +3,8 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Repeat.SyncronizerService.Common;
-using Repeat.SyncronizerService.DTOs;
 using Repeat.SyncronizerService.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService
 {

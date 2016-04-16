@@ -11,7 +11,6 @@ namespace Repeat.SyncronizerService.Strategies
 	//TODO:: implement json schema for all dtos
 	public class PrepareSyncQueueProcessorStrategy : IQueueProcessor<SyncRequest>
 	{
-		//TODO:: here lookup on how to dispose db connection if program stops...maybe if I call Task . Dispose it calls all its objects Dispose methods ??
 		public void Process(IQueue queue, SyncRequest messageToBeProcessed)
 		{
 			Task.Factory.StartNew(() =>

@@ -136,7 +136,7 @@ namespace Repeat.SyncronizerService.Strategies
 		{
 			lock (_object)
 			{
-				userLastSyncClone.LastSyncDate = DateTime.Now;
+				userLastSyncClone.LastSyncDate = DateTime.UtcNow;
 				unitOfWork.UsersLastSyncRepository.Update(userLastSyncClone);
 				unitOfWork.Save();
 			}
