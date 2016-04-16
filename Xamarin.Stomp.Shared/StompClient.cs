@@ -13,126 +13,111 @@ using Repeat.Mobile.PCL.Logging;
 using System.Threading;
 using Xamarin.Stomp.Shared.Eventing;
 using System.Runtime.Remoting.Contexts;
+using System.Collections.Concurrent;
 
 namespace Xamarin.StompClient
 {
-	//used to create a lock for every method, property
-	//[Synchronization]
-	public class StompClient : IStompClient
+	public class StompClient //: IStompClient
 	{
+
 		static readonly object _obj = new object();
 		bool _disposed = false;
 
+		bool _disconnectRequest;
 		WebSocket _webSocket;
 		IMessage _authenticationMessage;
 		MessageSerializer _messageSerializer;
 		List<EventingMessageConsumer> _subscribedConsumers;
 		Action _onConnectedCallback;
+		Queue<string> _delayedMessagesToBeSent;
+		Dictionary<string, string> _subscribedMessages = new Dictionary<string, string>();
+		List<CancellationTokenSource> _threadTokens = new List<CancellationTokenSource>();
 
-		public bool Connected
+
+		private bool Connected
 		{
 			get
 			{
-				lock (_obj)
-				{
-					return _webSocket.State == WebSocketState.Open ? true : false;
-				}
+				return _webSocket.State == WebSocketState.Open || _webSocket.State == WebSocketState.Connecting ? true : false;
 			}
 		}
 
 		public StompClient(string address)
 		{
+			_delayedMessagesToBeSent = new Queue<string>();
+
 			_webSocket = new WebSocket(address);
 
 			_messageSerializer = new MessageSerializer();
-
+			_subscribedConsumers = new List<EventingMessageConsumer>();
 
 			_webSocket.Opened += new EventHandler(Websocket_Opened);
 
+			_webSocket.Error += WebSocket_ErrorHandler;
+
 			_webSocket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(Websocket_MessageReceived);
+
+			_webSocket.Closed += _webSocket_Closed;
 		}
 
 
-		public async Task<bool> Connect(
-			int timeoutSeconds = 60,
+		public void Connect(
 			Dictionary<string, string> authenticationHeaders = null,
 			Action onConnectedCallBack = null,
 			Action<object, ErrorEventArgs> onErrorCallBack = null)
 		{
-
-			HandleConnectionParameters(authenticationHeaders, onConnectedCallBack, onErrorCallBack);
-
-
-			//if the connection is lost all the subscribtion messages need to be sent again
-			_subscribedConsumers = new List<EventingMessageConsumer>();
-
-
-			_webSocket.Open();
-
-			//wait until Connected becomes true or the max waiting time elapses
-			await Task.Run(delegate
+			if (!Connected)
 			{
-				while (!Connected && timeoutSeconds >= 0)
-				{
-					Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+				HandleConnectionParameters(authenticationHeaders, onConnectedCallBack, onErrorCallBack);
 
-					timeoutSeconds--;
-				}
-			});
 
-			return Connected;
+				//if the connection is lost all the subscribtion messages need to be sent again
+				//_subscribedConsumers = new List<EventingMessageConsumer>();
+
+
+				_webSocket.Open();
+
+				_disconnectRequest = false;
+			}
 		}
 
 
-		public bool Publish(string queueName, object messageBody)
+		public void Publish(string queueName, object messageBody)
 		{
-			if (!Connected)
-			{
-				return false;
-			}
 
 			var sendMessage = new SendMessage(queueName, messageBody);
 			string msgToBeSnet = _messageSerializer.Serialize(sendMessage);
 
-			_webSocket.Send(msgToBeSnet);
-
-			Kernel.Get<ILog>().Info(Guid.Empty, "PUBLISHED on " + queueName);
-
-			return true;
+			RegisterMessageToBeSentLater(msgToBeSnet);
 		}
 
-		public bool Subscribe<T>(string queueName, Action<T> eventOnMessageReceived, bool useAckowledgment = false) where T : class
+		public void Subscribe<T>(string queueName, Action<T> eventOnMessageReceived, bool useAckowledgment = false) where T : class
 		{
-			if (!Connected)
-			{
-				return false;
-			}
-
-			if (_subscribedConsumers.Exists(n => n.QueueName.Equals(queueName)))
+			//TODO:: list of _subscribedConsumers and _subscribedMessages should be one collection
+			if (_subscribedConsumers.Exists(n => n.QueueName.Equals("/queue/" + queueName)))
 			{
 				//remove existing event handler
-				EventingMessageConsumer consumerToBeRemoved = _subscribedConsumers.FirstOrDefault(n => n.QueueName.Equals(queueName));
+				EventingMessageConsumer consumerToBeRemoved = _subscribedConsumers.FirstOrDefault(n => n.QueueName.Equals("/queue/" + queueName));
 
-				_subscribedConsumers.Remove(consumerToBeRemoved);
+				_subscribedConsumers.Remove(consumerToBeRemoved);//remove the subscriber event handler
+				_subscribedMessages.Remove("/queue/" + queueName);//and message
 			}
-			else
-			{
-				//subscribe message should be sent only once
-				SubscribeMessage subscribeMessage = new SubscribeMessage(queueName, useAckowledgment);
-				string serializedMessage = _messageSerializer.Serialize(subscribeMessage);
 
-				_webSocket.Send(serializedMessage);
-			}
+			//subscribe message should be sent only once
+			SubscribeMessage subscribeMessage = new SubscribeMessage(queueName, useAckowledgment);
+			string serializedMessage = _messageSerializer.Serialize(subscribeMessage);
+
+			_subscribedMessages.Add("/queue/" + queueName, serializedMessage);
+			RegisterMessageToBeSentLater(serializedMessage);
+
 
 
 			EventingMessageConsumer consumer = new EventingMessageConsumer("/queue/" + queueName, useAckowledgment);
 
 			consumer.OnMessageReceived += (obj, args) =>
 			{
-				//Kernel.Get<ILog>().Info(Guid.Empty, "HANDLER EXECUTED!!! " + queueName);
-
 				T objConverted = JsonConvert.DeserializeObject<T>(args.Message.Body.ToString());
-				
+
 				eventOnMessageReceived(objConverted);
 
 				if (consumer.UseACKnowledgement)
@@ -142,10 +127,6 @@ namespace Xamarin.StompClient
 			};
 
 			_subscribedConsumers.Add(consumer);
-
-			//Kernel.Get<ILog>().Info(Guid.Empty, "SUBSCRIBED on " + queueName);
-
-			return true;
 		}
 
 		/// <summary>
@@ -154,23 +135,47 @@ namespace Xamarin.StompClient
 		/// <param name="serverHeartBeat"></param>
 		private void StartHeartBeatTask()
 		{
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			CancellationToken cancelationToken = cancellationTokenSource.Token;
+
 
 			Task.Factory.StartNew(() =>
 			{
-				while (Connected)
+				while (true)
 				{
-					Task.Delay(TimeSpan.FromSeconds(7)).Wait();
 
-					_webSocket.Send("\n");
+					Task.Delay(TimeSpan.FromSeconds(7)).Wait();
+					if (cancelationToken.IsCancellationRequested)
+					{
+						cancelationToken.ThrowIfCancellationRequested();
+
+						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat");
+					}
+
+					SendMessage("\n");
 				}
-			});
+			}, cancelationToken);
+
+			_threadTokens.Add(cancellationTokenSource);
+		}
+
+		private void Log(string message, Exception e = null)
+		{
+			if (e == null)
+			{
+				Kernel.Get<ILog>().Info(Guid.Empty, message);
+			}
+			else
+			{
+				Kernel.Get<ILog>().Exception(Guid.Empty, e, message);
+			}
 		}
 
 		private void SendACKMessage(string messageId)
 		{
 			string msgToBeSnet = _messageSerializer.Serialize(new ACKMessage(messageId));
 
-			_webSocket.Send(msgToBeSnet);
+			RegisterMessageToBeSentLater(msgToBeSnet);
 		}
 
 		private void HandleConnectionParameters(Dictionary<string, string> authenticationHeaders, Action onConnectedCallBack, Action<object, ErrorEventArgs> onErrorCallBack)
@@ -188,19 +193,29 @@ namespace Xamarin.StompClient
 
 			if (onErrorCallBack != null)
 			{
+				_webSocket.Error -= WebSocket_ErrorHandler;
 				_webSocket.Error += new EventHandler<ErrorEventArgs>(onErrorCallBack);
-			}
-			else
-			{
-				_webSocket.Error += new EventHandler<ErrorEventArgs>(WebSocket_ErrorHandler);
 			}
 		}
 
+		private void SendMessage(string msg)
+		{
+			lock (_obj)
+			{
+				if (!Connected)
+				{
+					Log("Lost conn while sendind msg");
+				}
+				_webSocket.Send(msg);
+
+				Kernel.Get<ILog>().Info(Guid.Empty, "SENT message with delayed queue" + msg.Substring(0, msg.Length > 60 ? 60 : msg.Length));
+			}
+		}
 
 		private void Websocket_Opened(object sender, EventArgs e)
 		{
 			string msgToSend = _messageSerializer.Serialize(_authenticationMessage);
-			_webSocket.Send(msgToSend);
+			SendMessage(msgToSend);
 		}
 
 		private void Websocket_MessageReceived(object sender, MessageReceivedEventArgs e)
@@ -212,12 +227,14 @@ namespace Xamarin.StompClient
 			{
 				case MessageCommand.Connected:
 					{
-						StartHeartBeatTask();
+						//StartHeartBeatTask();
 
 						if (_onConnectedCallback != null)
 						{
 							_onConnectedCallback();
 						}
+
+						StartTask_For_SendingMessages();
 					}
 					break;
 				case MessageCommand.Message:
@@ -235,16 +252,95 @@ namespace Xamarin.StompClient
 			}
 		}
 
+
+		private void _webSocket_Closed(object sender, EventArgs e)
+		{
+			//_threadTokens.ForEach(n => n.Cancel());//cancel the heart beat and delayed message sender tasks
+			//_threadTokens.Clear();
+			if (!_disconnectRequest)
+			{
+				Kernel.Get<ILog>().Info(Guid.Empty, "Connection Lost");
+
+				if (!Connected)
+				{
+					Kernel.Get<ILog>().Info(Guid.Empty, "Reconnecting");
+
+					Connect();
+
+					Thread.Sleep(200500);//TODO::maybe use a hashset instead of a queue ?
+
+
+					//subscribe again
+					foreach (var msg in _subscribedMessages)
+					{
+						RegisterMessageToBeSentLater(msg.Value);
+					}
+				}
+			}
+		}
+
 		private void WebSocket_ErrorHandler(object sender, ErrorEventArgs e)
 		{
-
 		}
 
 
 		public void Disconnect()
 		{
-			string serializedMsg = _messageSerializer.Serialize(new DisconnectMessage());
-			_webSocket.Send(serializedMsg);
+			if (Connected)
+			{
+				_disconnectRequest = true;
+				string serializedMsg = _messageSerializer.Serialize(new DisconnectMessage());
+				SendMessage(serializedMsg);
+			}
+		}
+
+		private void RegisterMessageToBeSentLater(string msg)
+		{
+			lock (_obj2)
+			{
+				_delayedMessagesToBeSent.Enqueue(msg);
+			}
+		}
+		private readonly object _obj2 = new object();
+		private void StartTask_For_SendingMessages()
+		{
+			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+			CancellationToken cancelationToken = cancellationTokenSource.Token;
+
+			Task.Factory.StartNew(() =>
+			{
+				while (true)
+				{
+					lock (_obj2)
+					{
+						if (_delayedMessagesToBeSent.Count > 0)
+						{
+							string msg = _delayedMessagesToBeSent.Peek();
+
+							SendMessage(msg);
+						}
+						else
+						{
+							Task.Delay(300).Wait();
+						}
+
+						//stop task
+						if (cancelationToken.IsCancellationRequested)
+						{
+							Kernel.Get<ILog>().Info(Guid.Empty, "Canceling task sending messages");
+							cancelationToken.ThrowIfCancellationRequested();
+						}
+						else//then the message got sent succesfully
+						{
+							if (_delayedMessagesToBeSent.Count > 0) {
+								string msg = _delayedMessagesToBeSent.Dequeue();
+							}
+						}
+					}
+				}
+			}, cancelationToken);
+
+			_threadTokens.Add(cancellationTokenSource);
 		}
 
 		public void Dispose()

@@ -20,6 +20,7 @@ namespace Repeat.Mobile.Activities.Notes
 		Guid chosenNotebookId;
 		Note _noteToBeEdited;
 
+		//TODO:: a possible resason for not synching is that here a date is saved in utc and in web client in gmt + 3 format
 		protected override void OnCreate(Bundle bundle)
 		{
 			chosenNotebookId = Guid.Parse(Intent.GetStringExtra("notebookId"));
@@ -86,7 +87,7 @@ namespace Repeat.Mobile.Activities.Notes
 		{
 			_noteToBeEdited.Name = _txtNote.Text;
 			_noteToBeEdited.Content = _txtContent.Text;
-			_noteToBeEdited.ModifiedDate = DateTime.Now;
+			_noteToBeEdited.ModifiedDate = DateTime.UtcNow;
 
 			_notesRepository.Update(_noteToBeEdited);
 			Finish();
@@ -100,8 +101,8 @@ namespace Repeat.Mobile.Activities.Notes
 				Name = _txtNote.Text,
 				Content = _txtContent.Text,
 				NotebookId = chosenNotebookId.ToString(),
-				CreatedDate = DateTime.Now,
-				ModifiedDate = DateTime.Now,
+				CreatedDate = DateTime.UtcNow,
+				ModifiedDate = DateTime.UtcNow,
 			});
 			Finish();
 		}

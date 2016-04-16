@@ -4,6 +4,7 @@ using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
 using SQLite.Net;
+using System;
 
 namespace Repeat.Mobile.PCL.DAL
 {
@@ -13,10 +14,11 @@ namespace Repeat.Mobile.PCL.DAL
 		INotesRepository _notesRepository;
 		INotebooksRepository _notebookRepository;
 		SQLiteConnection _db;
+		bool _disposed;
 
 		public UnitOfWork()
 		{
-			_db = Util.GetDbConnection();
+			_db = Util.CreateDbConnection();
 		}
 
 		public INotesRepository NotesRepository
@@ -43,6 +45,27 @@ namespace Repeat.Mobile.PCL.DAL
 
 				return _notebookRepository;
 			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			if (disposing)
+			{
+				// Free any other managed objects here.
+				_db.Dispose();
+			}
+
+			// Free any unmanaged objects here.
+			_disposed = true;
 		}
 	}
 }

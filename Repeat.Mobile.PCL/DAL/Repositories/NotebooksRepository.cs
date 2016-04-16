@@ -25,7 +25,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			return _db.Table<Notebook>().SingleOrDefault(n => n.Name.Equals(notebookName));
 		}
 
-		public List<Notebook> GetNotebooksWithNotesByLastModifiedDateForNotes(DateTime lastModifiedDate)
+		public List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate)
 		{
 			var notebooks = _db.GetAllWithChildren<Notebook>();
 

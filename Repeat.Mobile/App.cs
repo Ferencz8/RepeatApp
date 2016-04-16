@@ -12,8 +12,12 @@ namespace Repeat.Mobile
 {
 	public class App
 	{
-		private static App _current;
+		public event EventHandler<EventArgs> Initialized = delegate { };
 
+		public bool IsInitialized { get; set; }
+
+
+		private static App _current;
 		static App()
 		{
 			_current = new App();
@@ -27,18 +31,27 @@ namespace Repeat.Mobile
 			// subscribe to app wide unhandled exceptions so that we can log them.
 			AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 
-			new Task(() =>
-			{
-				Util.Log = new Logger();
+			//new Task(() =>
+			//{
+			Util.Log = new Logger();
 
-				SetUpDatabase();
-			}).Start();
+			//Kernel.Get<ILog>().Info(Guid.Empty, "Init started!");
+
+			SetUpDatabase();
+
+			// set our initialization flag so we know that we're all setup
+			this.IsInitialized = true;
+			// raise our intialized event
+			this.Initialized(this, new EventArgs());
+
+			Kernel.Get<ILog>().Info(Guid.Empty, "Init finished!");
+			//}).Start();
 		}
 
 		private void SetUpDatabase()
 		{
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), Configs.DatabaseName);
-			Util.CreateDbConnection(new SQLitePlatformAndroid(), path);
+			Util.DatabasePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), Configs.DatabaseName);
+			Util.SQLitePlatform = new SQLitePlatformAndroid();
 		}
 
 

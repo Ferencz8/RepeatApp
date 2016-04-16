@@ -15,7 +15,7 @@ namespace Repeat.Mobile.PCL.DependencyManagement
 	{
 		public override void Load()
 		{
-			var db = Util.GetDbConnection();
+			var db = Util.CreateDbConnection();
 
 			Bind<INotebooksRepository>().To<NotebooksRepository>().WithConstructorArgument("db", db);
 			Bind<INotesRepository>().To<NotesRepository>().WithConstructorArgument("db", db);

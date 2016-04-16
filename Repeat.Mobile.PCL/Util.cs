@@ -16,33 +16,31 @@ namespace Repeat.Mobile.PCL
 		public static ILog Log { get; set; }
 
 
-		private static SQLiteConnection _connection;
+		public static ISQLitePlatform SQLitePlatform { get; set; }
 
-		public static void CreateDbConnection(ISQLitePlatform sqlitePlatform, string databasePath)
+		public static string DatabasePath { get; set; }
+
+		public static SQLiteConnection CreateDbConnection()
 		{
-			if (_connection == null)
+
+			if (SQLitePlatform == null || string.IsNullOrWhiteSpace(DatabasePath))
+				throw new Exception("Parameters SQLitePlatform and DatabasePath must be set before using this method.");
+
+			var connection = new SQLiteConnection(SQLitePlatform, DatabasePath);
+
+			connection.CreateTable<Notebook>();
+			connection.CreateTable<Note>();
+			if (connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
 			{
-				_connection = new SQLiteConnection(sqlitePlatform, databasePath);
-
-				_connection.CreateTable<Notebook>();
-				_connection.CreateTable<Note>();
-				if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks add a default one
+				connection.Insert(new Notebook()
 				{
-					_connection.Insert(new Notebook()
-					{
-						Id = Guid.NewGuid().ToString(),
-						Name = "First Notebook",
-						CreatedDate = DateTime.Now,
-						ModifiedDate = DateTime.Now,
-					});
-				}
-
+					Id = Guid.NewGuid().ToString(),
+					Name = "First Notebook",
+					CreatedDate = DateTime.Now,
+					ModifiedDate = DateTime.Now,
+				});
 			}
-		}
-
-		public static SQLiteConnection GetDbConnection()
-		{
-			return _connection;
+			return connection;
 		}
 	}
 }

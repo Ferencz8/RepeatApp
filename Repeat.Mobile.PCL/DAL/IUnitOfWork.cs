@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repeat.Mobile.PCL.DAL
 {
-	public interface IUnitOfWork
+	public interface IUnitOfWork : IDisposable
 	{
 
 		INotesRepository NotesRepository { get; }

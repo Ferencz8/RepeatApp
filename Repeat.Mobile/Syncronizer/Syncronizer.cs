@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Android.App;
+using Android.Content;
+using Android.Widget;
+using Newtonsoft.Json;
+using Repeat.Mobile.PCL.APICallers.Interfaces;
 using Repeat.Mobile.PCL.Common;
 using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DependencyManagement;
@@ -9,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WebSocket4Net;
 using Xamarin.StompClient;
@@ -19,17 +24,8 @@ namespace Repeat.Mobile.Sync
 	public class Syncronizer
 	{
 
-		enum SyncStatus
-		{
-			Finished = 0,
-			Started			
-		}
-		private WebSocket _webSocket;
-		private IStompClient _client;
+		private StompClient _client;
 		private IUnitOfWork _unitOfWork;
-		private volatile SyncStatus _syncStatus;
-
-		private static Syncronizer _syncher;
 
 
 
@@ -39,127 +35,130 @@ namespace Repeat.Mobile.Sync
 
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
 		}
-
-		private void StartWebSocketMonitoringTask()
+		
+		public static Syncronizer CreateSyncher()
 		{
-			Task.Factory.StartNew(() =>
-			{
-				Task.Delay(TimeSpan.FromMinutes(2));//first wait until a connection is made
-
-				//here check if connection is open every x second(should be incremental)
-				//if connection is lost reconnect
-				double sleepTime = 5;
-				while (_syncStatus != SyncStatus.Finished)
-				{
-
-					Task.Delay(TimeSpan.FromSeconds(sleepTime)).Wait();
-					if (!_client.Connected)
-					{
-						_client.Dispose();
-						_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
-
-						Kernel.Get<ILog>().Info(Guid.Empty, "Atempting to connect again");
-
-						StartSynching();
-					}
-					else
-					{
-						Kernel.Get<ILog>().Info(Guid.Empty, "Connection Status: " + _client.Connected);
-						sleepTime = sleepTime == 80 ? 5 : sleepTime * 2;
-					}
-				}
-			});
+			return new Syncronizer();
 		}
 
-		//Singleton
-		public static Syncronizer GetSyncher()
+		/// <summary>
+		/// dbSyncStart - used to display UI  message/ do some action before starting local db syncronization with api
+		/// dbSyncEnd - used to display UI  message/ do some action after ending local db syncronization with api
+		/// </summary>
+		/// <param name="dbSyncStart"></param>
+		/// <param name="dbSyncEnd"></param>
+		public async void StartSynching(Action dbSyncStart, Action dbSyncEnd)
 		{
-			if (_syncher == null)
-			{
-				_syncher = new Syncronizer();
-			}
 
-			return _syncher;
-		}
-
-
-		public async void StartSynching()
-		{
 			//TODO:: maybe try a few times...and if it does not work display message to user
-			if (await this.Connect())
+			Connect();
+
+			//removes messages which due to the closing or lose of a connection remained on the queue
+			RemoveExistingMessages();
+
+
+			//here I should use the logged in user and device specific identification
+			DTOs.SyncRequest request = new DTOs.SyncRequest()
 			{
+				UserId = Guid.Empty,
+			};
 
-				//if the process started for the first time
-				if (_syncStatus == SyncStatus.Finished)
+			_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
+			{
+				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
 				{
-					StartWebSocketMonitoringTask();
-				}
-				_syncStatus = SyncStatus.Started;
 
+					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate);
 
-				//here I should use the logged in user and device specific identification
-				SyncRequest request = new SyncRequest()
-				{
-					UserId = Guid.Empty,
-				};
-
-				_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
-				{
-					if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
+					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
 					{
+						UserId = n.UserId,
+						Notebooks = notebooks,
+					});
+				}
+			}, true);
 
-						//here I should unsubscribe from the SyncReqeustQueue 
-						var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateForNotes(n.LastSyncDate);
+			_client.Subscribe<DTOs.SyncResult>(Configs.RabbitMQ_SyncResultQueue, syn =>
+			{
+				Kernel.Get<ILog>().Info(Guid.Empty, "Sync FINISHED");
 
-						_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
-						{
-							UserId = n.UserId,
-							Notebooks = notebooks,
-						});
-					}
-				}, true);
-
-				_client.Subscribe<SyncResult>(Configs.RabbitMQ_SyncResultQueue, syn =>
+				//temp solution
+				Task.Factory.StartNew(() =>
 				{
-					Kernel.Get<ILog>().Info(Guid.Empty, "Sync FINISHED");
-					//TODO:: display message to the user that the sync was a succes/failure
-
-					_syncStatus = SyncStatus.Finished;
+					Kernel.Get<ILog>().Info(Guid.Empty, "Dispose client");
+					Task.Delay(10000).Wait();
 					_client.Dispose();
-				}, true);
+					Kernel.Get<ILog>().Info(Guid.Empty, "Disposed");
+				});
 
-				_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
-			}
+				GetSynchedDataToDB(dbSyncStart, dbSyncEnd);
+			}, true);
+
+			_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
 		}
 
-		private async Task<bool> Connect()
+
+		private void RemoveExistingMessages()
 		{
-			if (!_client.Connected)
+			_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
 			{
-				var headers = new Dictionary<string, string>()
+				Kernel.Get<ILog>().Info(Guid.Empty, "Dead msg intercepted");
+			});
+
+			_client.Subscribe<DTOs.SyncResult>(Configs.RabbitMQ_SyncResultQueue, syn =>
+			{
+				Kernel.Get<ILog>().Info(Guid.Empty, "Dead msg intercepted");
+			});
+
+			Thread.Sleep(5000);
+
+			_client.Disconnect();
+			_client = null;
+			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
+			
+			Connect();
+		}
+
+		private async void GetSynchedDataToDB(Action dbSyncStart, Action dbSyncEnd)
+		{
+
+			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(Configs.NotebooksAPI_Notebooks_Get);
+
+			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(Configs.NotebooksAPI_Notes_Get);
+
+			dbSyncStart();
+
+			//TODO:: here display msg to User...that his data is getting synched && also should stop all actions on UI
+			_unitOfWork.NotebooksRepository.DeleteAll();
+			_unitOfWork.NotesRepository.DeleteAll();
+
+			foreach (var nb in apiNotebooks)
+			{
+				_unitOfWork.NotebooksRepository.Add(nb);
+			}
+			foreach (var note in apiNotes)
+			{
+				_unitOfWork.NotesRepository.Add(note);
+			}
+
+			_unitOfWork.Dispose();
+
+			//here end msg
+			dbSyncEnd();
+		}
+
+		private void Connect()
+		{
+			var headers = new Dictionary<string, string>()
 				{
 					{"login", Configs.RabbitMQ_Login },
 					{"passcode", Configs.RabbitMQ_Password},
 					{"host", Configs.RabbitMQ_Host },
 					{"accept-version", Configs.RabbitMQ_AcceptVersion },
-					{"heart-beat", "10000,10000" }//I hardcoded 10000 inside the StompClient code
+					//{"heart-beat", "10000,10000" }//I hardcoded 10000 inside the StompClient code
 				};
-				return await _client.Connect(60, headers,
-					() => Kernel.Get<ILog>().Info(Guid.Empty, "CONNECTED to WebSocket."),
-					(obj, args) =>
-					{
-
-						Kernel.Get<ILog>().Exception(Guid.Empty, args.Exception, "WebSocket ErrorHandler Exception");
-						if (args.Exception.Message.ToLower().Contains("the socket is not connected") && _syncStatus == SyncStatus.Started)
-						{
-							Kernel.Get<ILog>().Info(Guid.Empty, "Reconnecting");
-
-							StartSynching();
-						}
-					});
-			}
-
-			return true;
+			_client.Connect(headers,
+			   () => Kernel.Get<ILog>().Info(Guid.Empty, "CONNECTED to WebSocket."));
 		}
 	}
 }

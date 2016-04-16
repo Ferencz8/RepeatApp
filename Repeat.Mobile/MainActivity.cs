@@ -23,6 +23,7 @@ using Xamarin;
 using Repeat.Mobile.PCL.Logging;
 using Repeat.AppLayer;
 using Repeat.Mobile.PCL.Common;
+using Repeat.Common;
 
 namespace Repeat.Mobile
 {
@@ -46,8 +47,6 @@ namespace Repeat.Mobile
 
 		protected override void OnCreate(Bundle bundle)
 		{
-			var currentApp = App.Current;
-
 			base.OnCreate(bundle);
 
 			// Set our view from the "main" layout resource
@@ -55,13 +54,13 @@ namespace Repeat.Mobile
 
 			drawerLayout = FindViewById<DrawerLayout>(Resource.Id.myDrawer);
 			notebooks = FindViewById<ListView>(Resource.Id.notebooks);
-			leftSideMenu  = FindViewById<LinearLayout>(Resource.Id.leftSideMenu);
+			leftSideMenu = FindViewById<LinearLayout>(Resource.Id.leftSideMenu);
 			addNoteButton = FindViewById<Button>(Resource.Id.addButton);
 			notes = FindViewById<ListView>(Resource.Id.notes);
 			menuButton = FindViewById<Button>(Resource.Id.menuButton);
 			syncButton = FindViewById<Button>(Resource.Id.syncButton);
 			addNotebookButton = FindViewById<Button>(Resource.Id.addNotebookButton);
-			
+
 			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
 			drawerLayout.SetDrawerListener(drawerToggle);
 			drawerLayout.CloseDrawer(leftSideMenu);
@@ -86,7 +85,7 @@ namespace Repeat.Mobile
 			notes.ItemClick += Notes_ItemClick;
 		}
 
-		
+
 
 		private void AddNoteButton_Click(object sender, EventArgs e)
 		{
@@ -107,11 +106,36 @@ namespace Repeat.Mobile
 
 		private void SyncButton_Click(object sender, EventArgs e)
 		{
-			Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
+			if (NetworkConnection.IsOnline(this))
+			{
 
-			Toast.MakeText(this, "Sync Started!", ToastLength.Short).Show();
+				Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
 
-			Syncronizer.GetSyncher().StartSynching();
+				syncButton.Enabled = false;
+
+				Toast.MakeText(this, "Sync Started!", ToastLength.Short).Show();
+
+				Syncronizer.CreateSyncher().StartSynching(DbSyncStarted, DbSyncEnded);
+			}
+			else
+			{
+				Toast.MakeText(this, "Not internet connection!", ToastLength.Short).Show();
+			}
+		}
+
+		private void DbSyncStarted()
+		{
+			RunOnUiThread(() => Toast.MakeText(this, "Db Sync started", ToastLength.Long));
+		}
+
+		private void DbSyncEnded()
+		{
+			RunOnUiThread(() =>
+			{
+				RefreshNotesListContent();
+				Toast.MakeText(this, "Db Sync ended", ToastLength.Long);
+				syncButton.Enabled = true;
+			});			
 		}
 
 		private void AddNotebookButton_Click(object sender, EventArgs e)
@@ -131,8 +155,8 @@ namespace Repeat.Mobile
 				{
 					Id = Guid.NewGuid().ToString(),
 					Name = notebookName,
-					CreatedDate = DateTime.Now,
-					ModifiedDate = DateTime.Now,
+					CreatedDate = DateTime.UtcNow,
+					ModifiedDate = DateTime.UtcNow,
 				});
 				if (rowschanged == 1)
 				{
@@ -219,6 +243,11 @@ namespace Repeat.Mobile
 		{
 			notesAdapter.RefreshContent(chosenNotebookId);
 			notes.Adapter = notesAdapter;
+		}
+
+		protected override void FinishedInitializing()
+		{
+
 		}
 	}
 }
