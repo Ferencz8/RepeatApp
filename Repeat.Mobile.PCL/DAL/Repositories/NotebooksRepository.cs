@@ -20,6 +20,11 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			_db = db;
 		}
 
+		public override List<Notebook> Get()
+		{
+			return _db.Table<Notebook>().Where(n => !n.Deleted).ToList();
+		}
+
 		public Notebook GetByName(string notebookName)
 		{
 			return _db.Table<Notebook>().SingleOrDefault(n => n.Name.Equals(notebookName));
@@ -44,6 +49,35 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			}
 
 			return notebooks;
+		}
+
+		/// <summary>
+		/// Perform logical Delete.
+		/// </summary>
+		/// <param name="objPrimaryKey"></param>
+		/// <returns></returns>
+		public override int Delete(object objPrimaryKey)
+		{
+			Notebook notebookDb = base.GetByID(objPrimaryKey);
+			notebookDb.Deleted = true;
+			notebookDb.DeletedDate = DateTime.UtcNow;
+			notebookDb.ModifiedDate = DateTime.UtcNow;
+
+			return base.Update(notebookDb);
+		}
+
+		public override int DeleteAll()
+		{
+			var notesDb = this.Get();
+			foreach (var notebookDb in notesDb)
+			{
+				notebookDb.Deleted = true;
+				notebookDb.DeletedDate = DateTime.UtcNow;
+				notebookDb.ModifiedDate = DateTime.UtcNow;
+				base.Update(notebookDb);
+			}
+
+			return 1;
 		}
 	}
 }
