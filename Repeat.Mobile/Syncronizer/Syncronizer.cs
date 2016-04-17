@@ -112,8 +112,8 @@ namespace Repeat.Mobile.Sync
 
 			Thread.Sleep(5000);
 
-			_client.Disconnect();
-			_client = null;
+			_client.Dispose();
+			//_client = null;
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
 			
 			Connect();
@@ -155,7 +155,7 @@ namespace Repeat.Mobile.Sync
 					{"passcode", Configs.RabbitMQ_Password},
 					{"host", Configs.RabbitMQ_Host },
 					{"accept-version", Configs.RabbitMQ_AcceptVersion },
-					//{"heart-beat", "10000,10000" }//I hardcoded 10000 inside the StompClient code
+					{"heart-beat", "50000,50000" }//I hardcoded 10000 inside the StompClient code
 				};
 			_client.Connect(headers,
 			   () => Kernel.Get<ILog>().Info(Guid.Empty, "CONNECTED to WebSocket."));

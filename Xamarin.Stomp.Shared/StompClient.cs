@@ -17,7 +17,7 @@ using System.Collections.Concurrent;
 
 namespace Xamarin.StompClient
 {
-	public class StompClient //: IStompClient
+	public class StompClient : IStompClient
 	{
 
 		static readonly object _obj = new object();
@@ -49,6 +49,7 @@ namespace Xamarin.StompClient
 			_webSocket = new WebSocket(address);
 
 			_messageSerializer = new MessageSerializer();
+
 			_subscribedConsumers = new List<EventingMessageConsumer>();
 
 			_webSocket.Opened += new EventHandler(Websocket_Opened);
@@ -69,12 +70,7 @@ namespace Xamarin.StompClient
 			if (!Connected)
 			{
 				HandleConnectionParameters(authenticationHeaders, onConnectedCallBack, onErrorCallBack);
-
-
-				//if the connection is lost all the subscribtion messages need to be sent again
-				//_subscribedConsumers = new List<EventingMessageConsumer>();
-
-
+				
 				_webSocket.Open();
 
 				_disconnectRequest = false;
@@ -128,13 +124,14 @@ namespace Xamarin.StompClient
 
 			_subscribedConsumers.Add(consumer);
 		}
-
+		private static int s;
 		/// <summary>
 		/// This Heart Beat task will use send a heart beat every 10 seconds. 
 		/// </summary>
 		/// <param name="serverHeartBeat"></param>
 		private void StartHeartBeatTask()
 		{
+			++s;
 			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 			CancellationToken cancelationToken = cancellationTokenSource.Token;
 
@@ -144,15 +141,15 @@ namespace Xamarin.StompClient
 				while (true)
 				{
 
-					Task.Delay(TimeSpan.FromSeconds(7)).Wait();
+					Task.Delay(7000).Wait();
 					if (cancelationToken.IsCancellationRequested)
 					{
-						cancelationToken.ThrowIfCancellationRequested();
+						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat " + s);
 
-						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat");
+						cancelationToken.ThrowIfCancellationRequested();
 					}
 
-					SendMessage("\n");
+					SendMessage("\n"); Kernel.Get<ILog>().Info(Guid.Empty, "heart beat sent");
 				}
 			}, cancelationToken);
 
@@ -227,7 +224,7 @@ namespace Xamarin.StompClient
 			{
 				case MessageCommand.Connected:
 					{
-						//StartHeartBeatTask();
+						StartHeartBeatTask();
 
 						if (_onConnectedCallback != null)
 						{
@@ -255,8 +252,6 @@ namespace Xamarin.StompClient
 
 		private void _webSocket_Closed(object sender, EventArgs e)
 		{
-			//_threadTokens.ForEach(n => n.Cancel());//cancel the heart beat and delayed message sender tasks
-			//_threadTokens.Clear();
 			if (!_disconnectRequest)
 			{
 				Kernel.Get<ILog>().Info(Guid.Empty, "Connection Lost");
@@ -267,9 +262,13 @@ namespace Xamarin.StompClient
 
 					Connect();
 
-					Thread.Sleep(200500);//TODO::maybe use a hashset instead of a queue ?
 
+					Thread.Sleep(2000);//TODO::maybe use a hashset instead of a queue ?
 
+#if DEBUG
+					Thread.Sleep(100000);
+					Log("Debugging");
+#endif
 					//subscribe again
 					foreach (var msg in _subscribedMessages)
 					{
@@ -281,6 +280,7 @@ namespace Xamarin.StompClient
 
 		private void WebSocket_ErrorHandler(object sender, ErrorEventArgs e)
 		{
+			Kernel.Get<ILog>().Exception(Guid.Empty, e.Exception, "Error handler");
 		}
 
 
@@ -301,7 +301,9 @@ namespace Xamarin.StompClient
 				_delayedMessagesToBeSent.Enqueue(msg);
 			}
 		}
+
 		private readonly object _obj2 = new object();
+
 		private void StartTask_For_SendingMessages()
 		{
 			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -332,7 +334,8 @@ namespace Xamarin.StompClient
 						}
 						else//then the message got sent succesfully
 						{
-							if (_delayedMessagesToBeSent.Count > 0) {
+							if (_delayedMessagesToBeSent.Count > 0)
+							{
 								string msg = _delayedMessagesToBeSent.Dequeue();
 							}
 						}
@@ -357,6 +360,9 @@ namespace Xamarin.StompClient
 
 			if (disposing)
 			{
+				_threadTokens.ForEach(n => n.Cancel());//cancel the heart beat and delayed message sender tasks
+				_threadTokens.Clear();
+
 				Disconnect();
 			}
 
