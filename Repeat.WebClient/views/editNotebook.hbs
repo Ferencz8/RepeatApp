@@ -1,0 +1,19 @@
+{{title}}
+<br>
+<form class="editNotebook" action="/notebooks/edit" method="post">
+    <div class="id">
+        <input name="id" type="hidden" value="{{notebook.Id}}">
+    </div>
+    <div class="name">
+        <span>Name: </span>
+        <input name="name" type="text" value="{{notebook.Name}}">
+    </div>
+    <button type="submit">Save Changes</button>
+</form>
+
+<form class="deleteNotebook" action="/notebooks/delete" method="post">
+    <div class="id">
+        <input name="id" type="hidden" value="{{notebook.Id}}">
+    </div>
+    <input type="submit" value="Delete">
+</form>

@@ -1,0 +1,14 @@
+{{title}}
+<br>
+<form id="addNote" action="/notes/add" method="post">
+    <input type="hidden" name="notebookId" value="{{notebookId}}">
+    <div class="name">
+        <span>Name: </span>
+        <input name="name" type="text">
+    </div>
+    <div class="content">
+        <span>Content: </span>
+        <textarea form="addNote" name="content"></textarea>
+    </div>
+    <button  type="submit">Add Note</button>
+</form>

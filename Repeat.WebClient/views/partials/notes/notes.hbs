@@ -1,0 +1,74 @@
+{{title}}
+<br>
+<input type="hidden" value="{{notebookId}}" id="notebookId">
+<button id="addNote" type="submit">Add Note</button>
+<div class="notes">
+    {{#each notes}}
+        <div class="note" style="width: 300px;padding: 25px;border: 2px solid navy;margin: 25px;">
+            <div id="{{Id}}">
+                <span class="name" id="{{Name}}">Name : {{Name}}</span>
+                <br>
+                <span class="content" id="{{Content}}">Content : {{Content}}</span>
+                <br>
+                <span>Created Date: </span><span class="createdDate date">{{CreatedDate}}</span>
+                <br>
+                <span>Modified Date: </span><span class="modifiedDate date">{{ModifiedDate}}</span>
+                <br>
+                <button class="editNote">Edit</button>
+            </div>
+        </div>
+        <br>
+    {{/each}}
+</div>
+<br>
+<script>
+    $('.editNote').on('click', function (e) {
+        debugger;
+        var chosenNoteId = $(e.currentTarget).parent().prop('id');
+
+        $.ajax({
+            url: "/notes/edit",
+            data: {noteId: chosenNoteId},
+            type: "GET",
+            success: function (response) {
+
+                $(".container").html(response);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+
+    $('#addNote').on('click', function (e) {
+        debugger;
+        var notebookId = $('#notebookId').val();
+
+        $.ajax({
+            url: "/notes/add",
+            data: {notebookId: notebookId},
+            type: "GET",
+            success: function (response) {
+
+                $(".container").html(response);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+</script>
+<script>
+    $('.date').each(function (k, v) {
+        console.log('I tried-');
+        var value = $(v).text();
+        var formatedValue = formatDate(value);
+        $(v).text(formatedValue);
+    });
+
+    function formatDate(datetime) {
+        var date = new Date(Date.parse(datetime));
+        return date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate()) + "   "
+                + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    }
+</script>

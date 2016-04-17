@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+<body>
+<div class="container">
+    {{title}}
+    <div class="notebooks">
+        {{#each notebooks}}
+            <div class="notebook" style="width: 300px;padding: 25px;border: 2px solid navy;margin: 25px;">
+                <div id="{{Id}}">
+                    <span class="name" id="{{Name}}">Name : {{Name}}</span>
+                    <br>
+                    <span>Created Date: </span><span class="createdDate date">{{CreatedDate}}</span>
+                    <br>
+                    <span>Modified Date: </span><span class="modifiedDate date">{{ModifiedDate}}</span>
+                    <br>
+                    <button class="editNotebook">Edit</button>
+                    <button class="notes">Notes</button>
+                </div>
+            </div>
+            <br>
+        {{/each}}
+    </div>
+    <br>
+    <button id="addNotebook" type="submit">Add Notebook</button>
+</div>
+</body>
+</html>
+<script src="../lib/jquery/dist/jquery.js"></script>
+<script>
+    $('.date').each(function (k, v) {
+        var value = $(v).text();
+        var formatedValue = formatDate(value);
+        $(v).text(formatedValue);
+    });
+
+    $(".notes").on('click', function(e){
+        var chosenNotebookId = $(e.currentTarget).parent().prop('id');
+        var chosenNotebookName = $(e.currentTarget).parent().find('span.name').prop('id')
+        $.ajax({
+            url: "/notebooks/notes",
+            data: {notebookId: chosenNotebookId, notebookName: chosenNotebookName},
+            type: "GET",
+            success: function (response) {
+
+                $(".container").html(response);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+
+    $("#addNotebook").on('click', function (e) {
+
+        $.ajax({
+            url: "/notebooks/add",
+            type: "GET",
+            success: function (response) {
+
+                $(".container").html(response);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        })
+    });
+
+    $(".editNotebook").on("click", function (e) {
+        debugger;
+        chosenNotebookId =  $(e.currentTarget).parent().prop('id');
+
+        $.ajax({
+            url: "/notebooks/getNotebookById",
+            data: {noteBookId: chosenNotebookId},
+            type: "GET",
+            success: function (response) {
+
+                $(".container").html(response);
+            },
+            error: function (xhr) {
+
+            }
+        });
+    });
+
+    function formatDate(datetime) {
+        var date = new Date(Date.parse(datetime));
+        return date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate()) + "   "
+                + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    }
+
+</script>
