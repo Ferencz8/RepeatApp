@@ -24,10 +24,21 @@ namespace Repeat.NotebooksAPI.Controllers
 		}
 
 		// GET: api/notes
+		// GET: api/notes?deleted=true
 		[HttpGet]
-		public JsonResult<IEnumerable<Note>> GetNotes()
+		public JsonResult<IEnumerable<Note>> GetNotes(bool? deleted = null)
 		{
-			var notes = _unitOfWork.NotesRepository.Get();
+
+
+			IEnumerable<Note> notes = new List<Note>();
+			if (deleted.HasValue)
+			{
+				notes = _unitOfWork.NotesRepository.Get(n => n.Deleted.Equals(deleted.Value));
+			}
+			else
+			{
+				notes = _unitOfWork.NotesRepository.Get();
+			}
 
 			return Json(notes, _jsonSerializerSettings);
 		}
@@ -62,11 +73,11 @@ namespace Repeat.NotebooksAPI.Controllers
 			_unitOfWork.Save();
 		}
 
-		// DELETE api/values/5b8567ea-b323-4378-afef-0922eec1892f
-		public void Delete(Guid id)
-		{
-			_unitOfWork.NotesRepository.Delete(id);
-			_unitOfWork.Save();
-		}
+		//// DELETE api/values/5b8567ea-b323-4378-afef-0922eec1892f
+		//public void Delete(Guid id)
+		//{
+		//	_unitOfWork.NotesRepository.Delete(id);
+		//	_unitOfWork.Save();
+		//}
 	}
 }

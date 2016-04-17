@@ -32,8 +32,6 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 		[Required]
 		public DateTime ModifiedDate { get; set; }
 
-		public SyncStatus SyncStatus { get; set; }
-
 		public bool Deleted { get; set; }
 
 		public DateTime? DeletedDate { get; set; }
