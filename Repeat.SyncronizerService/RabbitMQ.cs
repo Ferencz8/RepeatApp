@@ -55,7 +55,7 @@ namespace Repeat.SyncronizerService
 			}
 		}
 
-		public void ProcessMessage<T>(string queueName, Action<IQueue, T> actionOnMessage)
+		public void ProcessMessage<T>(string queueName, Strategies.IQueueProcessor<T> strategy)//Action<IQueue, T> actionOnMessage)
 			where T : class
 		{
 			lock (_obj)
@@ -67,7 +67,8 @@ namespace Repeat.SyncronizerService
 				{
 					var body = ea.Body;
 					T message = ObjectConverter.ByteArray_To_JSON_To_Object<T>(body);
-					actionOnMessage(this, message);
+					//actionOnMessage(this, message);
+					strategy.Process(this, message);
 				};
 				_channel.BasicConsume(queue: queueName, noAck: true, consumer: consumer);
 			}

@@ -13,7 +13,7 @@ namespace Repeat.SyncronizerService.Interfaces
 
 		void SendMessage<T>(string queueName, T message);
 
-		void ProcessMessage<T>(string queueName, Action<IQueue, T> actionOnMessage) 
+		void ProcessMessage<T>(string queueName, Strategies.IQueueProcessor<T> processor)//Action<IQueue, T> actionOnMessage) 
 			where T : class;
 	}
 }
