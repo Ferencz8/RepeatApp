@@ -10,8 +10,8 @@ I built a NotebookAPI, which will be the central database and a Syncronization S
 For the moment the Xamarin android application offers CRUD operations on the notebook and notes.
 The android app persists it's data in an SQLite database in android. The NotebookAPI uses SQL-Server.
 
-For the moment I have 2 separate modules:
-* 1. **NotebookAPI** - which offers synchronous communication over **REST**
-* 2. **Syncronization Service** - which offers asynchronous communication via **Event Messaging using Rabbit - MessageQueue**
+For the moment I have 2 separate microservices:
+* **NotebookAPI** - which offers synchronous communication over **REST**
+* **Syncronization Service** - which offers asynchronous communication via **Event Messaging using Rabbit - MessageQueue**
 
 The next step would be to add another module to handle User Management.
