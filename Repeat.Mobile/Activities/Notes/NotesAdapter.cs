@@ -16,16 +16,16 @@ namespace Repeat.Mobile.Activities.Notes
 	{
 		List<Note> _notesList;
 		Activity _activity;
-		INotesRepository notesRepisotory;
+		IUnitOfWork _unitOfWork;
+
 		public NotesAdapter(Activity activity, Guid notebookId)
 		{
-			notesRepisotory = Kernel.Get<INotesRepository>();
-			var notebooksRepository = Kernel.Get<INotebooksRepository>();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
 			if (notebookId == Guid.Empty)// 0)
 			{
-				notebookId = Guid.Parse(notebooksRepository.Get().First().Id);
+				notebookId = Guid.Parse(_unitOfWork.NotebooksRepository.Get().First().Id);
 			}
-			_notesList = notesRepisotory.GetNotesByNotebookId(notebookId);
+			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(notebookId);
 
 			_activity = activity;
 		}
@@ -68,7 +68,9 @@ namespace Repeat.Mobile.Activities.Notes
 		public void RefreshContent(Guid chosenNotebookId)
 		{
 			_notesList.Clear();
-			_notesList = notesRepisotory.GetNotesByNotebookId(chosenNotebookId);
+			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(chosenNotebookId);
+			//_unitOfWork.Dispose();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
 		}
 	}
 }

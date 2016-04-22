@@ -27,7 +27,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 		public List<Note> GetNotesByNotebookId(Guid notebookId)
 		{
 			string notebookIdAsString = notebookId.ToString();
-			return _db.Table<Note>().Where(n => n.NotebookId.Equals(notebookIdAsString)).ToList();
+			return _db.Table<Note>().Where(n => n.NotebookId.Equals(notebookIdAsString) && !n.Deleted).ToList();
 		}
 
 		/// <summary>
@@ -57,6 +57,11 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			}
 
 			return 1;
+		}
+
+		public int EraseAll()
+		{
+			return base.DeleteAll();
 		}
 	}
 }

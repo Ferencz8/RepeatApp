@@ -5,6 +5,7 @@ using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
 using SQLite.Net;
 using System;
+using Repeat.Mobile.PCL.DAL.Repositories;
 
 namespace Repeat.Mobile.PCL.DAL
 {
@@ -27,7 +28,7 @@ namespace Repeat.Mobile.PCL.DAL
 			{
 				if(_notesRepository == null)
 				{
-					_notesRepository = Kernel.Get<INotesRepository>(new ConstructorArgument("db", _db));
+					_notesRepository = new NotesRepository(_db);//Kernel.Get<INotesRepository>(new ConstructorArgument("db", _db));
 				}
 
 				return _notesRepository;
@@ -40,7 +41,7 @@ namespace Repeat.Mobile.PCL.DAL
 			{
 				if(_notebookRepository == null)
 				{
-					_notebookRepository = Kernel.Get<INotebooksRepository>(new ConstructorArgument("db", _db)); ;
+					_notebookRepository = new NotebooksRepository(_db);//Kernel.Get<INotebooksRepository>(new ConstructorArgument("db", _db)); ;
 				}
 
 				return _notebookRepository;

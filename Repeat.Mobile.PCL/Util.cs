@@ -20,19 +20,21 @@ namespace Repeat.Mobile.PCL
 
 		public static string DatabasePath { get; set; }
 
+
+		private static SQLiteConnection _connection;
 		public static SQLiteConnection CreateDbConnection()
 		{
 
 			if (SQLitePlatform == null || string.IsNullOrWhiteSpace(DatabasePath))
 				throw new Exception("Parameters SQLitePlatform and DatabasePath must be set before using this method.");
 
-			var connection = new SQLiteConnection(SQLitePlatform, DatabasePath);
+			_connection = new SQLiteConnection(SQLitePlatform, DatabasePath);
 
-			connection.CreateTable<Notebook>();
-			connection.CreateTable<Note>();
-			if (connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
+			_connection.CreateTable<Notebook>();
+			_connection.CreateTable<Note>();
+			if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
 			{
-				connection.Insert(new Notebook()
+				_connection.Insert(new Notebook()
 				{
 					Id = Guid.NewGuid().ToString(),
 					Name = "First Notebook",
@@ -40,7 +42,16 @@ namespace Repeat.Mobile.PCL
 					ModifiedDate = DateTime.Now,
 				});
 			}
-			return connection;
+			return _connection;
+		}
+
+		public static SQLiteConnection GetDbConnection()
+		{
+			if(_connection == null)
+			{
+				CreateDbConnection();
+			}
+			return _connection;
 		}
 	}
 }

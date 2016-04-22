@@ -135,13 +135,13 @@ namespace Xamarin.StompClient
 			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 			CancellationToken cancelationToken = cancellationTokenSource.Token;
 
-
+			Kernel.Get<ILog>().Info(Guid.Empty, "Starting Heart Beat task");
 			Task.Factory.StartNew(() =>
 			{
 				while (true)
 				{
 
-					Task.Delay(7000).Wait();
+					Task.Delay(3000).Wait();
 					if (cancelationToken.IsCancellationRequested)
 					{
 						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat " + s);

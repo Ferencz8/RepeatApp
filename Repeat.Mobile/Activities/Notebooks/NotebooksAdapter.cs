@@ -8,6 +8,7 @@ using Android.Widget;
 using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
+using Repeat.Mobile.PCL.DAL;
 
 namespace Repeat.Mobile.Activities.Notebooks
 {
@@ -15,12 +16,12 @@ namespace Repeat.Mobile.Activities.Notebooks
 	{
 		List<Notebook> _notebooksList;
 		Activity _activity;
-		INotebooksRepository notebooksRepository;
+		IUnitOfWork _unitOfWork;
 
 		public NotebooksAdapter(Activity activity)
 		{
-			notebooksRepository = Kernel.Get<INotebooksRepository>();
-			_notebooksList = notebooksRepository.Get();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
+			_notebooksList = _unitOfWork.NotebooksRepository.Get();
 			_activity = activity;
 		}
 
@@ -59,7 +60,7 @@ namespace Repeat.Mobile.Activities.Notebooks
 
 		public void RefreshContent()
 		{
-			_notebooksList = notebooksRepository.Get();
+			_notebooksList = _unitOfWork.NotebooksRepository.Get();
 		}
 	}
 }

@@ -12,5 +12,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories.Interfaces
 		Notebook GetByName(string notebookName);
 
 		List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate);
+
+		int EraseAll();
 	}
 }

@@ -22,7 +22,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 
 		public override List<Notebook> Get()
 		{
-			return _db.Table<Notebook>().Where(n => !n.Deleted).ToList();
+			return _db.Table<Notebook>().Where(n => n.Deleted == false).ToList();
 		}
 
 		public Notebook GetByName(string notebookName)
@@ -36,7 +36,7 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 
 			foreach(var notebook in notebooks)
 			{
-				if(notebook.Notes == null)
+				if(notebook.Notes == null || notebook.Notes.Count == 0)
 				{
 					continue;
 				}
@@ -78,6 +78,12 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			}
 
 			return 1;
+		}
+
+		//TODO::temp
+		public int EraseAll()
+		{
+			return base.DeleteAll();
 		}
 	}
 }

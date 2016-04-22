@@ -67,7 +67,7 @@ namespace Repeat.Mobile.Sync
 			{
 				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
 				{
-
+					
 					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate);
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
@@ -129,8 +129,8 @@ namespace Repeat.Mobile.Sync
 			dbSyncStart();
 
 			//TODO:: here display msg to User...that his data is getting synched && also should stop all actions on UI
-			_unitOfWork.NotebooksRepository.DeleteAll();
-			_unitOfWork.NotesRepository.DeleteAll();
+			_unitOfWork.NotebooksRepository.EraseAll();
+			_unitOfWork.NotesRepository.EraseAll();
 
 			foreach (var nb in apiNotebooks)
 			{
