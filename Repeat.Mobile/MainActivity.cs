@@ -5,8 +5,6 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using System.Collections.Generic;
-using Android.Support.V4.Widget;
-using Android.Support.V4.App;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.Activities.Notebooks;
@@ -18,6 +16,8 @@ using Repeat.Mobile.PCL.Logging;
 using Repeat.AppLayer;
 using Repeat.Mobile.PCL.Common;
 using Repeat.Common;
+using Android.Support.V7.App;
+using Android.Support.V4.Widget;
 
 namespace Repeat.Mobile
 {
@@ -55,8 +55,8 @@ namespace Repeat.Mobile
 			syncButton = FindViewById<Button>(Resource.Id.syncButton);
 			addNotebookButton = FindViewById<Button>(Resource.Id.addNotebookButton);
 
-			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.Drawable.Icon, Resource.String.open_drawer, Resource.String.close_drawer);
-			drawerLayout.SetDrawerListener(drawerToggle);
+			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.String.open_drawer, Resource.String.close_drawer);//Resource.Drawable.Icon, -- removed
+			drawerLayout.AddDrawerListener(drawerToggle);
 			drawerLayout.CloseDrawer(leftSideMenu);
 
 			notebooksAdapter = new NotebooksAdapter(this);
@@ -134,7 +134,7 @@ namespace Repeat.Mobile
 
 		private void AddNotebookButton_Click(object sender, EventArgs e)
 		{
-			var builder = new AlertDialog.Builder(this);
+			var builder = new Android.App.AlertDialog.Builder(this);
 			builder.SetTitle("Add Notebook");
 			EditText edit = new EditText(this);
 			builder.SetView(edit);
@@ -230,7 +230,6 @@ namespace Repeat.Mobile
 		{
 			base.OnPause();
 		}
-
 
 
 		private void RefreshNotesListContent()
