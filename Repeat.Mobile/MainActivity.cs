@@ -1,17 +1,12 @@
 ﻿using System;
 using Android.App;
 using Android.Content;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
-using System.Linq;
 using System.Collections.Generic;
 using Android.Support.V4.Widget;
 using Android.Support.V4.App;
-using Repeat.Mobile.PCL.DAL;
-using System.IO;
-using SQLite.Net.Platform.XamarinAndroid;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.Activities.Notebooks;
@@ -19,7 +14,6 @@ using Repeat.Mobile.Activities.Notes;
 using Repeat.Mobile.Activities.SideMenu;
 using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.Sync;
-using Xamarin;
 using Repeat.Mobile.PCL.Logging;
 using Repeat.AppLayer;
 using Repeat.Mobile.PCL.Common;
@@ -65,7 +59,7 @@ namespace Repeat.Mobile
 			drawerLayout.SetDrawerListener(drawerToggle);
 			drawerLayout.CloseDrawer(leftSideMenu);
 
-			notebooksAdapter = new NotebooksAdapter(this);//, Android.Resource.Layout.SimpleListItem1, notebookItems);
+			notebooksAdapter = new NotebooksAdapter(this);
 			notebooks.Adapter = notebooksAdapter;
 			chosenNotebookId = Guid.Parse(notebooksAdapter.GetItemAtPosition(0).Id);
 

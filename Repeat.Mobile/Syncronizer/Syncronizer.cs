@@ -35,7 +35,7 @@ namespace Repeat.Mobile.Sync
 
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
 		}
-		
+
 		public static Syncronizer CreateSyncher()
 		{
 			return new Syncronizer();
@@ -49,6 +49,22 @@ namespace Repeat.Mobile.Sync
 		/// <param name="dbSyncEnd"></param>
 		public async void StartSynching(Action dbSyncStart, Action dbSyncEnd)
 		{
+			CancellationTokenSource cts = new CancellationTokenSource();
+			CancellationToken token = cts.Token;
+
+
+			Task.Factory.StartNew(() =>
+			{
+				Task.Delay(TimeSpan.FromMinutes(3)).Wait();
+
+				if (token.IsCancellationRequested)
+				{
+					Kernel.Get<ILog>().Info(Guid.Empty, "Monitoring will shut down task");
+					token.ThrowIfCancellationRequested();					
+				}
+
+				DisposeClient();
+			}, token);
 
 			//TODO:: maybe try a few times...and if it does not work display message to user
 			Connect();
@@ -67,7 +83,7 @@ namespace Repeat.Mobile.Sync
 			{
 				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
 				{
-					
+
 					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate);
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
@@ -89,6 +105,8 @@ namespace Repeat.Mobile.Sync
 					Task.Delay(10000).Wait();
 					_client.Dispose();
 					Kernel.Get<ILog>().Info(Guid.Empty, "Disposed");
+
+					cts.Cancel();
 				});
 
 				GetSynchedDataToDB(dbSyncStart, dbSyncEnd);
@@ -96,6 +114,15 @@ namespace Repeat.Mobile.Sync
 
 			_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
 		}
+
+		private void DisposeClient()
+		{
+			lock (_obj)
+			{
+				_client.Dispose();
+			}
+		}
+		private readonly object _obj = new object();
 
 
 		private void RemoveExistingMessages()
@@ -115,7 +142,7 @@ namespace Repeat.Mobile.Sync
 			_client.Dispose();
 			//_client = null;
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
-			
+
 			Connect();
 		}
 
@@ -129,6 +156,9 @@ namespace Repeat.Mobile.Sync
 			dbSyncStart();
 
 			//TODO:: here display msg to User...that his data is getting synched && also should stop all actions on UI
+
+			_unitOfWork.Dispose();
+			_unitOfWork = new UnitOfWork();
 			_unitOfWork.NotebooksRepository.EraseAll();
 			_unitOfWork.NotesRepository.EraseAll();
 
