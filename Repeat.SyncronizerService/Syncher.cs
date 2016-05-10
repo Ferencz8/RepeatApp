@@ -74,9 +74,9 @@ namespace Repeat.SyncronizerService
 
 		private void RegisterQueueProcessors()
 		{
-			_queue.ProcessMessage<SyncRequest>(Config.RabbitMQ_PrepareSyncQueue, new PrepareSyncQueueProcessorStrategy());//.Process);
+			_queue.ProcessMessage<SyncRequest>(Config.RabbitMQ_PrepareSyncQueue, new PrepareSyncQueueProcessorStrategy());
 
-			_queue.ProcessMessage<DataToBeSynched>(Config.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynchedQueueProcessorStrategy());//.Process);
+			_queue.ProcessMessage<DataToBeSynched>(Config.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynchedQueueProcessorStrategy());
 		}
 	}
 }

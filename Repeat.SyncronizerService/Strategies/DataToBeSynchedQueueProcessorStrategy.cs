@@ -29,6 +29,7 @@ namespace Repeat.SyncronizerService.Strategies
 
 				Console.ForegroundColor = ConsoleColor.DarkCyan;
 				Log.Info("userLastSync.SyncStatus Status :" + userLastSync.SyncStatus);
+				Console.ForegroundColor = ConsoleColor.White;
 				if (userLastSync.SyncStatus == SyncStatus.Stopped)
 				{
 					ChangeSyncStatus(unitOfWorkExternal, userLastSync, SyncStatus.Running);
@@ -78,6 +79,8 @@ namespace Repeat.SyncronizerService.Strategies
 					ChangeSyncStatus(unitOfWork, userLastSyncClone, SyncStatus.Stopped);
 
 					UpdateLastSyncDate(unitOfWork, userLastSyncClone);
+
+					Console.ForegroundColor = ConsoleColor.White;
 				}
 			});
 		}
@@ -115,9 +118,9 @@ namespace Repeat.SyncronizerService.Strategies
 				Notebook notebookApi = await apiCaller.NotebookAPICaller.Get(string.Format(Config.NotebookAPI_Notebooks_GETByID, notebook.Id));
 
 				//notebook was added from external source so we directly insert in api
-				if (notebookApi == null)
+				if (notebookApi == null || notebookApi.Id.Equals(Guid.Empty))
 				{
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notes_GET, notebook);
+					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook);
 					continue;
 				}
 

@@ -4,6 +4,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Repeat.SyncronizerService.Common;
 using Repeat.SyncronizerService.Interfaces;
+using Repeat.SyncronizerService.Strategies;
 using System;
 
 namespace Repeat.SyncronizerService
@@ -55,7 +56,7 @@ namespace Repeat.SyncronizerService
 			}
 		}
 
-		public void ProcessMessage<T>(string queueName, Strategies.IQueueProcessor<T> strategy)//Action<IQueue, T> actionOnMessage)
+		public void ProcessMessage<T>(string queueName, IQueueProcessor<T> strategy)
 			where T : class
 		{
 			lock (_obj)
@@ -67,7 +68,7 @@ namespace Repeat.SyncronizerService
 				{
 					var body = ea.Body;
 					T message = ObjectConverter.ByteArray_To_JSON_To_Object<T>(body);
-					//actionOnMessage(this, message);
+					
 					strategy.Process(this, message);
 				};
 				_channel.BasicConsume(queue: queueName, noAck: true, consumer: consumer);
@@ -93,7 +94,7 @@ namespace Repeat.SyncronizerService
 				Port = Int32.Parse(Config.RabbitMQPort),
 				VirtualHost = Config.RabbitMQVirtualHost,
 			};
-			//TODO:: if no connection can be made...send an email ??
+			//if no connection can be made...send an email ??
 			while (true)
 			{
 				try

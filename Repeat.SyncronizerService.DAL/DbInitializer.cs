@@ -54,7 +54,7 @@ namespace Repeat.SyncronizerService.DAL
 					foreach (var validationError in validationErrors.ValidationErrors)
 					{
 
-						//TODO:: implement logging
+						//logging
 					}
 				}
 			}

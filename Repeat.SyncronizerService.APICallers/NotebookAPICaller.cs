@@ -34,7 +34,7 @@ namespace Repeat.SyncronizerService.APICallers
 			}
 			catch (Exception e)
 			{
-				//TODO LOG
+				
 			}
 			return elements;
 		}

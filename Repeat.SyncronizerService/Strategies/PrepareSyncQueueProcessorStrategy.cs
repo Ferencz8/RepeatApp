@@ -32,6 +32,7 @@ namespace Repeat.SyncronizerService.Strategies
 					
 
 					Log.Info("END SENT Sync Request Response: " + userLastSync.LastSyncDate.ToString());
+					Console.ForegroundColor = ConsoleColor.White;
 				}
 			});
 		}

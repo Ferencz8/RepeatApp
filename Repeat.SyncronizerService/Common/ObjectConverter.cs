@@ -11,13 +11,14 @@ namespace Repeat.SyncronizerService.Common
 {
 	public class ObjectConverter
 	{
-		//https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
-		// Convert an object to a byte array
+		
 		private static JsonSerializerSettings _settings = new JsonSerializerSettings()
 		{
 			ReferenceLoopHandling = ReferenceLoopHandling.Ignore
 		};
 
+		//https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+		// Convert an object to a byte array
 		public static byte[] Object_To_JSON_To_ByteArray(object obj)
 		{
 			var messageAsJson = JsonConvert.SerializeObject(obj, _settings);

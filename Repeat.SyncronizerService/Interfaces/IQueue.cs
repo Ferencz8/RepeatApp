@@ -1,9 +1,6 @@
 ﻿using RabbitMQ.Client;
+using Repeat.SyncronizerService.Strategies;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repeat.SyncronizerService.Interfaces
 {
@@ -13,7 +10,7 @@ namespace Repeat.SyncronizerService.Interfaces
 
 		void SendMessage<T>(string queueName, T message);
 
-		void ProcessMessage<T>(string queueName, Strategies.IQueueProcessor<T> processor)//Action<IQueue, T> actionOnMessage) 
+		void ProcessMessage<T>(string queueName, IQueueProcessor<T> processor)
 			where T : class;
 	}
 }
