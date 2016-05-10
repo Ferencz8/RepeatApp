@@ -89,7 +89,7 @@ namespace Repeat.NotebooksAPI.Controllers
 
 		public void Post([FromBody]Notebook notebook)
 		{
-			//TODO:: here I should validate the obj
+			//TODO:: check if notes are inserted
 			if (notebook.Id == Guid.Empty)
 			{
 				notebook.Id = Guid.NewGuid();
@@ -105,6 +105,16 @@ namespace Repeat.NotebooksAPI.Controllers
 		public void Put(Guid id, [FromBody]Notebook notebook)
 		{
 			notebook.Id = id;
+			if (notebook.Deleted)
+			{
+				notebook.Notes.ForEach(n =>
+				{
+					n.Deleted = true;
+					n.DeletedDate = DateTime.UtcNow;
+					n.ModifiedDate = DateTime.UtcNow;
+				});
+			}
+			//todo:check if changes happem
 			_unitOfWork.NotebooksRepository.Update(notebook);
 			_unitOfWork.Save();
 		}
