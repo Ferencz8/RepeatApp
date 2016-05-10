@@ -52,7 +52,7 @@ namespace Repeat.Mobile.Sync
 			CancellationTokenSource cts = new CancellationTokenSource();
 			CancellationToken token = cts.Token;
 
-
+			//temp for presentation:::if in 3 minutes the sync is not done close conn
 			Task.Factory.StartNew(() =>
 			{
 				Task.Delay(TimeSpan.FromMinutes(3)).Wait();
@@ -63,7 +63,10 @@ namespace Repeat.Mobile.Sync
 					token.ThrowIfCancellationRequested();					
 				}
 
+				Kernel.Get<ILog>().Info(Guid.Empty, " Closing from task ");
 				DisposeClient();
+
+				dbSyncEnd();
 			}, token);
 
 			//TODO:: maybe try a few times...and if it does not work display message to user

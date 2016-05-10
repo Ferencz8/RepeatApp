@@ -41,8 +41,8 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 					continue;
 				}
 
-				var requestedNotes = notebook.Notes.Where(n => n.ModifiedDate > lastModifiedDate).ToList();
-
+				var requestedNotes = notebook.Notes.Where(n => DateTime.Compare(n.ModifiedDate, lastModifiedDate) > 0 ).ToList();
+				PCL.DependencyManagement.Kernel.Get<Logging.ILog>().Info(Guid.Empty, notebook.Notes[0].ModifiedDate.ToString() + " " + lastModifiedDate.ToString());
 				notebook.Notes.Clear();
 
 				notebook.Notes.AddRange(requestedNotes);

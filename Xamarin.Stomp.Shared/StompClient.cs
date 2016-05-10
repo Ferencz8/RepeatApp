@@ -70,7 +70,7 @@ namespace Xamarin.StompClient
 			if (!Connected)
 			{
 				HandleConnectionParameters(authenticationHeaders, onConnectedCallBack, onErrorCallBack);
-				
+
 				_webSocket.Open();
 
 				_disconnectRequest = false;
@@ -124,14 +124,12 @@ namespace Xamarin.StompClient
 
 			_subscribedConsumers.Add(consumer);
 		}
-		private static int s;
 		/// <summary>
 		/// This Heart Beat task will use send a heart beat every 10 seconds. 
 		/// </summary>
 		/// <param name="serverHeartBeat"></param>
 		private void StartHeartBeatTask()
 		{
-			++s;
 			CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 			CancellationToken cancelationToken = cancellationTokenSource.Token;
 
@@ -141,15 +139,16 @@ namespace Xamarin.StompClient
 				while (true)
 				{
 
-					Task.Delay(3000).Wait();
+					Task.Delay(10000).Wait();
 					if (cancelationToken.IsCancellationRequested)
 					{
-						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat " + s);
+						Kernel.Get<ILog>().Info(Guid.Empty, "Cancel task heart beat ");
 
 						cancelationToken.ThrowIfCancellationRequested();
 					}
 
-					SendMessage("\n"); Kernel.Get<ILog>().Info(Guid.Empty, "heart beat sent");
+					SendMessage("\n");
+					//Kernel.Get<ILog>().Info(Guid.Empty, "heart beat sent");
 				}
 			}, cancelationToken);
 
@@ -205,7 +204,10 @@ namespace Xamarin.StompClient
 				}
 				_webSocket.Send(msg);
 
-				Kernel.Get<ILog>().Info(Guid.Empty, "SENT message with delayed queue" + msg.Substring(0, msg.Length > 60 ? 60 : msg.Length));
+				if (!string.IsNullOrWhiteSpace(msg) && !msg.Equals("\n"))
+				{
+					Kernel.Get<ILog>().Info(Guid.Empty, "SENT message with delayed queue" + msg.Substring(0, msg.Length > 60 ? 60 : msg.Length));
+				}
 			}
 		}
 
@@ -263,12 +265,8 @@ namespace Xamarin.StompClient
 					Connect();
 
 
-					Thread.Sleep(2000);//TODO::maybe use a hashset instead of a queue ?
+					Thread.Sleep(2000);
 
-#if DEBUG
-					Thread.Sleep(100000);
-					Log("Debugging");
-#endif
 					//subscribe again
 					foreach (var msg in _subscribedMessages)
 					{
@@ -313,6 +311,8 @@ namespace Xamarin.StompClient
 			{
 				while (true)
 				{
+					Task.Delay(1000).Wait();
+
 					lock (_obj2)
 					{
 						if (_delayedMessagesToBeSent.Count > 0)
@@ -320,10 +320,6 @@ namespace Xamarin.StompClient
 							string msg = _delayedMessagesToBeSent.Peek();
 
 							SendMessage(msg);
-						}
-						else
-						{
-							Task.Delay(300).Wait();
 						}
 
 						//stop task

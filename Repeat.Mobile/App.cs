@@ -2,9 +2,7 @@ using System.IO;
 using SQLite.Net.Platform.XamarinAndroid;
 using Repeat.Mobile.PCL;
 using Repeat.Mobile.PCL.Common;
-using System.Threading.Tasks;
 using System;
-using Android.Util;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.Logging;
 
