@@ -1,0 +1,26 @@
+{{title}}
+<br>
+<form id="editNote" action="/notes/edit" method="post">
+    <div class="id">
+        <input name="id" type="hidden" value="{{note.Id}}">
+    </div>
+    <div class="name">
+        <span>Name: </span>
+        <input name="name" type="text" value="{{note.Name}}">
+    </div>
+    <div class="content">
+        <span>Content: </span>
+        <textarea form="editNote" name="content">{{note.Content}}</textarea>
+    </div>
+    <button  type="submit">Save Changes</button>
+</form>
+
+<form id="deleteNote" action="/notes/delete" method="post">
+    <div class="id">
+        <input name="id" type="hidden" value="{{note.Id}}">
+    </div>
+    <div class="notebookId">
+        <input name="notebookId" type="hidden" value="{{note.NotebookId}}">
+    </div>
+    <input type="submit" value="Delete">
+</form>

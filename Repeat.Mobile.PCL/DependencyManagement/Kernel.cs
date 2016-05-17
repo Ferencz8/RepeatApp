@@ -30,6 +30,7 @@ namespace Repeat.Mobile.PCL.DependencyManagement
 			{
 				new RepositoryModule(),
 				new APICallerModule(),
+				new LoggingModule(),
 			};
 		}
 	}

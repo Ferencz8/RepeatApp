@@ -13,7 +13,7 @@ namespace Repeat.NotebooksAPI.Infrastructure
 		//http://www.entityframeworktutorial.net/EntityFramework4.3/dbcontext-vs-objectcontext.aspx
 
 		public Db()
-			:base("Repeat")
+			:base("name=Repeat")
 		{
 
 		}
@@ -23,8 +23,7 @@ namespace Repeat.NotebooksAPI.Infrastructure
 			Database.SetInitializer(new DbInitializer());
 		}
 
-
-		//TODO:: find out what the IDbSet does
+		
 		public IDbSet<Note> Notes { get; set; }
 
 		public IDbSet<Notebook> Notebooks { get; set; }

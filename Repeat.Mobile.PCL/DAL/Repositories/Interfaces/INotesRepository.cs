@@ -10,6 +10,8 @@ namespace Repeat.Mobile.PCL.DAL.Repositories.Interfaces
 	public interface INotesRepository : IGenericRepository<Note>
 	{
 
-		List<Note> GetNotesByNotebookId(int notebookId);
+		List<Note> GetNotesByNotebookId(Guid notebookId);
+
+		int EraseAll();
 	}
 }

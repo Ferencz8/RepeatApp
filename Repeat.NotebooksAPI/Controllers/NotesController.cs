@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Repeat.NotebooksAPI.Infrastructure;
 using Repeat.NotebooksAPI.Domain.Entities;
 using Newtonsoft.Json;
+using System.Web.Http;
+using System.Collections.Generic;
+using System.Web.Http.Results;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Repeat.NotebooksAPI.Controllers
 {
-	[Route("api/[controller]")]
-	public class NotesController : Controller
+	public class NotesController : ApiController
 	{
 		IUnitOfWork _unitOfWork;
 		JsonSerializerSettings _jsonSerializerSettings;
-
-		public NotesController(IUnitOfWork unitOfWork)
+		public NotesController()
 		{
-			_unitOfWork = unitOfWork;
+			_unitOfWork = new UnitOfWork();
 			_jsonSerializerSettings = new JsonSerializerSettings()
 			{
 				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -27,17 +24,27 @@ namespace Repeat.NotebooksAPI.Controllers
 		}
 
 		// GET: api/notes
+		// GET: api/notes?deleted=true
 		[HttpGet]
-		public JsonResult Get()
+		public JsonResult<IEnumerable<Note>> GetNotes(bool? deleted = null)
 		{
-			var notes = _unitOfWork.NotebooksRepository.Get();
+
+
+			IEnumerable<Note> notes = new List<Note>();
+			if (deleted.HasValue)
+			{
+				notes = _unitOfWork.NotesRepository.Get(n => n.Deleted.Equals(deleted.Value));
+			}
+			else
+			{
+				notes = _unitOfWork.NotesRepository.Get();
+			}
 
 			return Json(notes, _jsonSerializerSettings);
 		}
 
 		// GET api/notes/5b8567ea-b323-4378-afef-0922eec1892f
-		[HttpGet("{id}")]
-		public JsonResult Get(Int64 id)
+		public JsonResult<Note> Get(Guid id)
 		{
 			var note = _unitOfWork.NotesRepository.GetByID(id);
 
@@ -48,24 +55,29 @@ namespace Repeat.NotebooksAPI.Controllers
 		[HttpPost]
 		public void Post([FromBody]Note note)
 		{
+			if (note.Id == Guid.Empty)
+			{
+				note.Id = Guid.NewGuid();
+				note.CreatedDate = DateTime.UtcNow;
+				note.ModifiedDate = DateTime.UtcNow;
+			}
 			_unitOfWork.NotesRepository.Add(note);
 			_unitOfWork.Save();
 		}
 
 		// PUT api/values/
-		[HttpPut("{id}")]
-		public void Put(Int64 id, [FromBody]Note note)
+		public void Put(Guid id, [FromBody]Note note)
 		{
+			note.Id = id;
 			_unitOfWork.NotesRepository.Update(note);
 			_unitOfWork.Save();
 		}
 
-		// DELETE api/values/5b8567ea-b323-4378-afef-0922eec1892f
-		[HttpDelete("{id}")]
-		public void Delete(Int64 id)
-		{
-			_unitOfWork.NotesRepository.Delete(id);
-			_unitOfWork.Save();
-		}
+		//// DELETE api/values/5b8567ea-b323-4378-afef-0922eec1892f
+		//public void Delete(Guid id)
+		//{
+		//	_unitOfWork.NotesRepository.Delete(id);
+		//	_unitOfWork.Save();
+		//}
 	}
 }

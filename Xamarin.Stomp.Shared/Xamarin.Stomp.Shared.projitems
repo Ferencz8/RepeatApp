@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0688e24c-c0d3-4156-adb2-e8093d79b7b1</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Xamarin.Stomp.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ACKMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DisconnectMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\ACKHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Eventing\DeliverEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Eventing\EventingMessageConsumer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IOutgoingMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IStompClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SendMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StompClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscribeMessage.cs" />
+  </ItemGroup>
+</Project>

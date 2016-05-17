@@ -9,9 +9,9 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Android.Support.V4.App;
-using Android.Support.V4.Widget;
 using Repeat.Mobile.Activities.Notebooks;
+using Android.Support.V7.App;
+using Android.Support.V4.Widget;
 
 namespace Repeat.Mobile.Activities.SideMenu
 {
@@ -20,8 +20,8 @@ namespace Repeat.Mobile.Activities.SideMenu
         Activity mActivity;
 		ListView leftListView;
 
-        public SideMenuDrawerToggle(Activity activity, DrawerLayout drawerLayout, int imageResource, int openDrawerDesc, int closeDrawerDesc)
-            : base(activity, drawerLayout, imageResource, openDrawerDesc, closeDrawerDesc)
+        public SideMenuDrawerToggle(Activity activity, DrawerLayout drawerLayout, int openDrawerDesc, int closeDrawerDesc)//int imageResource, 
+			: base(activity, drawerLayout, openDrawerDesc, closeDrawerDesc)
         {
             mActivity = activity;
         }
@@ -64,7 +64,6 @@ namespace Repeat.Mobile.Activities.SideMenu
                 //Left Drawer
                 base.OnDrawerSlide(drawerView, slideOffset);
             }
-
         }
     }
 }

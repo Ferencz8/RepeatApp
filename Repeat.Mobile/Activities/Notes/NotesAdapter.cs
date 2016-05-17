@@ -16,16 +16,16 @@ namespace Repeat.Mobile.Activities.Notes
 	{
 		List<Note> _notesList;
 		Activity _activity;
-		INotesRepository notesRepisotory;
-		public NotesAdapter(Activity activity, int notebookId = 0)
+		IUnitOfWork _unitOfWork;
+
+		public NotesAdapter(Activity activity, Guid notebookId)
 		{
-			notesRepisotory = Kernel.Get<INotesRepository>();
-			var notebooksRepository = Kernel.Get<INotebooksRepository>();
-			if (notebookId == 0)
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
+			if (notebookId == Guid.Empty)// 0)
 			{
-				notebookId = notebooksRepository.Get().First().Id;
+				notebookId = Guid.Parse(_unitOfWork.NotebooksRepository.Get().First().Id);
 			}
-			_notesList = notesRepisotory.GetNotesByNotebookId(notebookId);
+			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(notebookId);
 
 			_activity = activity;
 		}
@@ -50,7 +50,7 @@ namespace Repeat.Mobile.Activities.Notes
 
 		public override long GetItemId(int position)
 		{
-			return _notesList[position].Id;
+			return 0;// _notesList[position].Id;
 		}
 
 		public override View GetView(int position, View convertView, ViewGroup parent)
@@ -65,10 +65,12 @@ namespace Repeat.Mobile.Activities.Notes
 			return view;
 		}
 
-		public void RefreshContent(int chosenNotebookId)
+		public void RefreshContent(Guid chosenNotebookId)
 		{
 			_notesList.Clear();
-			_notesList = notesRepisotory.GetNotesByNotebookId(chosenNotebookId);
+			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(chosenNotebookId);
+			//_unitOfWork.Dispose();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
 		}
 	}
 }

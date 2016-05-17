@@ -2,27 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
 using Repeat.NotebooksAPI.Infrastructure.Repositories.Interfaces;
 using Repeat.NotebooksAPI.Infrastructure;
-using System.Web.Script.Serialization;
 using Repeat.NotebooksAPI.Domain.Entities;
 using Newtonsoft.Json;
-
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+using System.Web.Http;
+using System.Web.Http.Results;
 
 namespace Repeat.NotebooksAPI.Controllers
 {
-	[Route("api/[controller]")]
-	public class NotebooksController : Controller
+	public class NotebooksController : ApiController
 	{
 
 		IUnitOfWork _unitOfWork;
 		JsonSerializerSettings _jsonSerializerSettings;
 
-		public NotebooksController(IUnitOfWork unitOfWork)
+		public NotebooksController()
 		{
-			_unitOfWork = unitOfWork;
+
+			_unitOfWork = new UnitOfWork();
 			_jsonSerializerSettings = new JsonSerializerSettings()
 			{
 				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -30,59 +28,103 @@ namespace Repeat.NotebooksAPI.Controllers
 		}
 
 		// GET: api/notebooks
-		[HttpGet]
-		public JsonResult Get()
+		// GET: api/notebooks/?deleted=true
+
+		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null)
 		{
-			var notebooks = _unitOfWork.NotebooksRepository.Get();
+			IEnumerable<Notebook> notebooks = new List<Notebook>();
+			if (deleted.HasValue)
+			{
+				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value));
+			}
+			else {
+				notebooks = _unitOfWork.NotebooksRepository.Get();
+			}
 
 			return Json(notebooks, _jsonSerializerSettings);
 		}
 
-		// GET api/notebooks/5
-		[HttpGet("{id}")]
-		public JsonResult Get(Int64 id)
+		// GET api/notebooks/36A21286-5167-43F1-BC74-1C66471254EA
+
+		public JsonResult<Notebook> Get(Guid id)
 		{
 			var notebook = _unitOfWork.NotebooksRepository.GetByID(id);
-
+			//temp
+			notebook.Notes = new List<Note>();
 			return Json(notebook, _jsonSerializerSettings);
 		}
 
-		// GET api/notebooks/5/notes
-		[Route("{notebookId}/notes")]
-		[HttpGet("{notebookId}")]
-		public JsonResult GetNotes(Int64 notebookId)
+		// GET api/notebooks/36A21286-5167-43F1-BC74-1C66471254EA/notes
+		// GET api/notebooks/36A21286-5167-43F1-BC74-1C66471254EA/notes?lastSyncDate=4/7/2016&deleted=false
+		[Route("~/api/notebooks/{notebookId:guid}/notes")]
+		[HttpGet]
+		public JsonResult<List<Note>> Notes(Guid notebookId, [FromUri]DateTime? lastSyncDate = null, bool? deleted = null)
 		{
 			List<Note> notes = new List<Note>();
+
 			var notebook = _unitOfWork.NotebooksRepository.GetByID(notebookId);
 			if (notebook != null)
 			{
-				notes = notebook.Notes;
+				if (lastSyncDate.HasValue && deleted.HasValue)
+				{
+					notes = notebook.Notes.Where(n => n.ModifiedDate > lastSyncDate && n.Deleted.Equals(deleted)).ToList();
+				}
+				else if(lastSyncDate.HasValue)
+				{
+					notes = notebook.Notes.Where(n => n.ModifiedDate > lastSyncDate).ToList();
+				}
+				else if(deleted.HasValue)
+				{
+					notes = notebook.Notes.Where(n => n.Deleted.Equals(deleted)).ToList();
+				}
+				else
+				{
+					notes = notebook.Notes;
+				}
 			}
 			return Json(notes, _jsonSerializerSettings);
 		}
 
 		// POST api/notebooks
-		[HttpPost]
+
 		public void Post([FromBody]Notebook notebook)
 		{
+			//TODO:: check if notes are inserted
+			if (notebook.Id == Guid.Empty)
+			{
+				notebook.Id = Guid.NewGuid();
+				notebook.CreatedDate = DateTime.UtcNow;
+				notebook.ModifiedDate = DateTime.UtcNow;
+			}
 			_unitOfWork.NotebooksRepository.Add(notebook);
 			_unitOfWork.Save();
 		}
 
 		// PUT api/notebooks/5b8567ea-b323-4378-afef-0922eec1892f
-		[HttpPut("{id}")]
-		public void Put(Int64 id, [FromBody]Notebook notebook)
+
+		public void Put(Guid id, [FromBody]Notebook notebook)
 		{
+			notebook.Id = id;
+			if (notebook.Deleted)
+			{
+				notebook.Notes.ForEach(n =>
+				{
+					n.Deleted = true;
+					n.DeletedDate = DateTime.UtcNow;
+					n.ModifiedDate = DateTime.UtcNow;
+				});
+			}
+			//todo:check if changes happem
 			_unitOfWork.NotebooksRepository.Update(notebook);
 			_unitOfWork.Save();
 		}
 
-		// DELETE api/notebooks/5b8567ea-b323-4378-afef-0922eec1892f
-		[HttpDelete("{id}")]
-		public void Delete(Int64 id)
-		{
-			_unitOfWork.NotebooksRepository.Delete(id);
-			_unitOfWork.Save();
-		}
+		//// DELETE api/notebooks/5b8567ea-b323-4378-afef-0922eec1892f
+
+		//public void Delete(Guid id)
+		//{
+		//	_unitOfWork.NotebooksRepository.Delete(id);
+		//	_unitOfWork.Save();
+		//}
 	}
 }

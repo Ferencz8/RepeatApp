@@ -1,4 +1,5 @@
-﻿using Repeat.Mobile.PCL.DAL.Entities;
+﻿using Repeat.GenericLibs.PCL.APICallers.Interfaces;
+using Repeat.Mobile.PCL.DAL.Entities;
 
 namespace Repeat.Mobile.PCL.APICallers.Interfaces
 {

@@ -28,7 +28,10 @@ namespace Repeat.NotebooksAPI.Infrastructure
 		{
 			Notebook notebook = new Notebook()
 			{
-				Id = 12,
+				Id = Guid.NewGuid(),
+				CreatedDate = DateTime.Now,
+				ModifiedDate = DateTime.Now,
+				DeletedDate = null,
 				Name = "First Notebook",
 			};
 

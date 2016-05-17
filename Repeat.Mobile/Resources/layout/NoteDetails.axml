@@ -38,20 +38,20 @@
         android:scrollbars="vertical"
         android:imeOptions="actionDone"
         android:hint="..." />
-    <CheckBox
-        android:id="@+id/chkDone"
+    <Button
+        android:id="@+id/deleteNoteButton"
         android:layout_below="@+id/txtContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Done"
+        android:text="Delete"
         android:layout_alignParentRight="true"
         android:paddingRight="25dp" />
     <Button
         android:text="Add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/chkDone"
-        android:id="@+id/addButton"
+        android:layout_below="@id/txtContent"
+        android:id="@+id/addEditButton"
         android:layout_alignParentLeft="true"
         android:clickable="true" />
 </RelativeLayout>
