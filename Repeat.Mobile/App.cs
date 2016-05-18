@@ -5,6 +5,9 @@ using Repeat.Mobile.PCL.Common;
 using System;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.Logging;
+using System.Dynamic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Repeat.Mobile
 {
@@ -27,8 +30,7 @@ namespace Repeat.Mobile
 		{
 
 			// subscribe to app wide unhandled exceptions so that we can log them.
-			AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
-
+			AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;			
 			//new Task(() =>
 			//{
 			Util.Log = new Logger();

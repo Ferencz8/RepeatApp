@@ -38,6 +38,9 @@
     <Compile Include="APICallers\Interfaces\INotebookAPICaller.cs" />
     <Compile Include="APICallers\NoteAPICaller.cs" />
     <Compile Include="APICallers\NotebookAPICaller.cs" />
+    <Compile Include="Authentication\User.cs" />
+    <Compile Include="Authentication\UserAuthenticator.cs" />
+    <Compile Include="Session.cs" />
     <Compile Include="Common\Configs.cs" />
     <Compile Include="Common\ObjectConverter.cs" />
     <Compile Include="DAL\UnitOfWork.cs" />
@@ -65,6 +68,9 @@
   <ItemGroup>
     <Reference Include="SQLiteNetExtensions">
       <HintPath>..\libs\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UserApp">
+      <HintPath>..\..\Mobile\src\UserApp\bin\Debug\UserApp.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Socket.IO">
       <HintPath>..\Repeat.Mobile\bin\Debug\Xamarin.Socket.IO.dll</HintPath>

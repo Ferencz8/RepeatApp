@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="Hello">Hello World, Click Me!</string>
   <string name="ApplicationName">Repeat</string>
   <string name="open_drawer">Open Drawer</string>
   <string name="close_drawer">Close Drawer</string>
+  
+  <string name="login_progress_signing_in">Logging in&#8230;</string>
+  <string name="signup_progress_signing_up">Signing up&#8230;</string>
+  <string name="title_activity_main_fragment">Welcome!</string>
+  <string name="error_field_required">Field is required</string>
+  <string name="login">Log In</string>
+  <string name="signup">Sign Up</string>
+  <string name="email">Email</string>
+  <string name="username">Username</string>
+  <string name="password">Password</string>
 </resources>

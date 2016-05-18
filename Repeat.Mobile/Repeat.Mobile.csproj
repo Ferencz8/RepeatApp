@@ -95,6 +95,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\Authentication\BaseFragment.cs" />
+    <Compile Include="Activities\Authentication\LoginFragment.cs" />
+    <Compile Include="Activities\Notes\NotesActivity.cs" />
     <Compile Include="AppLayer\ActivityBase.cs" />
     <Compile Include="Common\NetworkConnection.cs" />
     <Compile Include="Logging\Logger.cs" />
@@ -128,9 +131,15 @@
     <AndroidResource Include="Resources\layout\NotebookListItem.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\LogIn.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\Main.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\Main.axml" />
+    <AndroidResource Include="Resources\layout\Notes.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
@@ -168,6 +177,10 @@
     </XamarinComponentReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Mobile\src\UserApp\UserApp.csproj">
+      <Project>{a8d89ee3-9b96-41fe-a86e-69f58910d0a3}</Project>
+      <Name>UserApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Repeat.Mobile.PCL\Repeat.Mobile.PCL.csproj">
       <Project>{e7b2007f-f511-49a9-9c56-d9f963033f4b}</Project>
       <Name>Repeat.Mobile.PCL</Name>
