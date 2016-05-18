@@ -75,6 +75,7 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Config.cs" />
     <Compile Include="Common\ObjectConverter.cs" />
     <Compile Include="Interfaces\IQueue.cs" />
     <Compile Include="Log.cs" />
@@ -86,6 +87,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
