@@ -8,6 +8,7 @@ using Repeat.NotebooksAPI.Domain.Entities;
 using Newtonsoft.Json;
 using System.Web.Http;
 using System.Web.Http.Results;
+using Repeat.NotebooksAPI.ActionFilters;
 
 namespace Repeat.NotebooksAPI.Controllers
 {
@@ -29,7 +30,7 @@ namespace Repeat.NotebooksAPI.Controllers
 
 		// GET: api/notebooks
 		// GET: api/notebooks/?deleted=true
-
+		[AuthorizationRequired]
 		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null)
 		{
 			IEnumerable<Notebook> notebooks = new List<Notebook>();
@@ -50,7 +51,8 @@ namespace Repeat.NotebooksAPI.Controllers
 		{
 			var notebook = _unitOfWork.NotebooksRepository.GetByID(id);
 			//temp
-			notebook.Notes = new List<Note>();
+			if (notebook != null)
+			{ notebook.Notes = new List<Note>(); }
 			return Json(notebook, _jsonSerializerSettings);
 		}
 
@@ -69,11 +71,11 @@ namespace Repeat.NotebooksAPI.Controllers
 				{
 					notes = notebook.Notes.Where(n => n.ModifiedDate > lastSyncDate && n.Deleted.Equals(deleted)).ToList();
 				}
-				else if(lastSyncDate.HasValue)
+				else if (lastSyncDate.HasValue)
 				{
 					notes = notebook.Notes.Where(n => n.ModifiedDate > lastSyncDate).ToList();
 				}
-				else if(deleted.HasValue)
+				else if (deleted.HasValue)
 				{
 					notes = notebook.Notes.Where(n => n.Deleted.Equals(deleted)).ToList();
 				}

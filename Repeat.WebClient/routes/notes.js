@@ -46,11 +46,23 @@ router.route('/edit')
 router.post('/delete', function (req, res) {
     var route = notesRoute + req.body.id;
 
-    var deleteCallBack = function (deleteResponse) {
-        res.redirect('http://localhost:3000/notebooks/notes?notebookId=' + req.body.notebookId);
+    var getcallback = function (apiNote) {
+
+        var date = new Date();
+        apiNote.ModifiedDate = date.toISOString();
+        apiNote.Deleted = true;
+        apiNote.DeletedDate = date.toISOString();
+        var putRoute = notesRoute + apiNote.Id;
+
+
+        var putCallBack = function (putResponse) {
+
+            res.redirect('http://localhost:3000/notebooks/notes?notebookId=' + apiNote.NotebookId);
+        };
+        apiCaller.putRequest(putRoute, apiNote, putCallBack);
     };
 
-    apiCaller.deleteRequest(route, deleteCallBack);
+    apiCaller.getRequest(route, getcallback);
 });
 
 router.route('/add')

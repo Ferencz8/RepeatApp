@@ -61,13 +61,25 @@ router.post('/edit', function (req, res) {
 
 router.post('/delete', function (req, res) {
 
-    var route = notebooksRoute + req.body.id;
 
-    var deleteCallBack = function (deleteResponse) {
-        res.redirect('http://localhost:3000/notebooks');
+    var route = notebooksRoute + req.body.id;
+    var getcallback = function (apiNotebook) {
+
+        var date = new Date();
+        apiNotebook.ModifiedDate = date.toISOString();
+        apiNotebook.Deleted = true;
+        apiNotebook.DeletedDate = date.toISOString();
+        var putRoute = notebooksRoute + apiNotebook.Id;
+
+
+        var putCallBack = function (putResponse) {
+
+            res.redirect('http://localhost:3000/notebooks');
+        };
+        apiCaller.putRequest(putRoute, apiNotebook, putCallBack);
     };
 
-    apiCaller.deleteRequest(route, deleteCallBack);
+    apiCaller.getRequest(route, getcallback);
 });
 
 router.get('/getNotebookById', function (req, res) {
@@ -92,6 +104,8 @@ router.get('/notes', function (req, res) {
         if (redirect) {
             apiCaller.getRequest(notebooksRoute + req.query.notebookId, function callback(apiNotebook) {
 
+                apiNotes = removeDeletedNotes(apiNotes);
+
                 res.render('layouts/notesContainer', {
                     title: 'Notes of ' + apiNotebook.Name,
                     notes: apiNotes,
@@ -99,6 +113,7 @@ router.get('/notes', function (req, res) {
                 });
             });
         } else {
+            apiNotes = removeDeletedNotes(apiNotes);
 
             res.render('partials/notes/notes', {
                 title: 'Notes of ' + req.query.notebookName,
@@ -110,5 +125,15 @@ router.get('/notes', function (req, res) {
 
     apiCaller.getRequest(route, renderCallBack);
 });
+
+function removeDeletedNotes(notes) {
+    var cleanedNotes = [];
+    for (var x in notes) {
+        if (notes[x].Deleted != true) {
+            cleanedNotes.push(notes[x]);
+        }
+    }
+    return cleanedNotes;
+}
 
 module.exports = router;
