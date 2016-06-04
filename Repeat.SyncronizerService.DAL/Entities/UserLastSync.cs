@@ -14,7 +14,7 @@ namespace Repeat.SyncronizerService.DAL.Entities
 	public class UserLastSync : Prototype<UserLastSync>
 	{
 		[Key, Column(Order = 0)]
-		public Guid UserId { get; set; }
+		public string UserId { get; set; }
 
 		[Key, ForeignKey("Device"), Column(Order = 1)]
 		public Guid DeviceId { get; set; }

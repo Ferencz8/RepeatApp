@@ -17,12 +17,13 @@ namespace Repeat.SyncronizerService.APICallers
 		{
 		}
 
-		public async Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null)
+		public async Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null, Dictionary<string, string> headers = null)
 		{
 			List<Note> elements = new List<Note>();
 			try
 			{
 				var client = HttpClientExtensions.GetAPIClient(_apiURL);
+				client.AddHeaders(headers);
 				string date = !lastSyncDate.HasValue ? string.Empty : "?lastSyncDate=" + lastSyncDate.Value.ToShortDateString();
 
 				var response = await client.GetAsync(_apiURL + string.Format(apiRoute, notebookId, lastSyncDate));

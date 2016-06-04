@@ -5,6 +5,7 @@ using Repeat.SyncronizerService.DTOs;
 using Repeat.SyncronizerService.Interfaces;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Repeat.SyncronizerService.Strategies
 {
@@ -22,6 +23,25 @@ namespace Repeat.SyncronizerService.Strategies
 					Log.Info("STARTED Process Sync Request : " + messageClone.ToString());
 
 					UserLastSync userLastSync = unitOfWork.UsersLastSyncRepository.GetUserLastSyncFor(messageToBeProcessed);
+
+					if (userLastSync == null)
+					{
+						var device = unitOfWork.DevicesRepository.Get(n => n.Name.Equals("ANDROID"));
+						if(device.FirstOrDefault() == null)
+						{
+							throw new Exception("ANDROID Device is not set");
+						}
+
+						userLastSync = new UserLastSync()
+						{
+							UserId = messageClone.UserId,
+							LastSyncDate = DateTime.UtcNow.AddYears(-100),
+							SyncStatus = DAL.Enums.SyncStatus.Stopped,
+							DeviceId = device.FirstOrDefault().Id,
+						};
+						unitOfWork.UsersLastSyncRepository.Add(userLastSync);
+						unitOfWork.Save();
+					}
 
 					queue.SendMessage(Config.RabbitMQ_SyncRequestQueue, new SyncRequestResponse()
 					{

@@ -54,17 +54,17 @@ namespace Repeat.SyncronizerService.Strategies
 			{
 				using (IUnitOfWork unitOfWork = new UnitOfWork())
 				{
-
+					var headers = new Dictionary<string, string>() { { "Authorization", messageToBeProcessed.UserToken } };
 					CentralAPICaller apiCaller = new CentralAPICaller();
 					UserLastSync userLastSyncClone = GetUserLastSyncClone(messageToBeProcessed, userLastSync);
 					List<Note> notesToBeUpdated = new List<Note>();
 					List<Note> notesToBeInserted = new List<Note>();
 
-					await PopulateListsWithDataToBeSynced(messageToBeProcessed, userLastSync, apiCaller, notesToBeUpdated, notesToBeInserted);
+					await PopulateListsWithDataToBeSynced(messageToBeProcessed, userLastSync, apiCaller, notesToBeUpdated, notesToBeInserted, headers);
 
 
-					Sync_NotesToBeInserted(apiCaller, notesToBeInserted);
-					Sync_NotesToBeUpdated(apiCaller, notesToBeUpdated);
+					Sync_NotesToBeInserted(apiCaller, notesToBeInserted, headers);
+					Sync_NotesToBeUpdated(apiCaller, notesToBeUpdated, headers);
 
 					Console.ForegroundColor = ConsoleColor.Green;
 					Log.Info("END Data To Be Synched processing !");
@@ -95,38 +95,40 @@ namespace Repeat.SyncronizerService.Strategies
 			});
 		}
 
-		private void Sync_NotesToBeUpdated(CentralAPICaller apiCaller, List<Note> notesToBeUpdated)
+		private void Sync_NotesToBeUpdated(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, Dictionary<string, string> headers)
 		{
 			foreach (var note in notesToBeUpdated)
 			{
-				apiCaller.NoteAPICaller.Update(string.Format(Config.NotebookAPI_Notes_PUT, note.Id), note);
+				apiCaller.NoteAPICaller.Update(string.Format(Config.NotebookAPI_Notes_PUT, note.Id), note, headers);
 			}
 		}
 
-		private void Sync_NotesToBeInserted(CentralAPICaller apiCaller, List<Note> notesToBeInserted)
+		private void Sync_NotesToBeInserted(CentralAPICaller apiCaller, List<Note> notesToBeInserted, Dictionary<string, string> headers)
 		{
 			foreach (var note in notesToBeInserted)
 			{
-				apiCaller.NoteAPICaller.Add(Config.NotebookAPI_Notes_POST, note);
+				apiCaller.NoteAPICaller.Add(Config.NotebookAPI_Notes_POST, note, headers);
 			}
 		}
 
-		private async Task PopulateListsWithDataToBeSynced(DataToBeSynched messageToBeProcessed, UserLastSync userLastSync, CentralAPICaller apiCaller, List<Note> notesToBeUpdated, List<Note> notesToBeInserted)
+		private async Task PopulateListsWithDataToBeSynced(DataToBeSynched messageToBeProcessed, UserLastSync userLastSync, CentralAPICaller apiCaller, 
+			List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Dictionary<string, string> headers)
 		{
 			foreach (var notebook in messageToBeProcessed.Notebooks)
 			{
-				Notebook notebookApi = await apiCaller.NotebookAPICaller.Get(string.Format(Config.NotebookAPI_Notebooks_GETByID, notebook.Id));
+				Notebook notebookApi = await apiCaller.NotebookAPICaller.Get(string.Format(Config.NotebookAPI_Notebooks_GETByID, notebook.Id), headers);
 
 				//notebook was added from external source so we directly insert in api
 				if (notebookApi == null || notebookApi.Id.Equals(Guid.Empty))
 				{
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook);
+					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook, headers);
 					continue;
 				}
 
 				SyncNotebooks(userLastSync, apiCaller, notebook, notebookApi);
 
-				List<Note> apiNotes = await apiCaller.NotebookAPICaller.GetNotes(Config.NotebookAPI_Notebooks_GET_Notes, notebook.Id, userLastSync.LastSyncDate);
+				List<Note> apiNotes = await apiCaller.NotebookAPICaller.GetNotes(Config.NotebookAPI_Notebooks_GET_Notes, notebook.Id, userLastSync.LastSyncDate,
+					headers);
 
 				await SyncNotes(apiCaller, notesToBeUpdated, notesToBeInserted, notebook, apiNotes);
 			}

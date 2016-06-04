@@ -9,6 +9,6 @@ namespace Repeat.SyncronizerService.APICallers.Interfaces
 	public interface INotebookAPICaller : IGenericAPICaller<Notebook>
 	{
 
-		Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null);
+		Task<List<Note>> GetNotes(string apiRoute, Guid notebookId, DateTime? lastSyncDate = null, Dictionary<string, string> headers = null);
 	}
 }

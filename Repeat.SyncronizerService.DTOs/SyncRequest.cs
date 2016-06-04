@@ -9,7 +9,9 @@ namespace Repeat.SyncronizerService.DTOs
 	public class SyncRequest : Prototype<SyncRequest>
 	{
 
-		public Guid UserId { get; set; }
+		public string UserId { get; set; }
+
+		public string UserToken { get; set; }
 
 		public string Device { get; set; }
 	}

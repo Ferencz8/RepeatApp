@@ -21,5 +21,7 @@ namespace Repeat.SyncronizerService.DTOs
 		public bool Deleted { get; set; }
 
 		public DateTime? DeletedDate { get; set; }
+
+		public string UserId { get; set; }
 	}
 }

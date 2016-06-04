@@ -32,17 +32,8 @@ namespace Repeat.SyncronizerService.DAL
 				Id = Guid.NewGuid(),
 				Name = "ANDROID",
 			};
-
-			UserLastSync user = new UserLastSync()
-			{
-				UserId = Guid.Empty,
-				Device = device,
-				LastSyncDate = DateTime.Now.AddDays(-30),
-				SyncStatus = Enums.SyncStatus.Stopped,
-			};
-
+			
 			context.Devices.Add(device);
-			context.UsersLastSync.Add(user);
 			try
 			{
 				context.SaveChanges();
