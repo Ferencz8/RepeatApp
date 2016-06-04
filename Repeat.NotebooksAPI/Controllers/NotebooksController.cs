@@ -116,7 +116,7 @@ namespace Repeat.NotebooksAPI.Controllers
 					n.ModifiedDate = DateTime.UtcNow;
 				});
 			}
-			//todo:check if changes happem
+			
 			_unitOfWork.NotebooksRepository.Update(notebook);
 			_unitOfWork.Save();
 		}

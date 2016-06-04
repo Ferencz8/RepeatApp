@@ -29,5 +29,8 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 		public bool Deleted { get; set; }
 
 		public DateTime? DeletedDate { get; set; }
+
+		[Required]
+		public string UserId { get; set; }
 	}
 }
