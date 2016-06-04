@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Widget;
 using Newtonsoft.Json;
+using Repeat.Mobile.PCL;
 using Repeat.Mobile.PCL.APICallers.Interfaces;
 using Repeat.Mobile.PCL.Common;
 using Repeat.Mobile.PCL.DAL;
@@ -47,27 +48,27 @@ namespace Repeat.Mobile.Sync
 		/// </summary>
 		/// <param name="dbSyncStart"></param>
 		/// <param name="dbSyncEnd"></param>
-		public async void StartSynching(Action dbSyncStart, Action dbSyncEnd)
+		public  void StartSynching(Action dbSyncStart, Action dbSyncEnd)
 		{
 			CancellationTokenSource cts = new CancellationTokenSource();
 			CancellationToken token = cts.Token;
 
 			//temp for presentation:::if in 3 minutes the sync is not done close conn
-			Task.Factory.StartNew(() =>
+			new Task(() =>
 			{
 				Task.Delay(TimeSpan.FromMinutes(3)).Wait();
 
 				if (token.IsCancellationRequested)
 				{
 					Kernel.Get<ILog>().Info(Guid.Empty, "Monitoring will shut down task");
-					token.ThrowIfCancellationRequested();					
+					token.ThrowIfCancellationRequested();
 				}
 
 				Kernel.Get<ILog>().Info(Guid.Empty, " Closing from task ");
 				DisposeClient();
 
 				dbSyncEnd();
-			}, token);
+			}, token).Start();
 
 			//TODO:: maybe try a few times...and if it does not work display message to user
 			Connect();
@@ -79,7 +80,8 @@ namespace Repeat.Mobile.Sync
 			//here I should use the logged in user and device specific identification
 			DTOs.SyncRequest request = new DTOs.SyncRequest()
 			{
-				UserId = Guid.Empty,
+				UserId = Session.LoggedInUser.Id,
+				UserToken = Session.LoggedInUser.Token,
 			};
 
 			_client.Subscribe<SyncRequestResponse>(Configs.RabbitMQ_SyncRequestQueue, n =>
@@ -91,8 +93,9 @@ namespace Repeat.Mobile.Sync
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
 					{
-						UserId = n.UserId,
-						Notebooks = notebooks,
+						UserId = Session.LoggedInUser.Id,
+						UserToken = Session.LoggedInUser.Token,
+						Notebooks = notebooks,						
 					});
 				}
 			}, true);
@@ -152,9 +155,10 @@ namespace Repeat.Mobile.Sync
 		private async void GetSynchedDataToDB(Action dbSyncStart, Action dbSyncEnd)
 		{
 
-			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(Configs.NotebooksAPI_Notebooks_Get);
+			var headers = new Dictionary<string, string>() { { "Authorization", Session.LoggedInUser.Token } };
+			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(Configs.NotebooksAPI_Notebooks_Get, headers);
 
-			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(Configs.NotebooksAPI_Notes_Get);
+			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(Configs.NotebooksAPI_Notes_Get, headers);
 
 			dbSyncStart();
 
@@ -162,8 +166,8 @@ namespace Repeat.Mobile.Sync
 
 			_unitOfWork.Dispose();
 			_unitOfWork = new UnitOfWork();
-			_unitOfWork.NotebooksRepository.EraseAll();
 			_unitOfWork.NotesRepository.EraseAll();
+			_unitOfWork.NotebooksRepository.EraseAll();
 
 			foreach (var nb in apiNotebooks)
 			{

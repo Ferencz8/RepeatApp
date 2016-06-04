@@ -22,38 +22,34 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			_apiURL = apiURL;
 		}
 
-		public async void Add(string apiRoute, T obj)
+		public async void Add(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
 			try
 			{
 				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
-					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
+					client.AddHeaders(headers);
+					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");					
 					var response = await client.PostAsync(apiRoute, stringContent);
 					if (response != null)
 					{
-						//TODO:: do smth with the response
+						//do smth with the response
 					}
 				}
 			}
 			catch (Exception e)
 			{
-				//TODO LOG
 			}
 		}
-
-		public async void Delete(string apiRoute, object id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<List<T>> GetList(string apiRoute)
+				
+		public async Task<List<T>> GetList(string apiRoute, Dictionary<string, string> headers = null)
 		{
 			List<T> elements = new List<T>();
 			try
 			{
 				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
+					client.AddHeaders(headers);
 					var response = await client.GetAsync(apiRoute);
 					if (response != null)
 					{
@@ -64,18 +60,19 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			}
 			catch (Exception e)
 			{
-				//TODO LOG
 			}
+
 			return elements;
 		}
 
-		public async Task<T> Get(string apiRoute)
+		public async Task<T> Get(string apiRoute, Dictionary<string, string> headers = null)
 		{
 			T element = default(T);
 			try
 			{
 				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
+					client.AddHeaders(headers);
 					var response = await client.GetAsync(apiRoute);
 					if (response != null)
 					{
@@ -86,29 +83,33 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			}
 			catch (Exception e)
 			{
-				//TODO LOG
 			}
 			return element;
 		}
 
-		public async void Update(string apiRoute, T obj)
+		public async void Update(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
 			try
 			{
 				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 				{
+					client.AddHeaders(headers);
 					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
 					var response = await client.PutAsync(apiRoute, stringContent);
 					if (response != null)
 					{
-						//TODO:: do smth with the response
+
 					}
 				}
 			}
 			catch (Exception e)
 			{
-				//TODO LOG
 			}
+		}
+		
+		public async void Delete(string apiRoute, object id,  Dictionary<string, string> headers = null)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

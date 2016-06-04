@@ -18,6 +18,7 @@ using Repeat.Mobile.PCL.Common;
 using Repeat.Common;
 using Android.Support.V7.App;
 using Android.Support.V4.Widget;
+using Repeat.Mobile.PCL;
 
 namespace Repeat.Activities.Notes
 {
@@ -42,6 +43,8 @@ namespace Repeat.Activities.Notes
 
 		protected override void OnCreate(Bundle bundle)
 		{
+			Util.PrepareDatabaseForFirstTimeUse();
+
 			base.OnCreate(bundle);
 
 			// Set our view from the "main" layout resource
@@ -161,6 +164,7 @@ namespace Repeat.Activities.Notes
 					Name = notebookName,
 					CreatedDate = DateTime.UtcNow,
 					ModifiedDate = DateTime.UtcNow,
+					UserId = Session.LoggedInUser.Id,
 				});
 				if (rowschanged == 1)
 				{

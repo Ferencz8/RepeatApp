@@ -26,5 +26,8 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 
 		[OneToMany()]
 		public virtual List<Note> Notes { get; set; }
+
+		[NotNull]
+		public string UserId { get; set; }
 	}
 }

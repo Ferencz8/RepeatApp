@@ -30,19 +30,48 @@ namespace Repeat.Mobile.PCL
 
 			_connection = new SQLiteConnection(SQLitePlatform, DatabasePath);
 
-			_connection.CreateTable<Notebook>();
-			_connection.CreateTable<Note>();
-			if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
+			try {
+				_connection.CreateTable<Notebook>();
+				_connection.CreateTable<Note>();
+				//if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
+				//{
+				//	_connection.Insert(new Notebook()
+				//	{
+				//		Id = Guid.NewGuid().ToString(),
+				//		Name = "First Notebook",
+				//		CreatedDate = DateTime.Now,
+				//		ModifiedDate = DateTime.Now,
+				//		UserId = Session.LoggedInUser.Id,
+				//	});
+				//}
+			}
+			catch(Exception e)
 			{
-				_connection.Insert(new Notebook()
+
+			}
+			return _connection;
+		}
+
+		public static void PrepareDatabaseForFirstTimeUse()
+		{
+			//used to create a first notebook if one does not exist
+			if (Session.LoggedInUser == null || string.IsNullOrEmpty(Session.LoggedInUser.Id))
+			{
+				throw new Exception("Session.LoggedInUser is not set");
+			}
+
+			SQLiteConnection connection = GetDbConnection();
+			if (connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
+			{
+				connection.Insert(new Notebook()
 				{
 					Id = Guid.NewGuid().ToString(),
 					Name = "First Notebook",
 					CreatedDate = DateTime.Now,
 					ModifiedDate = DateTime.Now,
+					UserId = Session.LoggedInUser.Id,
 				});
 			}
-			return _connection;
 		}
 
 		public static SQLiteConnection GetDbConnection()

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repeat.GenericLibs.PCL.APICallers
 {
-	public class HttpClientExtensions
+	public static class HttpClientExtensions
 	{
 
 		public static HttpClient GetAPIClient(string apiURL)
@@ -16,6 +16,17 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			client.BaseAddress = new Uri(apiURL);
 
 			return client;
+		}
+
+		public static void AddHeaders(this HttpClient client, Dictionary<string, string> headers)
+		{
+			if (headers != null)
+			{
+				foreach (var header in headers)
+				{
+					client.DefaultRequestHeaders.Add(header.Key, header.Value);
+				}
+			}
 		}
 	}
 }
