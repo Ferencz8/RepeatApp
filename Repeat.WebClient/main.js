@@ -2,7 +2,18 @@ var express = require('express');
 var path = require('path');
 var notebookRoutes = require('./routes/notebooks');
 var notesRoutes = require('./routes/notes');
+var authenticationRoutes = require('./routes/authentication');
 var app = express();
+var cookieParser = require('cookie-parser')
+//var cookieSession = require('cookie-session');
+//
+//app.set('trust proxy', 1); // trust first proxy
+//
+//app.use(cookieSession({
+//    name: 'session',
+//    keys: ['token']
+//}));
+app.use(cookieParser());
 
 
 app.use(express.static('public'));
@@ -14,7 +25,8 @@ var handlebars = require('express-handlebars');
 var hbs = handlebars.create({
     extname: '.hbs',
     partialsDir: [
-        'views/partials/notes'
+        //'views/partials/notes',
+        'views/notes'
     ]
 });
 app.engine('.hbs', hbs.engine);
@@ -27,15 +39,17 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 
-//redirect / -> /notebooks
+//redirect / -> /authentication
 app.get('/', function (req, res) {
-    res.redirect('http://localhost:3000/notebooks');
+    //res.redirect('http://localhost:3000/notebooks');
+    res.redirect('http://localhost:3000/authentication');
     console.log('redirected');
 });
 
 
 app.use('/notebooks', notebookRoutes);
 app.use('/notes', notesRoutes);
+app.use('/authentication', authenticationRoutes);
 
 //start server
 app.listen(3000, function () {

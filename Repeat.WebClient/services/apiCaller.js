@@ -8,18 +8,19 @@ var apiCaller = (function () {
 
     var host = config.host;
 
-    var getRequest = function (route, cb) {
+    var getRequest = function (route, headers, cb) {
 
         var options = {
             host: host,
-            path: route
+            path: route,
+            headers: headers
         };
 
         var callback = function (response) {
             var str = '';
             response.setEncoding('utf8');
             response.on('data', function (chunk) {
-                console.log('Data received')
+                console.log('Data received');
                 str += chunk;
             });
             response.on('end', function () {
@@ -34,7 +35,7 @@ var apiCaller = (function () {
         });
     };
 
-    var postRequest = function (route, parameters, cb) {
+    var postRequest = function (route, parameters, headers, cb) {
 
 
         var bodyString = JSON.stringify(parameters);
@@ -49,10 +50,14 @@ var apiCaller = (function () {
             }
         };
 
+        for (var propertyName in headers) {
+            postOptions.headers.propertyName = headers[propertyName];
+        }
+
         http.request(postOptions, cb).write(bodyString);
     };
 
-    var putRequest = function (route, parameters, cb) {
+    var putRequest = function (route, parameters, headers, cb) {
         var bodyString = JSON.stringify(parameters);
 
         var putOptions = {
@@ -65,12 +70,14 @@ var apiCaller = (function () {
             }
         };
 
-
+        for (var propertyName in headers) {
+            putOptions.headers.propertyName = headers[propertyName];
+        }
         // on request response call cb(callback)
         http.request(putOptions, cb).write(bodyString);
     };
 
-    var deleteRequest = function(route, cb){
+    var deleteRequest = function (route, headers, cb) {
 
         var deleteOptions = {
             host: host,

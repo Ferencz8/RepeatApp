@@ -1,0 +1,315 @@
+<div class="right_col" role="main" style="min-height: 1035px;">
+    <div class="">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <input id="notebookId" type="hidden" value="{{Id}}">
+
+                        <h2 id="notebookName">{{Name}}</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-expanded="false"><i class="fa fa-wrench"></i></a>
+
+                                <div id="editNotebook" role="menu">
+                                </div>
+                            </li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-sm-3 mail_list_column">
+                                <button id="compose" class="btn btn-sm btn-success btn-block" type="button">COMPOSE
+                                </button>
+                                {{#each notes}}
+                                    <div class="mail_list">
+                                        <div class="left">
+                                            <i class="fa fa-circle"></i>&nbsp;
+                                            <i class="fa fa-edit"></i>
+                                        </div>
+                                        <div class="right">
+                                            <input type="hidden" value="{{Id}}" class="noteId">
+
+                                            <h3 class="noteName">{{Name}}</h3>
+                                            <p class="noteContent">{{Content}}</p>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            <!-- /MAIL LIST -->
+
+                            <!-- CONTENT MAIL -->
+                            <div class="col-sm-9 mail_view">
+                                <div class="inbox-body">
+                                    <div class="mail_heading row">
+
+                                        <input id="chosenNoteId" type="hidden">
+
+                                        <div class="col-md-8">
+
+
+                                            <!--<span id="chosenNoteName" style="font-size:22px"></span>-->
+                                            <h4 id="chosenNoteName"></h4>
+                                        </div>
+
+
+                                        <div class="col-md-4 text-right">
+                                            <div class="btn-group">
+                                                <button id="editNoteButton" class="btn btn-sm btn-default" type="button"
+                                                        data-placement="top" data-toggle="tooltip"
+                                                        data-original-title="Print"><i class="fa fa-edit"></i></button>
+                                                <button id="deleteNoteButton" class="btn btn-sm btn-default"
+                                                        type="button"
+                                                        data-placement="top" data-toggle="tooltip"
+                                                        data-original-title="Trash"><i class="fa fa-trash-o"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="sender-info">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <!--<strong id="chosenNoteName"></strong>-->
+                                                <a class="sender-dropdown"><i class="fa fa-chevron-down"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="chosenNoteContent" class="view-mail">
+                                    </div>
+                                    <div class="btn-group" id="editButtons" style="display: none;">
+                                        <button class="btn btn-sm btn-default" type="button" data-placement="top"
+                                                data-toggle="tooltip" data-original-title="Save"
+                                                id="saveEditNoteButton"><i
+                                                class="fa fa-check"></i></button>
+                                        <button class="btn btn-sm btn-default" type="button" data-placement="top"
+                                                data-toggle="tooltip" data-original-title="Cancel"
+                                                id="cancelEditNoteButton"><i
+                                                class="fa fa-remove"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /CONTENT MAIL -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="../lib/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+<script>
+
+    $('#compose').on('click', function () {
+        var notebookId = $('#notebookId').val();
+        if (notebookId == undefined || notebookId == '') {
+            alert('Please select a notebook first')
+        }
+        else {
+            $('#chosenNoteName').text('');
+            $('#chosenNoteContent').text('');
+
+            makeNoteFieldsEditable(true);
+            bindAddButtonsClickEvent();
+        }
+    });
+
+    function bindAddButtonsClickEvent() {
+        $("#editButtons").attr('style', 'display: block;');
+
+        $('#saveEditNoteButton').on("click", function () {
+
+            $.ajax({
+                url: "/notes/add",
+                data: {
+                    name: $('#chosenNoteName').text(),
+                    content: $('#chosenNoteContent').text(),
+                    notebookId: $('#notebookId').val()
+                },
+                type: "POST",
+                success: function (data) {
+
+                    var chosenNotebookId = $('#notebookId').val();
+                    refreshNotes(chosenNotebookId);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        });
+        $('#cancelEditNoteButton').on("click", function () {
+            $('#chosenNoteName').text('');
+            $('#chosenNoteContent').text('');
+
+            $("#editButtons").attr('style', 'display: none;');
+
+            $('#saveEditNoteButton').unbind("click");
+            $('#cancelEditNoteButton').unbind("click");
+
+            makeNoteFieldsEditable(false);
+        });
+    }
+
+    $('.mail_list').on('click', function () {
+
+        debugger;
+        var that = $(this);
+        $('#chosenNoteId').val(that.find('.noteId').val());
+        var chosenNoteId = $('#chosenNoteId').val();
+
+        refreshNoteContainer(chosenNoteId);
+    });
+
+    $('#deleteNoteButton').on('click', function () {
+
+        var noteId = $('#chosenNoteId').val();
+
+        $.ajax({
+            url: "/notes/delete",
+            data: {id: noteId},
+            type: "POST",
+            success: function (data) {
+
+                var chosenNotebookId = $('#notebookId').val();
+                refreshNotes(chosenNotebookId);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+
+    function refreshNotes(notebookId) {
+        $.ajax({
+            url: "/notebooks/notes",
+            data: {notebookId: notebookId},
+            type: "GET",
+            success: function (data) {
+
+                $('#notesContainer').html(data);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    }
+
+    function refreshNoteContainer(chosenNoteId) {
+        $.ajax({
+            url: "/notes/getById",
+            data: {noteId: chosenNoteId},
+            type: "GET",
+            success: function (data) {
+
+                $('#chosenNoteName').html(data.Name);
+                $('#chosenNoteContent').html(data.Content);
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    }
+
+    function saveEditedNoteClickEvent() {
+        $('#saveEditNoteButton').on('click', function () {
+            $.ajax({
+                url: "/notes/edit",
+                data: {
+                    id: $('#chosenNoteId').val(),
+                    name: $('#chosenNoteName').text(),
+                    content: $('#chosenNoteContent').text()
+                },
+                type: "POST",
+                success: function (data) {
+                    debugger;
+                    makeNoteFieldsEditable(false);
+
+                    bindEditButtonsClickEvent(false);
+
+                    displayEditNoteResult(true);
+
+                    setTimeout(function () {
+                        var chosenNotebookId = $('#notebookId').val();
+                        refreshNotes(chosenNotebookId);
+                    }, 3000);
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                    displayEditNoteResult(false);
+                }
+            });
+        });
+    }
+
+    function displayEditNoteResult(result) {
+
+        var $noteName = $('#chosenNoteName');
+        var currentTitle = $noteName.text();
+        if (result == true) {
+            $noteName.text(currentTitle + "    Edited Successfully!");
+        }
+        else {
+            $noteName.text(currentTitle + "    Failed to edit!");
+        }
+
+        setTimeout(function () {
+            $noteName.text(currentTitle);
+        }, 3000);
+    }
+    //todo:: register focus out of Note Container....act like cancel button was clicked
+    function cancelEditedNoteClickEvent() {
+        $('#cancelEditNoteButton').on('click', function () {
+            makeNoteFieldsEditable(false);
+            bindEditButtonsClickEvent(false);
+
+            refreshNoteContainer($('#chosenNoteId').val());
+        });
+    }
+
+    $('.noteContent').each(function (index, element) {
+        var short = $(element).text();
+        if (short != '') {
+            $(element).text(short.substring(0, 100) + '...');
+        }
+    });
+
+    $('#editNoteButton').on('click', function () {
+        makeNoteFieldsEditable(true);
+        bindEditButtonsClickEvent(true);
+    });
+
+    function makeNoteFieldsEditable(editable) {
+        $('#chosenNoteName').attr('contenteditable', editable);
+        $('#chosenNoteContent').attr('contenteditable', editable);
+    }
+
+    function bindEditButtonsClickEvent(editable) {
+        if (editable == false) {
+            $("#editButtons").attr('style', 'display: none;');
+
+            $('#saveEditNoteButton').unbind("click");
+            $('#cancelEditNoteButton').unbind("click");
+        }
+        else {
+            $("#editButtons").attr('style', 'display: block;');
+
+            saveEditedNoteClickEvent();
+
+            cancelEditedNoteClickEvent();
+        }
+    }
+
+    var ActionEnum = {
+        Add: 'Add',
+        Edit: 'Edit'
+    }
+</script>
+<!-- /page content -->
