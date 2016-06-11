@@ -4,4 +4,5 @@
 var User = function () {
     this.userId = "";
     this.token = "";
+    this.username = "";
 };

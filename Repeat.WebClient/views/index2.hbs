@@ -31,6 +31,9 @@
                 <form id="loginForm" action="/authentication/login" method="post">
                     <h1>Login Form</h1>
 
+                    <div id="loginErrorMessage" style="color:red">
+                        {{error}}
+                    </div>
                     <div>
                         <input type="text" class="form-control" placeholder="Username" name="username" required=""/>
                     </div>
@@ -64,7 +67,7 @@
 
         <div id="register" class="animate form registration_form">
             <section class="login_content">
-                <form id="signupForm" action="">
+                <form id="signupForm" action="/authentication/signup" method="post">
                     <h1>Create Account</h1>
 
                     <div>
@@ -106,25 +109,11 @@
 
 <script src="../lib/jquery/dist/jquery.js"></script>
 <script>
-//    $(document).ready(function () {
-//        $('#loginButton').on('click', function () {
-//
-//            var datastring = $("#loginForm").serialize();
-//            debugger;
-//            $.ajax({
-//                url: "/authentication/login",
-//                data: datastring,
-//                type: "POST",
-//                success: function (response) {
-//
-//                    debugger;
-//                   // $(".container").html(response);
-//                },
-//                error: function (xhr) {
-//                    console.log(xhr);
-//                }
-//            });
-//
-//        });
-//    });
+    $(document).ready(function (){
+
+        $('input').on('input', function (){
+
+            $('#loginErrorMessage').empty();
+        });
+    });
 </script>

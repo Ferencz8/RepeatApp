@@ -1,4 +1,7 @@
 <div class="right_col" role="main" style="min-height: 1035px;">
+    <div class="modal fade" id="editNotebookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+    </div>
     <div class="">
         <div class="row">
             <div class="col-md-12">
@@ -10,14 +13,14 @@
                         <ul class="nav navbar-right panel_toolbox">
                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                             </li>
-                            <li class="dropdown">
+                            <li id="editNotebook" class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-expanded="false"><i class="fa fa-wrench"></i></a>
 
-                                <div id="editNotebook" role="menu">
-                                </div>
+                                <!--<div id="editNotebook" role="menu">-->
+                                <!--</div>-->
                             </li>
-                            <li><a class="close-link"><i class="fa fa-close"></i></a>
+                            <li id="deleteNotebook"><a class="close-link"><i class="fa fa-close"></i></a>
                             </li>
                         </ul>
                         <div class="clearfix"></div>
@@ -37,6 +40,7 @@
                                             <input type="hidden" value="{{Id}}" class="noteId">
 
                                             <h3 class="noteName">{{Name}}</h3>
+
                                             <p class="noteContent">{{Content}}</p>
                                         </div>
                                     </div>
@@ -106,7 +110,59 @@
 
 <!-- jQuery -->
 <script src="../lib/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+
+
+<!-- Bootstrap -->
+<script src="../lib/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
 <script>
+
+    console.log('notes2');
+    $('#editNotebook').on('click', function () {
+
+        var notebookId = $('#notebookId').val();
+        if (notebookId != undefined && notebookId != '') {
+
+            console.log('edit process initiated');
+            $.ajax({
+                url: "/notebooks/edit",
+                data: {notebookId: notebookId},
+                type: "GET",
+                success: function (data) {
+
+                    var $editModal = $('#editNotebookModal');
+                    $editModal.html(data);
+                    $editModal.modal('show');
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        }
+    });
+
+
+    $('#deleteNotebook').on('click', function () {
+
+        var notebookId = $('#notebookId').val();
+        if (notebookId != undefined && notebookId != '') {
+            console.log('delete process initiated');
+            $.ajax({
+                url: "/notebooks/delete",
+                data: {
+                    id: notebookId
+                },
+                type: "POST",
+                success: function (data) {
+
+                    debugger;
+                    window.location.href = "/notebooks";
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+        }
+    });
 
     $('#compose').on('click', function () {
         var notebookId = $('#notebookId').val();
@@ -187,10 +243,10 @@
         });
     });
 
-    function refreshNotes(notebookId) {
+    function refreshNotes(notebookId, notebookName) {
         $.ajax({
             url: "/notebooks/notes",
-            data: {notebookId: notebookId},
+            data: {notebookId: notebookId, notebookName: $('#notebookName').text()},
             type: "GET",
             success: function (data) {
 
@@ -305,11 +361,6 @@
 
             cancelEditedNoteClickEvent();
         }
-    }
-
-    var ActionEnum = {
-        Add: 'Add',
-        Edit: 'Edit'
     }
 </script>
 <!-- /page content -->

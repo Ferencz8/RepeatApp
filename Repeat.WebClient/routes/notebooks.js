@@ -13,9 +13,11 @@ router.get('/', function (req, res) {
     else { //TODO::token should be checked
         var renderCallBack = function (apiNotebooks) {
 
+            var localNotebooks = removeDeleted(apiNotebooks);
             res.locals = {
                 title: 'List of Notebooks',
-                notebooks: apiNotebooks
+                notebooks: localNotebooks,
+                username: req.cookies.username
             };
 
             res.render('layouts/sharedLayout', {
@@ -37,59 +39,91 @@ router.route('/add')
         });
     })
     .post(function (req, res) {
+        if (req.cookies.token == undefined) {
+            res.redirect('/');
+        }
+        else {
+            var addedNotebook = req.body;
 
-        var addedNotebook = req.body;
+            addedNotebook.UserId = req.cookies.userId;
+            var postCallback = function (postResponse) {
+                res.redirect('/notebooks');
+            };
 
-        var postCallback = function (postResponse) {
-            res.redirect('http://localhost:3000/notebooks');
-        };
-
-        apiCaller.postRequest(notebooksRoute, addedNotebook, postCallback);
+            apiCaller.postRequest(notebooksRoute, addedNotebook, {'Authorization': req.cookies.token}, postCallback);
+        }
     });
 
-router.post('/edit', function (req, res) {
+router
+    .get('/edit', function (req, res) {
+        if (req.cookies.token == undefined) {
+            res.redirect('/');
+        }
+        else {
+            var route = notebooksRoute + req.query.notebookId;
+            var getCallback = function (apiNotebook) {
 
-    var editedNotebook = req.body;
-    var route = notebooksRoute + editedNotebook.id;
-    var getcallback = function (apiNotebook) {
-        apiNotebook.Name = editedNotebook.name;
+                res.render('editNotebook', {
+                    title: 'Edit Notebook',
+                    Id: apiNotebook.Id,
+                    Name: apiNotebook.Name
+                });
+            };
+            apiCaller.getRequest(route, {'Authorization': req.cookies.token}, getCallback);
+        }
+    })
+    .post('/edit', function (req, res) {
+        if (req.cookies.token == undefined) {
+            res.redirect('/');
+        }
+        else {
 
-        var date = new Date();
-        apiNotebook.ModifiedDate = date.toISOString();
-        var putRoute = notebooksRoute + apiNotebook.Id;
+            var editedNotebook = req.body;
+            var route = notebooksRoute + editedNotebook.id;
+            var getcallback = function (apiNotebook) {
+                apiNotebook.Name = editedNotebook.name;
+
+                var date = new Date();
+                apiNotebook.ModifiedDate = date.toISOString();
+                var putRoute = notebooksRoute + apiNotebook.Id;
 
 
-        var putCallBack = function (putResponse) {
+                var putCallBack = function (putResponse) {
 
-            res.redirect('http://localhost:3000/notebooks');
-        };
-        apiCaller.putRequest(putRoute, apiNotebook, putCallBack);
-    };
+                    res.redirect('/notebooks');
+                };
+                apiCaller.putRequest(putRoute, apiNotebook, {'Authorization': req.cookies.token}, putCallBack);
+            };
 
-    apiCaller.getRequest(route, getcallback);
-});
+            apiCaller.getRequest(route, {'Authorization': req.cookies.token}, getcallback);
+        }
+    });
 
 router.post('/delete', function (req, res) {
+    if (req.cookies.token == undefined) {
+        res.redirect('/');
+    }
+    else {
+
+        var route = notebooksRoute + req.body.id;
+        var getcallback = function (apiNotebook) {
+
+            var date = new Date();
+            apiNotebook.ModifiedDate = date.toISOString();
+            apiNotebook.Deleted = true;
+            apiNotebook.DeletedDate = date.toISOString();
+            var putRoute = notebooksRoute + apiNotebook.Id;
 
 
-    var route = notebooksRoute + req.body.id;
-    var getcallback = function (apiNotebook) {
+            var putCallBack = function (putResponse) {
 
-        var date = new Date();
-        apiNotebook.ModifiedDate = date.toISOString();
-        apiNotebook.Deleted = true;
-        apiNotebook.DeletedDate = date.toISOString();
-        var putRoute = notebooksRoute + apiNotebook.Id;
-
-
-        var putCallBack = function (putResponse) {
-
-            res.redirect('http://localhost:3000/notebooks');
+                res.send(putResponse.statusCode);
+            };
+            apiCaller.putRequest(putRoute, apiNotebook, {'Authorization': req.cookies.token}, putCallBack);
         };
-        apiCaller.putRequest(putRoute, apiNotebook, putCallBack);
-    };
 
-    apiCaller.getRequest(route, getcallback);
+        apiCaller.getRequest(route, {'Authorization': req.cookies.token}, getcallback);
+    }
 });
 
 router.get('/getNotebookById', function (req, res) {
@@ -118,7 +152,7 @@ router.get('/notes', function (req, res) {
             //if (redirect) {
             //    apiCaller.getRequest(notebooksRoute + req.query.notebookId, function callback(apiNotebook) {
             //
-            //        apiNotes = removeDeletedNotes(apiNotes);
+            //        apiNotes = removeDeleted(apiNotes);
             //
             //        res.render('layouts/notesContainer', {
             //            title: 'Notes of ' + apiNotebook.Name,
@@ -127,18 +161,18 @@ router.get('/notes', function (req, res) {
             //        });
             //    });
             //} else {
-                apiNotes = removeDeletedNotes(apiNotes);
+            apiNotes = removeDeleted(apiNotes);
 
-                //res.render('partials/notes/notes', {
-                //    title: 'Notes of ' + req.query.notebookName,
-                //    notes: apiNotes,
-                //    notebookId: req.query.notebookId
-                //});
-                res.render('notes/notes2', {
-                    Id: req.query.notebookId,
-                    Name: '1234',
-                    notes: apiNotes
-                });
+            //res.render('partials/notes/notes', {
+            //    title: 'Notes of ' + req.query.notebookName,
+            //    notes: apiNotes,
+            //    notebookId: req.query.notebookId
+            //});
+            res.render('notes/notes2', {
+                Id: req.query.notebookId,
+                Name: req.query.notebookName,
+                notes: apiNotes
+            });
             //}
         };
 
@@ -146,14 +180,14 @@ router.get('/notes', function (req, res) {
     }
 });
 
-function removeDeletedNotes(notes) {
-    var cleanedNotes = [];
-    for (var x in notes) {
-        if (notes[x].Deleted != true) {
-            cleanedNotes.push(notes[x]);
+function removeDeleted(list) {
+    var cleanedList = [];
+    for (var x in list) {
+        if (list[x].Deleted != true) {
+            cleanedList.push(list[x]);
         }
     }
-    return cleanedNotes;
+    return cleanedList;
 }
 
 module.exports = router;

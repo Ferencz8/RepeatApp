@@ -20,18 +20,28 @@ router.route('/login')
 
         var postData = req.body;
 
-        if (postData.username == undefined && postData == undefined) {
+        if (postData.username == undefined || postData == undefined) {
             //return login error
+            res.redirect('/', {
+                error: 'Username or Password are empty'
+            });
         }
+
         else {
             authenticationService.login(postData.username, postData.password, function (user) {
                 res.cookie('token', user.token);
                 res.cookie('userId', user.userId);
+                res.cookie('username', user.username);
                 //TODO:: add authorization for each route
                 res.redirect('/notebooks');
+            }, function(errorMessage){
+                res.render('index2', {
+                    error: errorMessage
+                });
             });
         }
-    });
+    })
+;
 
 router.route('/logout')
     .get(function (req, res) {
@@ -41,21 +51,19 @@ router.route('/logout')
     });
 
 router.route('/signup')
-    .get(function (req, res) {
-
-        res.render('addNotebook', {
-            title: 'Add Notebook'
-        });
-    })
     .post(function (req, res) {
 
-        var addedNotebook = req.body;
+        var postData = req.body;
+        if (postData.username == undefined || postData.password == undefined) {
+            res.render('index2');//Check how to display error message
+        }
+        else {
 
-        var postCallback = function (postResponse) {
-            res.redirect('http://localhost:3000/notebooks');
-        };
+            authenticationService.signup(postData.username, postData.email, postData.password, function (user) {
 
-        apiCaller.postRequest(notebooksRoute, addedNotebook, postCallback);
+                res.redirect('/');
+            });
+        }
     });
 
 module.exports = router;

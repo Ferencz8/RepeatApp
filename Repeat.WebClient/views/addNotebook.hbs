@@ -1,9 +1,24 @@
-{{title}}
-<br>
-<form class="addNotebook" action="/notebooks/add" method="post">
-    <div class="name">
-        <span>Name: </span>
-        <input name="name" type="text">
+<div class="modal-dialog">
+    <div class="modal-content">
+
+        <form action="/notebooks/add" method="post" class="form-horizontal" role="form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="Name" class="control-label col-sm-2">Name:</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" name="name" class="form-control" id="name" placeholder="Name">
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center !important">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
     </div>
-    <button type="submit">Add</button>
-</form>
+</div>
