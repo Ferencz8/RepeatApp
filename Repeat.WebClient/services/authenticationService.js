@@ -64,10 +64,51 @@ var authenticationService = (function () {
         });
     }
 
+    function authorize(token, authorizedCallback, notAuthorizedCalback) {
+        UserApp.initialize({
+            appId: config.userAPIKey,
+            token: token
+        });
+
+        UserApp.User.get({}, function (error, result) {
+
+            if (error) {
+                console.log(error);
+
+                //for demo purposes
+                if(error.name=='INTERNAL_ERROR'){
+                    authorizedCallback();
+                }
+
+                if(notAuthorizedCalback){
+                    notAuthorizedCalback();
+                }
+            }
+
+            if(authorizedCallback) {
+                authorizedCallback();
+            }
+        });
+    }
+
+    function refreshToken(token, succesfullRefreshCb, failedCb){
+        UserApp.Token.heartbeat(function(error, result){
+            // Handle error/result
+            if(error != undefined || result.alive == false){
+                failedCb();
+            }
+            else if(result.alive = true){
+                succesfullRefreshCb();
+            }
+        });
+    }
+
     return {
         login: login,
         logout: logout,
-        signup: signup
+        signup: signup,
+        authorize: authorize,
+        refreshToken: refreshToken,
     }
 })();
 

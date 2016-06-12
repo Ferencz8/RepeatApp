@@ -29,10 +29,9 @@ router.route('/login')
 
         else {
             authenticationService.login(postData.username, postData.password, function (user) {
-                res.cookie('token', user.token);
-                res.cookie('userId', user.userId);
-                res.cookie('username', user.username);
-                //TODO:: add authorization for each route
+                res.cookie('token', user.token,{ expires: new Date(Date.now() + 1000 * 60 * 59)});
+                res.cookie('userId', user.userId,{ expires: new Date(Date.now() + 1000 * 60 * 59)});
+                res.cookie('username', user.username,{ expires: new Date(Date.now() + 1000 * 60 * 59)});
                 res.redirect('/notebooks');
             }, function(errorMessage){
                 res.render('index2', {

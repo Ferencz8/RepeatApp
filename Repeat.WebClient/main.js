@@ -4,7 +4,7 @@ var notebookRoutes = require('./routes/notebooks');
 var notesRoutes = require('./routes/notes');
 var authenticationRoutes = require('./routes/authentication');
 var app = express();
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
 //var cookieSession = require('cookie-session');
 //
 //app.set('trust proxy', 1); // trust first proxy
@@ -13,6 +13,8 @@ var cookieParser = require('cookie-parser')
 //    name: 'session',
 //    keys: ['token']
 //}));
+
+
 app.use(cookieParser());
 
 
