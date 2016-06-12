@@ -10,23 +10,19 @@ var notebooksRoute = config.notebooksRoute;
 
 router.get('/', authorization.authorize, function (req, res) {
 
+    var route = notebooksRoute + "?deleted=false&userId=" + req.cookies.userId;
     var renderCallBack = function (apiNotebooks) {
 
-        var localNotebooks = removeDeleted(apiNotebooks);
         res.locals = {
             title: 'List of Notebooks',
-            notebooks: localNotebooks,
+            notebooks: apiNotebooks,
             username: req.cookies.username
         };
 
-        res.render('layouts/sharedLayout', {
-            //title: apiNotebook.Name,
-            //notes: apiNotes,
-            //notebookId: apiNotebook.Id
-        });
+        res.render('layouts/sharedLayout');
     };
 
-    apiCaller.getRequest(notebooksRoute, {'Authorization': req.cookies.token}, renderCallBack);
+    apiCaller.getRequest(route, {'Authorization': req.cookies.token}, renderCallBack);
 });
 
 router.route('/add', authorization.authorize)

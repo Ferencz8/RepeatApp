@@ -29,14 +29,22 @@ namespace Repeat.NotebooksAPI.Controllers
 		}
 
 		// GET: api/notebooks
-		// GET: api/notebooks/?deleted=true
-		[AuthorizationRequired]
-		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null)
+		// GET: api/notebooks/?deleted=true&userId=wnvksandkavb
+		//[AuthorizationRequired]
+		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null, string userId = null)
 		{
 			IEnumerable<Notebook> notebooks = new List<Notebook>();
-			if (deleted.HasValue)
+			if (deleted.HasValue && !string.IsNullOrEmpty(userId))
+			{
+				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value) && n.UserId.Equals(userId));
+			}
+			else if (deleted.HasValue)
 			{
 				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value));
+			}
+			else if (!string.IsNullOrEmpty(userId))
+			{
+				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.UserId.Equals(userId));
 			}
 			else {
 				notebooks = _unitOfWork.NotebooksRepository.Get();
@@ -116,7 +124,7 @@ namespace Repeat.NotebooksAPI.Controllers
 					n.ModifiedDate = DateTime.UtcNow;
 				});
 			}
-			
+
 			_unitOfWork.NotebooksRepository.Update(notebook);
 			_unitOfWork.Save();
 		}
