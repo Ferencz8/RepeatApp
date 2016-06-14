@@ -59,9 +59,18 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			return 1;
 		}
 
-		public int EraseAll()
+		public int EraseAll(string userId)
 		{
-			return base.DeleteAll();
+			
+			foreach(var notebook in this._db.Table<Notebook>().Where(n => n.UserId.Equals(userId)))
+			{
+				foreach(var note in _db.Table<Note>().Where(n => n.NotebookId.Equals(notebook.Id)))
+				{
+					base.Delete(note.Id);
+				}
+			}
+
+			return 1;
 		}
 	}
 }

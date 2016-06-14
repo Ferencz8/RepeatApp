@@ -19,7 +19,7 @@ namespace Repeat.Mobile.PCL.DAL
 
 		public UnitOfWork()
 		{
-			_db = Util.CreateDbConnection();
+			_db = Util.CreateDbConnection();			
 		}
 
 		public INotesRepository NotesRepository
@@ -45,6 +45,26 @@ namespace Repeat.Mobile.PCL.DAL
 				}
 
 				return _notebookRepository;
+			}
+		}
+
+		public void SaveChanges()
+		{
+			try
+			{
+				_db.Commit();
+
+
+				//used to refresh changes
+				_db.Close();
+				_notesRepository = null;
+				_notebookRepository = null;
+
+				_db = Util.CreateDbConnection();
+			}
+			catch(Exception e)
+			{
+				_db.Rollback();
 			}
 		}
 

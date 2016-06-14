@@ -1,7 +1,7 @@
 <div class="modal-dialog">
     <div class="modal-content">
 
-        <form action="/notebooks/add" method="post" class="form-horizontal" role="form">
+        <form id="addNotebookForm" action="/notebooks/add" method="post" class="form-horizontal" role="form">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">{{title}}</h4>
@@ -13,12 +13,39 @@
                     <div class="col-sm-10">
                         <input type="text" name="name" class="form-control" id="name" placeholder="Name">
                     </div>
+                    <span id="errorMessage" style="color:red">
 
+                    </span>
                 </div>
             </div>
             <div class="modal-footer" style="text-align:center !important">
-                <button type="submit" class="btn btn-primary">Add</button>
+                <button id="addNotebook" type="button" class="btn btn-primary">Add</button>
             </div>
         </form>
     </div>
 </div>
+<script>
+    $('#name').on('input', function(){
+        $('#errorMessage').text('');
+    });
+
+    $('#addNotebook').on('click', function(){
+        $.ajax({
+            url: "/notebooks/isNameUnique",
+            data: {name: $('#name').val()},
+            type: "GET",
+            success: function (data) {
+debugger;
+                if(data == true){
+                    $('#addNotebookForm').submit();
+                }
+                else{
+                    $('#errorMessage').text('Chosen name is not unique');
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
+    });
+</script>

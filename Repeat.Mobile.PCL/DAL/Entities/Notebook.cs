@@ -7,6 +7,11 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 {
 	public class Notebook
 	{
+		public Notebook()
+		{
+			Notes = new List<Note>();
+		}
+
 		[PrimaryKey]
 		//[JsonIgnore]
 		public string Id { get; set; }

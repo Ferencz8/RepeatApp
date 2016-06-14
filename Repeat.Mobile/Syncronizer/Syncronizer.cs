@@ -32,7 +32,7 @@ namespace Repeat.Mobile.Sync
 
 		private Syncronizer()
 		{
-			_unitOfWork = new UnitOfWork();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
 
 			_client = new StompClient(Configs.RabbitMQ_StompClient_Address);
 		}
@@ -48,7 +48,7 @@ namespace Repeat.Mobile.Sync
 		/// </summary>
 		/// <param name="dbSyncStart"></param>
 		/// <param name="dbSyncEnd"></param>
-		public  void StartSynching(Action dbSyncStart, Action dbSyncEnd)
+		public void StartSynching(Action dbSyncStart, Action dbSyncEnd)
 		{
 			CancellationTokenSource cts = new CancellationTokenSource();
 			CancellationToken token = cts.Token;
@@ -89,7 +89,7 @@ namespace Repeat.Mobile.Sync
 				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
 				{
 
-					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate);
+					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate, Session.LoggedInUser.Id);
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
 					{
@@ -156,29 +156,36 @@ namespace Repeat.Mobile.Sync
 		{
 
 			var headers = new Dictionary<string, string>() { { "Authorization", Session.LoggedInUser.Token } };
-			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(Configs.NotebooksAPI_Notebooks_Get, headers);
+			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(string.Format(Configs.NotebooksAPI_Notebooks_Get, false, Session.LoggedInUser.Id), headers);
 
-			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(Configs.NotebooksAPI_Notes_Get, headers);
+			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(string.Format(Configs.NotebooksAPI_Notes_Get, false), headers);
 
 			dbSyncStart();
 
 			//TODO:: here display msg to User...that his data is getting synched && also should stop all actions on UI
 
-			_unitOfWork.Dispose();
-			_unitOfWork = new UnitOfWork();
-			_unitOfWork.NotesRepository.EraseAll();
-			_unitOfWork.NotebooksRepository.EraseAll();
+			//_unitOfWork.Dispose();
+			//_unitOfWork = new UnitOfWork();
+			_unitOfWork.NotesRepository.EraseAll(Session.LoggedInUser.Id);
+			_unitOfWork.NotebooksRepository.EraseAll(Session.LoggedInUser.Id);
 
-			foreach (var nb in apiNotebooks)
-			{
-				_unitOfWork.NotebooksRepository.Add(nb);
-			}
-			foreach (var note in apiNotes)
-			{
-				_unitOfWork.NotesRepository.Add(note);
-			}
+			try {
+				foreach (var nb in apiNotebooks)
+				{
+					_unitOfWork.NotebooksRepository.Add(nb);
 
-			_unitOfWork.Dispose();
+					foreach(var note in nb.Notes)
+					{
+						_unitOfWork.NotesRepository.Add(note);
+					}
+				}
+
+				_unitOfWork.SaveChanges();
+			}
+			catch (Exception e)
+			{
+
+			}		
 
 			//here end msg
 			dbSyncEnd();

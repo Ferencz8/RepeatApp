@@ -15,6 +15,7 @@ using System.Dynamic;
 using Newtonsoft.Json;
 using Repeat.Activities.Notes;
 using Repeat.Mobile.PCL.Authentication;
+using System.Threading.Tasks;
 
 namespace Repeat.Activities.Authentication
 {
@@ -23,6 +24,7 @@ namespace Repeat.Activities.Authentication
 		private int _layoutToInflate;
 		private EditText _username;
 		private EditText _password;
+		private ProgressBar _loginProgressBar;
 
 		public LoginFragment(int layoutId)
 		{
@@ -46,6 +48,7 @@ namespace Repeat.Activities.Authentication
 			Button loginButton = loginLayout.FindViewById<Button>(Resource.Id.login_button);
 			_username = loginLayout.FindViewById<EditText>(Resource.Id.login_username);
 			_password = loginLayout.FindViewById<EditText>(Resource.Id.login_password);
+			_loginProgressBar = loginLayout.FindViewById<ProgressBar>(Resource.Id.loginProgressBar);
 
 			loginButton.Click += LoginButton_Click;
 
@@ -58,19 +61,39 @@ namespace Repeat.Activities.Authentication
 			{
 				Toast.MakeText(Activity, "Username or password is not filled in", ToastLength.Short);
 			}
+			
 
-			if (Login(_username.Text, _password.Text))
-			{
-				RemoveThisFragment();
+			_loginProgressBar.Visibility = ViewStates.Visible;
 
-				//StartNotesActivity
-				Intent intent = new Intent(Activity, typeof(NotesActivity));
-				StartActivity(intent);
-			}
-			else
+			var mOverlayDialog = new Dialog(Activity, Android.Resource.Style.ThemePanel); //display an invisible overlay dialog to prevent user interaction and pressing back
+			mOverlayDialog.SetCancelable(false);
+			mOverlayDialog.Show();
+			
+
+			Task.Factory.StartNew(() =>
 			{
-				Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short);
-			}
+				if (Login(_username.Text, _password.Text))
+				{
+					RemoveThisFragment();
+
+					//StartNotesActivity
+					Intent intent = new Intent(Activity, typeof(NotesActivity));
+					StartActivity(intent);
+
+					Activity.RunOnUiThread(() =>
+					{
+						_loginProgressBar.Visibility = ViewStates.Gone;
+						mOverlayDialog.Dismiss();
+					});
+				}
+				else
+				{
+					Activity.RunOnUiThread(() =>
+					{
+						Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short);
+					});
+				}
+			});
 		}
 
 		private bool Login(string username, string password)

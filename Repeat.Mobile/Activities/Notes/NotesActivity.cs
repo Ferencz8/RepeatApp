@@ -19,6 +19,8 @@ using Repeat.Common;
 using Android.Support.V7.App;
 using Android.Support.V4.Widget;
 using Repeat.Mobile.PCL;
+using System.Threading.Tasks;
+using Repeat.Mobile.PCL.DAL;
 
 namespace Repeat.Activities.Notes
 {
@@ -107,6 +109,7 @@ namespace Repeat.Activities.Notes
 		{
 			if (NetworkConnection.IsOnline(this))
 			{
+				Toast.MakeText(this, "Sync Started!", ToastLength.Short).Show();
 
 				Kernel.Get<ILog>().Info(Guid.Empty, "Sync button clicked!");
 
@@ -118,9 +121,7 @@ namespace Repeat.Activities.Notes
 
 				syncButton.Enabled = false;
 
-				Toast.MakeText(this, "Sync Started!", ToastLength.Short).Show();
-
-				Syncronizer.CreateSyncher().StartSynching(DbSyncStarted, DbSyncEnded);
+				Task.Factory.StartNew(() => Syncronizer.CreateSyncher().StartSynching(DbSyncStarted, DbSyncEnded));
 			}
 			else
 			{
@@ -130,15 +131,18 @@ namespace Repeat.Activities.Notes
 
 		private void DbSyncStarted()
 		{
-			RunOnUiThread(() => Toast.MakeText(this, "Db Sync started", ToastLength.Long));
+			RunOnUiThread(() => Toast.MakeText(this, "Db Sync started", ToastLength.Long).Show());
 		}
 
 		private void DbSyncEnded()
 		{
 			RunOnUiThread(() =>
 			{
+				notebooksAdapter.RefreshContent();
+				notebooksAdapter.NotifyDataSetChanged();
+
 				RefreshNotesListContent();
-				Toast.MakeText(this, "Db Sync ended", ToastLength.Long);
+				Toast.MakeText(this, "Db Sync ended", ToastLength.Long).Show();
 				syncButton.Enabled = true;
 				progressBar.Visibility = ViewStates.Gone;
 				mOverlayDialog.Dismiss();
@@ -157,8 +161,8 @@ namespace Repeat.Activities.Notes
 				string notebookName = edit.Text;
 
 				//TODO:: TempSolution maybe add one more layer for handling CRUD operations
-				var repo = Kernel.Get<INotebooksRepository>();
-				int rowschanged = repo.Add(new Notebook()
+				var unitOfWork = Kernel.Get<IUnitOfWork>();
+				int rowschanged = unitOfWork.NotebooksRepository.Add(new Notebook()
 				{
 					Id = Guid.NewGuid().ToString(),
 					Name = notebookName,
@@ -166,9 +170,10 @@ namespace Repeat.Activities.Notes
 					ModifiedDate = DateTime.UtcNow,
 					UserId = Session.LoggedInUser.Id,
 				});
+				unitOfWork.SaveChanges();
 				if (rowschanged == 1)
 				{
-					chosenNotebookId = Guid.Parse(repo.GetByName(notebookName).Id);
+					chosenNotebookId = Guid.Parse(unitOfWork.NotebooksRepository.GetByName(notebookName).Id);
 				}
 				notebooksAdapter.RefreshContent();
 				notebooksAdapter.NotifyDataSetChanged();

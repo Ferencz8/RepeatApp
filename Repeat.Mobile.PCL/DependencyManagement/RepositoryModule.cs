@@ -17,9 +17,9 @@ namespace Repeat.Mobile.PCL.DependencyManagement
 		{
 			var db = Util.GetDbConnection();
 
-			Bind<INotebooksRepository>().To<NotebooksRepository>().WithConstructorArgument("db", db);
-			Bind<INotesRepository>().To<NotesRepository>().WithConstructorArgument("db", db);
-			Bind<IUnitOfWork>().To<UnitOfWork>().InTransientScope();
+			//Bind<INotebooksRepository>().To<NotebooksRepository>().WithConstructorArgument("db", db);
+			//Bind<INotesRepository>().To<NotesRepository>().WithConstructorArgument("db", db);
+			Bind<IUnitOfWork>().To<UnitOfWork>().InSingletonScope();
 
 			//http://stackoverflow.com/questions/25667834/constructor-with-multiple-arguments-with-ninject
 			//Bind<IUnitOfWork>().To<UnitOfWork>().InSingletonScope()

@@ -13,5 +13,7 @@ namespace Repeat.Mobile.PCL.DAL
 		INotesRepository NotesRepository { get; }
 
 		INotebooksRepository NotebooksRepository { get; }
+
+		void SaveChanges();
 	}
 }

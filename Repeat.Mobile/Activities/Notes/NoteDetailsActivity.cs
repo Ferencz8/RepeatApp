@@ -3,6 +3,7 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using Repeat.Mobile.PCL.Common;
+using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
@@ -16,7 +17,7 @@ namespace Repeat.Mobile.Activities.Notes
 		EditText _txtNote;
 		EditText _txtContent;
 
-		INotesRepository _notesRepository;
+		IUnitOfWork _unitOfWork;
 		Guid chosenNotebookId;
 		Note _noteToBeEdited;
 
@@ -39,7 +40,7 @@ namespace Repeat.Mobile.Activities.Notes
 			Button addEditButton = FindViewById<Button>(Resource.Id.addEditButton);
 
 
-			_notesRepository = Kernel.Get<INotesRepository>();
+			_unitOfWork = Kernel.Get<IUnitOfWork>();
 
 
 			if (Intent.GetStringExtra("action").Equals("ADD"))
@@ -73,7 +74,8 @@ namespace Repeat.Mobile.Activities.Notes
 			builder.SetMessage("Are you sure you want to delete this note ?");
 			builder.SetPositiveButton("Yeah", (alertDialogSender, args) =>
 			{
-				_notesRepository.Delete(_noteToBeEdited.Id);
+				_unitOfWork.NotesRepository.Delete(_noteToBeEdited.Id);
+				_unitOfWork.SaveChanges();
 				Finish();
 			});
 			builder.SetNegativeButton("Nope", (alertDialogSender, args) =>
@@ -89,13 +91,14 @@ namespace Repeat.Mobile.Activities.Notes
 			_noteToBeEdited.Content = _txtContent.Text;
 			_noteToBeEdited.ModifiedDate = DateTime.UtcNow;
 
-			_notesRepository.Update(_noteToBeEdited);
+			_unitOfWork.NotesRepository.Update(_noteToBeEdited);
+			_unitOfWork.SaveChanges();
 			Finish();
 		}
 
 		private void AddButton_Click(object sender, EventArgs e)
 		{
-			_notesRepository.Add(new Note()
+			_unitOfWork.NotesRepository.Add(new Note()
 			{
 				Id = Guid.NewGuid().ToString(),
 				Name = _txtNote.Text,
@@ -104,6 +107,7 @@ namespace Repeat.Mobile.Activities.Notes
 				CreatedDate = DateTime.UtcNow,
 				ModifiedDate = DateTime.UtcNow,
 			});
+			_unitOfWork.SaveChanges();
 			Finish();
 		}
 

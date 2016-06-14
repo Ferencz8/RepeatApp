@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="Activities\Authentication\BaseFragment.cs" />
     <Compile Include="Activities\Authentication\LoginFragment.cs" />
+    <Compile Include="Activities\Authentication\ProgressDialogFragment.cs" />
     <Compile Include="Activities\Notes\NotesActivity.cs" />
     <Compile Include="AppLayer\ActivityBase.cs" />
     <Compile Include="Common\NetworkConnection.cs" />

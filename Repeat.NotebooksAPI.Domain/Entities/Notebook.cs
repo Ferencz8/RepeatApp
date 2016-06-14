@@ -15,7 +15,7 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 
 		[Required]
 		[StringLength(100)]
-		[Index(IsUnique = true)]
+		[Index("NameAndUser", 1, IsUnique = true)]
 		public string Name { get; set; }
 
 		public virtual List<Note> Notes { get; set; }
@@ -31,6 +31,7 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 		public DateTime? DeletedDate { get; set; }
 
 		[Required]
+		[Index("NameAndUser", 2, IsUnique = true)]
 		public string UserId { get; set; }
 	}
 }

@@ -20,9 +20,9 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			_db = db;
 		}
 
-		public override List<Notebook> Get()
+		public List<Notebook> GetForUser(string userId)
 		{
-			return _db.Table<Notebook>().Where(n => n.Deleted == false).ToList();
+			return _db.Table<Notebook>().Where(n => n.Deleted == false && n.UserId.Equals(userId)).ToList();
 		}
 
 		public Notebook GetByName(string notebookName)
@@ -30,9 +30,9 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			return _db.Table<Notebook>().SingleOrDefault(n => n.Name.Equals(notebookName));
 		}
 
-		public List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate)
+		public List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate, string userId)
 		{
-			var notebooks = _db.GetAllWithChildren<Notebook>();
+			var notebooks = _db.GetAllWithChildren<Notebook>(n => n.UserId.Equals(userId));
 
 			foreach(var notebook in notebooks)
 			{
@@ -66,24 +66,14 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 			return base.Update(notebookDb);
 		}
 
-		public override int DeleteAll()
+		public int EraseAll(string userId)
 		{
-			var notesDb = this.Get();
-			foreach (var notebookDb in notesDb)
+			var notebooks = this.GetForUser(userId);
+			foreach(var notebookId in notebooks.Select(n => n.Id))
 			{
-				notebookDb.Deleted = true;
-				notebookDb.DeletedDate = DateTime.UtcNow;
-				notebookDb.ModifiedDate = DateTime.UtcNow;
-				base.Update(notebookDb);
+				base.Delete(notebookId);
 			}
-
-			return 1;
-		}
-
-		//TODO::temp
-		public int EraseAll()
-		{
-			return base.DeleteAll();
+			return notebooks.Count;
 		}
 	}
 }

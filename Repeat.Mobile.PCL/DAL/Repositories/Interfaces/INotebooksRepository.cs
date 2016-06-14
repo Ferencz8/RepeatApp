@@ -11,8 +11,10 @@ namespace Repeat.Mobile.PCL.DAL.Repositories.Interfaces
 
 		Notebook GetByName(string notebookName);
 
-		List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate);
+		List<Notebook> GetNotebooksWithNotesByLastModifiedDateOfNotes(DateTime lastModifiedDate, string userId);
 
-		int EraseAll();
+		int EraseAll(string userId);
+
+		List<Notebook> GetForUser(string userId);
 	}
 }

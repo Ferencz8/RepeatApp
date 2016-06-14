@@ -9,6 +9,7 @@ using Repeat.Mobile.PCL.DAL.Entities;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.DAL;
+using Repeat.Mobile.PCL;
 
 namespace Repeat.Mobile.Activities.Notebooks
 {
@@ -21,7 +22,7 @@ namespace Repeat.Mobile.Activities.Notebooks
 		public NotebooksAdapter(Activity activity)
 		{
 			_unitOfWork = Kernel.Get<IUnitOfWork>();
-			_notebooksList = _unitOfWork.NotebooksRepository.Get();
+			_notebooksList = _unitOfWork.NotebooksRepository.GetForUser(Session.LoggedInUser.Id);
 			_activity = activity;
 		}
 
@@ -60,7 +61,7 @@ namespace Repeat.Mobile.Activities.Notebooks
 
 		public void RefreshContent()
 		{
-			_notebooksList = _unitOfWork.NotebooksRepository.Get();
+			_notebooksList = _unitOfWork.NotebooksRepository.GetForUser(Session.LoggedInUser.Id);
 		}
 	}
 }

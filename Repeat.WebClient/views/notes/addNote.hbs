@@ -4,11 +4,29 @@
     <input type="hidden" name="notebookId" value="{{notebookId}}">
     <div class="name">
         <span>Name: </span>
-        <input name="name" type="text">
+        <input id="chosenNotebookName" name="name" type="text">
     </div>
     <div class="content">
         <span>Content: </span>
         <textarea form="addNote" name="content"></textarea>
     </div>
-    <button  type="submit">Add Note</button>
+    <button id="addNotebook" type="button">Add Note</button>
 </form>
+<script>
+$('#addNotebook').on('click', function(){
+    $.ajax({
+        url: "/notebooks/isNameUnique",
+        data: {name: $('#chosenNotebookName').val()},
+        type: "GET",
+        success: function (data) {
+
+            if(data == true){
+
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr);
+        }
+    });
+});
+</script>

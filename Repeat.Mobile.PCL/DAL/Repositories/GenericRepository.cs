@@ -16,6 +16,10 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 		public GenericRepository(SQLiteConnection db)
 		{
 			_db = db;
+			if (!_db.IsInTransaction)
+			{
+				_db.BeginTransaction();
+			}
 		}
 
 		public virtual int Add(T obj)

@@ -121,6 +121,14 @@ namespace Repeat.SyncronizerService.Strategies
 				//notebook was added from external source so we directly insert in api
 				if (notebookApi == null || notebookApi.Id.Equals(Guid.Empty))
 				{
+
+					var nbs = await apiCaller.NotebookAPICaller.GetList(string.Format(Config.NotebookAPI_Notebooks_GET_WithParameters,"", userLastSync.UserId, notebook.Name), headers);
+
+					if(nbs!=null && nbs.Any())//a notebok with the same name  for current user already exists 
+					{
+						notebook.Name += " Conflict";
+					}
+
 					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook, headers);
 					continue;
 				}

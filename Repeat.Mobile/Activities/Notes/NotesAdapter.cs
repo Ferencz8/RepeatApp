@@ -9,6 +9,7 @@ using Repeat.Mobile.PCL.DependencyManagement;
 using Repeat.Mobile.PCL.DAL;
 using Repeat.Mobile.PCL.DAL.Repositories.Interfaces;
 using System;
+using Repeat.Mobile.PCL;
 
 namespace Repeat.Mobile.Activities.Notes
 {
@@ -23,7 +24,7 @@ namespace Repeat.Mobile.Activities.Notes
 			_unitOfWork = Kernel.Get<IUnitOfWork>();
 			if (notebookId == Guid.Empty)// 0)
 			{
-				notebookId = Guid.Parse(_unitOfWork.NotebooksRepository.Get().First().Id);
+				notebookId = Guid.Parse(_unitOfWork.NotebooksRepository.GetForUser(Session.LoggedInUser.Id).First().Id);
 			}
 			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(notebookId);
 
@@ -69,8 +70,6 @@ namespace Repeat.Mobile.Activities.Notes
 		{
 			_notesList.Clear();
 			_notesList = _unitOfWork.NotesRepository.GetNotesByNotebookId(chosenNotebookId);
-			//_unitOfWork.Dispose();
-			_unitOfWork = Kernel.Get<IUnitOfWork>();
 		}
 	}
 }

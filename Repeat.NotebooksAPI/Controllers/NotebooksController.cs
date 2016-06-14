@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Repeat.NotebooksAPI.ActionFilters;
+using System.ComponentModel.DataAnnotations;
 
 namespace Repeat.NotebooksAPI.Controllers
 {
@@ -31,24 +32,46 @@ namespace Repeat.NotebooksAPI.Controllers
 		// GET: api/notebooks
 		// GET: api/notebooks/?deleted=true&userId=wnvksandkavb
 		//[AuthorizationRequired]
-		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null, string userId = null)
+		public JsonResult<IEnumerable<Notebook>> Get(bool? deleted = null, string userId = null, string notebookName = null)
 		{
 			IEnumerable<Notebook> notebooks = new List<Notebook>();
-			if (deleted.HasValue && !string.IsNullOrEmpty(userId))
-			{
-				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value) && n.UserId.Equals(userId));
-			}
-			else if (deleted.HasValue)
-			{
-				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value));
-			}
-			else if (!string.IsNullOrEmpty(userId))
-			{
-				notebooks = _unitOfWork.NotebooksRepository.Get(n => n.UserId.Equals(userId));
-			}
-			else {
-				notebooks = _unitOfWork.NotebooksRepository.Get();
-			}
+			//if (deleted.HasValue && !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(notebookName))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value) && n.UserId.Equals(userId) && n.Name.Equals(notebookName));
+			//}
+			//else if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(notebookName))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.UserId.Equals(userId) && n.Name.Equals(notebookName));
+			//}
+			//else if (deleted.HasValue && !string.IsNullOrEmpty(userId))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value) && n.UserId.Equals(userId));
+			//}
+			//else if (deleted.HasValue && !string.IsNullOrEmpty(notebookName))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value) && n.Name.Equals(notebookName));
+			//}
+			//else if (deleted.HasValue)
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Deleted.Equals(deleted.Value));
+			//}
+			//else if (!string.IsNullOrEmpty(userId))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.UserId.Equals(userId));
+			//}
+			//else if (!string.IsNullOrEmpty(notebookName))
+			//{
+			//	notebooks = _unitOfWork.NotebooksRepository.Get(n => n.Name.Equals(notebookName));
+			//}
+			//else {
+			//	notebooks = _unitOfWork.NotebooksRepository.Get();
+			//}
+
+
+			notebooks = _unitOfWork.NotebooksRepository.Get(n =>
+			(deleted.HasValue == false || n.Deleted.Equals(deleted.Value))
+			&& (userId == null || n.UserId.Equals(userId))
+			&& (notebookName == null || n.Name.Equals(notebookName)));
 
 			return Json(notebooks, _jsonSerializerSettings);
 		}
@@ -61,6 +84,15 @@ namespace Repeat.NotebooksAPI.Controllers
 			//temp
 			if (notebook != null)
 			{ notebook.Notes = new List<Note>(); }
+			return Json(notebook, _jsonSerializerSettings);
+		}
+
+		[Route("~/api/notebooks/name/")]
+		[HttpGet]
+		public JsonResult<Notebook> GetByName([Required]string notebookName)
+		{
+			var notebook = _unitOfWork.NotebooksRepository.Get(n => n.Name.Equals(notebookName)).FirstOrDefault();
+
 			return Json(notebook, _jsonSerializerSettings);
 		}
 

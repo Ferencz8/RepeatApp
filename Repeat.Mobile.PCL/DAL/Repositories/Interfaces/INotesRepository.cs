@@ -12,6 +12,6 @@ namespace Repeat.Mobile.PCL.DAL.Repositories.Interfaces
 
 		List<Note> GetNotesByNotebookId(Guid notebookId);
 
-		int EraseAll();
+		int EraseAll(string userId);
 	}
 }

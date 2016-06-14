@@ -29,26 +29,7 @@ namespace Repeat.Mobile.PCL
 				throw new Exception("Parameters SQLitePlatform and DatabasePath must be set before using this method.");
 
 			_connection = new SQLiteConnection(SQLitePlatform, DatabasePath);
-
-			try {
-				_connection.CreateTable<Notebook>();
-				_connection.CreateTable<Note>();
-				//if (_connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
-				//{
-				//	_connection.Insert(new Notebook()
-				//	{
-				//		Id = Guid.NewGuid().ToString(),
-				//		Name = "First Notebook",
-				//		CreatedDate = DateTime.Now,
-				//		ModifiedDate = DateTime.Now,
-				//		UserId = Session.LoggedInUser.Id,
-				//	});
-				//}
-			}
-			catch(Exception e)
-			{
-
-			}
+						
 			return _connection;
 		}
 
@@ -61,6 +42,10 @@ namespace Repeat.Mobile.PCL
 			}
 
 			SQLiteConnection connection = GetDbConnection();
+
+
+			connection.CreateTable<Notebook>();
+			connection.CreateTable<Note>();
 			if (connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
 			{
 				connection.Insert(new Notebook()

@@ -38,6 +38,8 @@ namespace Repeat.SyncronizerService.Common
 
 		public static string NotebookAPI_Notebooks_GET = "api/notebooks";
 
+		public static string NotebookAPI_Notebooks_GET_WithParameters = "api/notebooks/?deleted={0}&userId={1}&notebookName={2}";
+
 		public static string NotebookAPI_Notebooks_GETByID = "api/notebooks/{0}";
 
 		public static string NotebookAPI_Notebooks_GET_Notes = "api/notebooks/{0}/notes?lastSyncDate={1}";

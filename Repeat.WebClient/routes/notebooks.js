@@ -131,6 +131,26 @@ router.get('/notes', authorization.authorize, function (req, res) {
     apiCaller.getRequest(route, {'Authorization': req.cookies.token}, renderCallBack);
 });
 
+router.get('/isNameUnique', authorization.authorize, function(req, res){
+
+    var chosenName = req.query.name;
+    var route = notebooksRoute + "?deleted=false&userId=" + req.cookies.userId;
+    var renderCallBack = function (apiNotebooks) {
+
+        var unique = true;
+        for (var notebookCount in apiNotebooks){
+            if(apiNotebooks[notebookCount].Name == chosenName){
+                unique = false;
+                break;
+            }
+        }
+
+        res.send(unique);
+    };
+
+    apiCaller.getRequest(route, {'Authorization': req.cookies.token}, renderCallBack);
+});
+
 function removeDeleted(list) {
     var cleanedList = [];
     for (var x in list) {
