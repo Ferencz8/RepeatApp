@@ -6,7 +6,8 @@
 <!-- The main content view -->
     <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"                    
+        android:background="#005472">
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,11 +26,12 @@
             android:width="3px" />
         <Button
             android:text="Edit"
-            android:layout_width="40.5dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editNotebookButton"
-            android:layout_marginRight="0.0dp"
-            android:width="3px" />
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/syncButton"
+            android:layout_toStartOf="@+id/syncButton" />
         <Button
             android:text="Sync"
             android:layout_width="wrap_content"
@@ -48,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_below="@+id/menuButton">
+            android:layout_below="@+id/menuButton"
+            android:id="@+id/linearLayout">
             <ListView
                 android:id="@+id/notes"
                 android:layout_width="fill_parent"
@@ -60,19 +63,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        
         android:layout_gravity="left"
         android:id="@+id/leftSideMenu"
-        android:background="@android:color/white">
-        <Button
-            android:text="Add Notebook"
-            android:layout_width="wrap_content"
+        android:background="#005472">
+        <LinearLayout
             android:layout_height="wrap_content"
-            android:id="@+id/addNotebookButton" />
-        <Button
-            android:text="Log Out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/logoutButton" />
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:weightSum="1">
+            <Button
+                android:text="Add Notebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addNotebookButton" />
+            <Button
+                android:text="Log Out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/logoutButton"
+                android:layout_gravity="right"
+                android:gravity="end|right" />
+        </LinearLayout>
         <ListView
             android:id="@+id/notebooks"
             android:layout_width="300dp"
