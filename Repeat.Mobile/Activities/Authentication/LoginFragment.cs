@@ -44,56 +44,76 @@ namespace Repeat.Activities.Authentication
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
 
-			LinearLayout loginLayout = (LinearLayout)inflater.Inflate(_layoutToInflate, container);
+			LinearLayout loginLayout = (LinearLayout)inflater.Inflate(_layoutToInflate, container, false);
 			Button loginButton = loginLayout.FindViewById<Button>(Resource.Id.login_button);
+			Button show_signupButotn = loginLayout.FindViewById<Button>(Resource.Id.show_signup);
 			_username = loginLayout.FindViewById<EditText>(Resource.Id.login_username);
 			_password = loginLayout.FindViewById<EditText>(Resource.Id.login_password);
 			_loginProgressBar = loginLayout.FindViewById<ProgressBar>(Resource.Id.loginProgressBar);
 
 			loginButton.Click += LoginButton_Click;
+			show_signupButotn.Click += Show_signupButotn_Click;
 
-			return base.OnCreateView(inflater, container, savedInstanceState);
+			return loginLayout;
+		}
+
+		private void Show_signupButotn_Click(object sender, EventArgs e)
+		{
+			if (CheckIfFragmentExists(typeof(SignUpFragment).Name))
+			{
+				ShowExistingFragment(typeof(SignUpFragment).Name, false);
+			}
+			else
+			{
+				CreateNewFragment(new SignUpFragment(Resource.Layout.SignUp));
+			}
 		}
 
 		private void LoginButton_Click(object sender, EventArgs e)
 		{
+			
 			if (string.IsNullOrEmpty(_username.Text) || string.IsNullOrEmpty(_password.Text))
 			{
 				Toast.MakeText(Activity, "Username or password is not filled in", ToastLength.Short);
 			}
-			
-
-			_loginProgressBar.Visibility = ViewStates.Visible;
-
-			var mOverlayDialog = new Dialog(Activity, Android.Resource.Style.ThemePanel); //display an invisible overlay dialog to prevent user interaction and pressing back
-			mOverlayDialog.SetCancelable(false);
-			mOverlayDialog.Show();
-			
-
-			Task.Factory.StartNew(() =>
+			else if(_password.Text.Trim().Length < 5)
 			{
-				if (Login(_username.Text, _password.Text))
-				{
-					RemoveThisFragment();
+				Toast.MakeText(Activity, "Password must be at least 5 characters", ToastLength.Short);
+			}
+			else {
 
-					//StartNotesActivity
-					Intent intent = new Intent(Activity, typeof(NotesActivity));
-					StartActivity(intent);
+				_loginProgressBar.Visibility = ViewStates.Visible;
 
-					Activity.RunOnUiThread(() =>
-					{
-						_loginProgressBar.Visibility = ViewStates.Gone;
-						mOverlayDialog.Dismiss();
-					});
-				}
-				else
+				var mOverlayDialog = new Dialog(Activity, Android.Resource.Style.ThemePanel); //display an invisible overlay dialog to prevent user interaction and pressing back
+				mOverlayDialog.SetCancelable(false);
+				mOverlayDialog.Show();
+
+
+				Task.Factory.StartNew(() =>
 				{
-					Activity.RunOnUiThread(() =>
+					if (Login(_username.Text, _password.Text))
 					{
-						Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short);
-					});
-				}
-			});
+						RemoveThisFragment();
+
+						//StartNotesActivity
+						Intent intent = new Intent(Activity, typeof(NotesActivity));
+						StartActivity(intent);
+
+						Activity.RunOnUiThread(() =>
+						{
+							_loginProgressBar.Visibility = ViewStates.Gone;
+							mOverlayDialog.Dismiss();
+						});
+					}
+					else
+					{
+						Activity.RunOnUiThread(() =>
+						{
+							Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short);
+						});
+					}
+				});
+			}
 		}
 
 		private bool Login(string username, string password)

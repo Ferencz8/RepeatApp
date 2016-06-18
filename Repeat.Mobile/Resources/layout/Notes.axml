@@ -24,6 +24,13 @@
             android:layout_marginRight="0.0dp"
             android:width="3px" />
         <Button
+            android:text="Edit"
+            android:layout_width="40.5dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editNotebookButton"
+            android:layout_marginRight="0.0dp"
+            android:width="3px" />
+        <Button
             android:text="Sync"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,6 +68,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/addNotebookButton" />
+        <Button
+            android:text="Log Out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/logoutButton" />
         <ListView
             android:id="@+id/notebooks"
             android:layout_width="300dp"

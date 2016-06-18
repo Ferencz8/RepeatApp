@@ -88,14 +88,14 @@ namespace Repeat.Mobile.Sync
 			{
 				if (n.Device.Equals(request.Device) && n.UserId.Equals(request.UserId))
 				{
-
+					Kernel.Get<ILog>().Info(Guid.Empty, "This is a shark attack");
 					var notebooks = _unitOfWork.NotebooksRepository.GetNotebooksWithNotesByLastModifiedDateOfNotes(n.LastSyncDate, Session.LoggedInUser.Id);
 
 					_client.Publish(Configs.RabbitMQ_DataToBeSynchedQueue, new DataToBeSynched()
 					{
 						UserId = Session.LoggedInUser.Id,
 						UserToken = Session.LoggedInUser.Token,
-						Notebooks = notebooks,						
+						Notebooks = notebooks,
 					});
 				}
 			}, true);
@@ -107,6 +107,10 @@ namespace Repeat.Mobile.Sync
 				//temp solution
 				Task.Factory.StartNew(() =>
 				{
+					Kernel.Get<ILog>().Info(Guid.Empty, "Sync FINISHED2");
+					GetSynchedDataToDB(dbSyncStart, dbSyncEnd);
+
+					Kernel.Get<ILog>().Info(Guid.Empty, "Sync FINISHED3");
 					Kernel.Get<ILog>().Info(Guid.Empty, "Dispose client");
 					Task.Delay(10000).Wait();
 					_client.Dispose();
@@ -115,7 +119,6 @@ namespace Repeat.Mobile.Sync
 					cts.Cancel();
 				});
 
-				GetSynchedDataToDB(dbSyncStart, dbSyncEnd);
 			}, true);
 
 			_client.Publish(Configs.RabbitMQ_PrepareSyncQueue, request);
@@ -154,9 +157,11 @@ namespace Repeat.Mobile.Sync
 
 		private async void GetSynchedDataToDB(Action dbSyncStart, Action dbSyncEnd)
 		{
-
+			
 			var headers = new Dictionary<string, string>() { { "Authorization", Session.LoggedInUser.Token } };
+			Kernel.Get<ILog>().Info(Guid.Empty, "Entered db sync method");
 			var apiNotebooks = await Kernel.Get<INotebookAPICaller>().GetList(string.Format(Configs.NotebooksAPI_Notebooks_Get, false, Session.LoggedInUser.Id), headers);
+			Kernel.Get<ILog>().Info(Guid.Empty, "Entered db sync method - Passed Breakpoint");
 
 			var apiNotes = await Kernel.Get<INoteAPICaller>().GetList(string.Format(Configs.NotebooksAPI_Notes_Get, false), headers);
 
@@ -169,12 +174,13 @@ namespace Repeat.Mobile.Sync
 			_unitOfWork.NotesRepository.EraseAll(Session.LoggedInUser.Id);
 			_unitOfWork.NotebooksRepository.EraseAll(Session.LoggedInUser.Id);
 
-			try {
+			try
+			{
 				foreach (var nb in apiNotebooks)
 				{
 					_unitOfWork.NotebooksRepository.Add(nb);
 
-					foreach(var note in nb.Notes)
+					foreach (var note in nb.Notes)
 					{
 						_unitOfWork.NotesRepository.Add(note);
 					}
@@ -185,7 +191,7 @@ namespace Repeat.Mobile.Sync
 			catch (Exception e)
 			{
 
-			}		
+			}
 
 			//here end msg
 			dbSyncEnd();

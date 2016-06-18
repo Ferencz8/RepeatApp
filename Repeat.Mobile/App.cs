@@ -8,6 +8,8 @@ using Repeat.Mobile.PCL.Logging;
 using System.Dynamic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Android.Widget;
+using Repeat.Common;
 
 namespace Repeat.Mobile
 {
@@ -31,6 +33,8 @@ namespace Repeat.Mobile
 
 			// subscribe to app wide unhandled exceptions so that we can log them.
 			AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;			
+
+			
 			//new Task(() =>
 			//{
 			Util.Log = new Logger();
@@ -64,6 +68,8 @@ namespace Repeat.Mobile
 			// instead, your err handling code shoudl be run:
 			Kernel.Get<ILog>().Exception(Guid.Empty, e, "Global Exception Handler");
 			Console.WriteLine("========= MyHandler caught : " + e.Message);
+
+			ExceptionHandler.DisplayFatalErrorMessage();
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Repeat.Activities.Authentication
 
 			fragmentTransaction.Replace(fragment.Id, newFragment, newFragment.GetType().Name);
 			fragmentTransaction.AddToBackStack(null);
-
+			
 			fragmentTransaction.SetTransition(FragmentTransit.FragmentFade);
 			fragmentTransaction.Commit();
 		}
@@ -64,6 +64,11 @@ namespace Repeat.Activities.Authentication
 
 			fragmentTransaction.SetTransition(FragmentTransit.FragmentFade);
 			fragmentTransaction.Commit();
+		}
+
+		public bool CheckIfFragmentExists(string existingFragmentTagName)
+		{
+			return FragmentManager.FindFragmentByTag(existingFragmentTagName)!=null ? true : false;
 		}
 
 		public override void OnDestroyView()

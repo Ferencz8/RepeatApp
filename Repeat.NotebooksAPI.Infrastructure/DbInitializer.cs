@@ -21,7 +21,7 @@ namespace Repeat.NotebooksAPI.Infrastructure
 		{
 			base.Seed(context);
 
-			Initialize(context);
+			//Initialize(context);
 		}
 
 		private void Initialize(Db context)

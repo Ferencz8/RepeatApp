@@ -14,8 +14,8 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 		public Guid Id { get; set; }
 
 		[Required]
-		[StringLength(100)]
-		[Index("NameAndUser", 1, IsUnique = true)]
+		[MaxLength(128)]
+		[Index("IX_NameAndUser", 1, IsUnique = true)]
 		public string Name { get; set; }
 
 		public virtual List<Note> Notes { get; set; }
@@ -31,7 +31,9 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 		public DateTime? DeletedDate { get; set; }
 
 		[Required]
-		[Index("NameAndUser", 2, IsUnique = true)]
+		[MaxLength(128)]
+		//[Column(TypeName = "varchar(128)")]
+		[Index("IX_NameAndUser", 2, IsUnique = true)]
 		public string UserId { get; set; }
 	}
 }

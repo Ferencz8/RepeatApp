@@ -64,10 +64,6 @@
       <HintPath>..\packages\RabbitMQ.Client.3.6.1\lib\net45\RabbitMQ.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Repeat.GenericLibsPCL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Repeat.GenericLibs.PCL\bin\Debug\Repeat.GenericLibsPCL.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -93,6 +89,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Repeat.GenericLibs.PCL\Repeat.GenericLibs.PCL.csproj">
+      <Project>{b9cbf137-1b87-44d7-9907-1d9eb30d63bd}</Project>
+      <Name>Repeat.GenericLibs.PCL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Repeat.SyncronizerService.APICallers\Repeat.SyncronizerService.APICallers.csproj">
       <Project>{b628016f-0073-4d3b-b6b3-9069bfdb26a4}</Project>
       <Name>Repeat.SyncronizerService.APICallers</Name>

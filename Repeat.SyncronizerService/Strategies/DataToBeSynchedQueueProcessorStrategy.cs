@@ -111,7 +111,7 @@ namespace Repeat.SyncronizerService.Strategies
 			}
 		}
 
-		private async Task PopulateListsWithDataToBeSynced(DataToBeSynched messageToBeProcessed, UserLastSync userLastSync, CentralAPICaller apiCaller, 
+		private async Task PopulateListsWithDataToBeSynced(DataToBeSynched messageToBeProcessed, UserLastSync userLastSync, CentralAPICaller apiCaller,
 			List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Dictionary<string, string> headers)
 		{
 			foreach (var notebook in messageToBeProcessed.Notebooks)
@@ -122,9 +122,9 @@ namespace Repeat.SyncronizerService.Strategies
 				if (notebookApi == null || notebookApi.Id.Equals(Guid.Empty))
 				{
 
-					var nbs = await apiCaller.NotebookAPICaller.GetList(string.Format(Config.NotebookAPI_Notebooks_GET_WithParameters,"", userLastSync.UserId, notebook.Name), headers);
+					var nbs = await apiCaller.NotebookAPICaller.GetList(string.Format(Config.NotebookAPI_Notebooks_GET_WithParameters, "", userLastSync.UserId, notebook.Name), headers);
 
-					if(nbs!=null && nbs.Any())//a notebok with the same name  for current user already exists 
+					if (nbs != null && nbs.Any())//a notebok with the same name  for current user already exists 
 					{
 						notebook.Name += " Conflict";
 					}
@@ -133,16 +133,16 @@ namespace Repeat.SyncronizerService.Strategies
 					continue;
 				}
 
-				SyncNotebooks(userLastSync, apiCaller, notebook, notebookApi);
+				SyncNotebooks(userLastSync, apiCaller, notebook, notebookApi, headers);
 
 				List<Note> apiNotes = await apiCaller.NotebookAPICaller.GetNotes(Config.NotebookAPI_Notebooks_GET_Notes, notebook.Id, userLastSync.LastSyncDate,
 					headers);
 
-				await SyncNotes(apiCaller, notesToBeUpdated, notesToBeInserted, notebook, apiNotes);
+				await SyncNotes(apiCaller, notesToBeUpdated, notesToBeInserted, notebook, apiNotes, headers);
 			}
 		}
 
-		private async Task SyncNotes(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Notebook notebook, List<Note> apiNotes)
+		private async Task SyncNotes(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Notebook notebook, List<Note> apiNotes, Dictionary<string, string> headers)
 		{
 			foreach (Note note in notebook.Notes)
 			{
@@ -181,7 +181,7 @@ namespace Repeat.SyncronizerService.Strategies
 				else
 				{
 					//if note exists in api -> update else -> insert
-					Note apiNoteCheck = await apiCaller.NoteAPICaller.Get(string.Format(Config.NotebookAPI_Notes_GETByID, note.Id));
+					Note apiNoteCheck = await apiCaller.NoteAPICaller.Get(string.Format(Config.NotebookAPI_Notes_GETByID, note.Id), headers);
 					if (apiNoteCheck != null)//note was edited on external db only, so we update the one from the api
 					{
 						notesToBeUpdated.Add(note);
@@ -194,13 +194,13 @@ namespace Repeat.SyncronizerService.Strategies
 			}
 		}
 
-		private void SyncNotebooks(UserLastSync userLastSync, CentralAPICaller apiCaller, Notebook notebook, Notebook notebookApi)
+		private void SyncNotebooks(UserLastSync userLastSync, CentralAPICaller apiCaller, Notebook notebook, Notebook notebookApi, Dictionary<string, string> headers)
 		{
 			if (notebookApi.ModifiedDate < userLastSync.LastSyncDate && notebook.ModifiedDate > userLastSync.LastSyncDate)//notebook changed only in External db
 			{
-				apiCaller.NotebookAPICaller.Update(Config.NotebookAPI_Notebooks_PUT, notebook);
+				apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 			}
-			else if(notebookApi.ModifiedDate > userLastSync.LastSyncDate && notebook.ModifiedDate > userLastSync.LastSyncDate)//both notebooks exist. Both, API and external Db notebook have been updated out of sync
+			else if (notebookApi.ModifiedDate > userLastSync.LastSyncDate && notebook.ModifiedDate > userLastSync.LastSyncDate)//both notebooks exist. Both, API and external Db notebook have been updated out of sync
 			{
 				if (notebook.Deleted == true && notebookApi.Deleted == true)
 				{
@@ -213,25 +213,25 @@ namespace Repeat.SyncronizerService.Strategies
 					notebook.Name += " - Conflict-Deleted";
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_PUT, notebook);
+					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 				else if (notebookApi.Deleted)
 				{
 					notebookApi.Deleted = false;
 					notebookApi.DeletedDate = null;
 					notebookApi.Name += " - Conflict-Deleted";
-					apiCaller.NotebookAPICaller.Update(Config.NotebookAPI_Notebooks_PUT, notebookApi);
+					apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebookApi, headers);
 
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_PUT, notebook);
+					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 				else//none of the notebooks got deleted
 				{
 					notebook.Name += " -Conflict";
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_PUT, notebook);
+					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 			}
 		}

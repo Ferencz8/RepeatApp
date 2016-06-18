@@ -7,6 +7,7 @@ using Android.Widget;
 using Repeat.Activities.Authentication;
 using Repeat.Activities.Notes;
 using Repeat.AppLayer;
+using Repeat.Common;
 using Repeat.Mobile.PCL;
 
 namespace Repeat.Mobile
@@ -23,6 +24,8 @@ namespace Repeat.Mobile
 			// Set our view from the "main" layout resource
 			SetContentView(Resource.Layout.Main);
 
+			ExceptionHandler.Activity = this;
+
 			if (Session.LoggedInUser != null)
 			{
 				Intent intent = new Intent(this, typeof(NotesActivity));
@@ -32,14 +35,9 @@ namespace Repeat.Mobile
 			else {
 
 				LoginFragment loginFragment = new LoginFragment(Resource.Layout.LogIn);
-				Bundle bundle2 = new Bundle();
-				bundle2.PutString("hi", "acsacas");
-
-				loginFragment.Arguments = bundle2;
 
 				LinearLayout view = new LinearLayout(this);
 				int id = Resource.Id.mainActivity;
-				int id2 = view.RootView.Id;
 				NavigateTo(id, loginFragment, loginFragment.GetType().Name);
 			}
 		}

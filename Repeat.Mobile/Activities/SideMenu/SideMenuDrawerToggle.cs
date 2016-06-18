@@ -39,7 +39,7 @@ namespace Repeat.Mobile.Activities.SideMenu
 				}
                 //Left Drawer
                 base.OnDrawerOpened(drawerView);
-                mActivity.ActionBar.Title = "Please Select From List";
+                mActivity.ActionBar.Title = "Notebooks";
             }
         }
 
@@ -51,7 +51,7 @@ namespace Repeat.Mobile.Activities.SideMenu
             {
                 //Left Drawer
                 base.OnDrawerClosed(drawerView);
-                mActivity.ActionBar.Title = "Drawer Layout App";
+                mActivity.ActionBar.Title = "Notebooks";
             }
         }
 

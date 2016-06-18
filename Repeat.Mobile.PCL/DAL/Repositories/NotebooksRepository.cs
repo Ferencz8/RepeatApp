@@ -34,7 +34,10 @@ namespace Repeat.Mobile.PCL.DAL.Repositories
 		{
 			var notebooks = _db.GetAllWithChildren<Notebook>(n => n.UserId.Equals(userId));
 
-			foreach(var notebook in notebooks)
+
+			var nb = _db.Table<Notebook>().ToList();
+			var nt = _db.Table<Note>().ToList();
+			foreach (var notebook in notebooks)
 			{
 				if(notebook.Notes == null || notebook.Notes.Count == 0)
 				{

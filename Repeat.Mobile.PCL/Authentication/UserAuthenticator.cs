@@ -18,6 +18,7 @@ namespace Repeat.Mobile.PCL.Authentication
 		public UserAuthenticator()
 		{
 			_log = Kernel.Get<ILog>();
+			_api = new API(Configs.UserAPP_APIKey);
 		}
 
 		public bool LogIn(string username, string password)
@@ -26,7 +27,6 @@ namespace Repeat.Mobile.PCL.Authentication
 			{
 				try
 				{
-					_api = new API(Configs.UserAPP_APIKey);
 					var loginResult = _api.User.Login(login: username, password: password);
 
 					Session.LoggedInUser = new User();
@@ -59,12 +59,12 @@ namespace Repeat.Mobile.PCL.Authentication
 			}
 		}
 
-		public bool SignUp(string username, string password)
+		public bool SignUp(string username, string password, string email)
 		{
 			try
 			{
 
-				var newUser = _api.User.Save(login: username, password: password);
+				var newUser = _api.User.Save(login: username, password: password, email: email);
 
 				return newUser != null ? true : false;
 			}

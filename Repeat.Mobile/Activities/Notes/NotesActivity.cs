@@ -21,6 +21,8 @@ using Android.Support.V4.Widget;
 using Repeat.Mobile.PCL;
 using System.Threading.Tasks;
 using Repeat.Mobile.PCL.DAL;
+using Repeat.Mobile.PCL.Authentication;
+using Repeat.Mobile;
 
 namespace Repeat.Activities.Notes
 {
@@ -36,7 +38,9 @@ namespace Repeat.Activities.Notes
 		Button addNoteButton;
 		Button menuButton;
 		Button syncButton;
+		Button editNotebookButton;
 		Button addNotebookButton;
+		Button logoutButton;
 		ActionBarDrawerToggle drawerToggle;
 		LinearLayout leftSideMenu;
 		ProgressBar progressBar;
@@ -61,6 +65,8 @@ namespace Repeat.Activities.Notes
 			menuButton = FindViewById<Button>(Resource.Id.menuButton);
 			syncButton = FindViewById<Button>(Resource.Id.syncButton);
 			addNotebookButton = FindViewById<Button>(Resource.Id.addNotebookButton);
+			editNotebookButton = FindViewById<Button>(Resource.Id.editNotebookButton);
+			logoutButton = FindViewById<Button>(Resource.Id.logoutButton);
 
 			drawerToggle = new SideMenuDrawerToggle(this, drawerLayout, Resource.String.open_drawer, Resource.String.close_drawer);//Resource.Drawable.Icon, -- removed
 			drawerLayout.AddDrawerListener(drawerToggle);
@@ -79,14 +85,62 @@ namespace Repeat.Activities.Notes
 
 			syncButton.Click += SyncButton_Click;
 
+			editNotebookButton.Click += EditNotebookButton_Click;
+
+			logoutButton.Click += LogoutButton_Click; 
+
 			addNotebookButton.Click += AddNotebookButton_Click;
 
-			notebooks.ItemClick += Notebooks_ItemClick; ;
+			notebooks.ItemClick += Notebooks_ItemClick;
 
 			notes.ItemClick += Notes_ItemClick;
 		}
 
+		private void EditNotebookButton_Click(object sender, EventArgs e)
+		{
+			var builder = new Android.App.AlertDialog.Builder(this);
+			builder.SetTitle("Edit Notebook");
+			EditText edit = new EditText(this);
 
+			var unitOfWork = Kernel.Get<IUnitOfWork>();
+			var chosenNotebook = unitOfWork.NotebooksRepository.GetByID(chosenNotebookId);
+			edit.Text = chosenNotebook.Name;
+			builder.SetView(edit);
+			builder.SetPositiveButton("Save", (alertDialogSender, args) =>
+			{
+				/* do stuff on OK */
+				string notebookName = edit.Text;
+
+				if (string.IsNullOrEmpty(notebookName))
+				{
+					Toast.MakeText(this, "Name should not be empty!", ToastLength.Short).Show();
+				}
+				else {
+
+					chosenNotebook.Name = notebookName;
+					chosenNotebook.ModifiedDate = DateTime.UtcNow;
+					int rowschanged = unitOfWork.NotebooksRepository.Update(chosenNotebook);
+
+					unitOfWork.SaveChanges();
+					
+					notebooksAdapter.RefreshContent();
+					notebooksAdapter.NotifyDataSetChanged();
+				}
+			});
+			builder.Show();
+		}
+
+		private void LogoutButton_Click(object sender, EventArgs e)
+		{
+			new UserAuthenticator().LogOut();
+
+			Session.LoggedInUser = null;
+
+			Finish();
+
+			Intent intent = new Intent(this, typeof(MainActivity));
+			StartActivity(intent);
+		}
 
 		private void AddNoteButton_Click(object sender, EventArgs e)
 		{
@@ -160,25 +214,31 @@ namespace Repeat.Activities.Notes
 				/* do stuff on OK */
 				string notebookName = edit.Text;
 
-				//TODO:: TempSolution maybe add one more layer for handling CRUD operations
-				var unitOfWork = Kernel.Get<IUnitOfWork>();
-				int rowschanged = unitOfWork.NotebooksRepository.Add(new Notebook()
+				if (string.IsNullOrEmpty(notebookName))
 				{
-					Id = Guid.NewGuid().ToString(),
-					Name = notebookName,
-					CreatedDate = DateTime.UtcNow,
-					ModifiedDate = DateTime.UtcNow,
-					UserId = Session.LoggedInUser.Id,
-				});
-				unitOfWork.SaveChanges();
-				if (rowschanged == 1)
-				{
-					chosenNotebookId = Guid.Parse(unitOfWork.NotebooksRepository.GetByName(notebookName).Id);
+					Toast.MakeText(this, "Name should not be empty!", ToastLength.Short).Show();
 				}
-				notebooksAdapter.RefreshContent();
-				notebooksAdapter.NotifyDataSetChanged();
+				else {
+					//TODO:: TempSolution maybe add one more layer for handling CRUD operations
+					var unitOfWork = Kernel.Get<IUnitOfWork>();
+					int rowschanged = unitOfWork.NotebooksRepository.Add(new Notebook()
+					{
+						Id = Guid.NewGuid().ToString(),
+						Name = notebookName,
+						CreatedDate = DateTime.UtcNow,
+						ModifiedDate = DateTime.UtcNow,
+						UserId = Session.LoggedInUser.Id,
+					});
+					unitOfWork.SaveChanges();
+					if (rowschanged == 1)
+					{
+						chosenNotebookId = Guid.Parse(unitOfWork.NotebooksRepository.GetByName(notebookName).Id);
+					}
+					notebooksAdapter.RefreshContent();
+					notebooksAdapter.NotifyDataSetChanged();
 
-				RefreshNotesListContent();
+					RefreshNotesListContent();
+				}
 			});
 			builder.Show();
 		}

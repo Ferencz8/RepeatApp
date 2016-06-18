@@ -87,28 +87,42 @@ namespace Repeat.Mobile.Activities.Notes
 
 		private void EditButton_Click(object sender, EventArgs e)
 		{
-			_noteToBeEdited.Name = _txtNote.Text;
-			_noteToBeEdited.Content = _txtContent.Text;
-			_noteToBeEdited.ModifiedDate = DateTime.UtcNow;
+			if (string.IsNullOrEmpty(_txtNote.Text))
+			{
+				Toast.MakeText(this, "Name field cannot be empty", ToastLength.Short).Show();
+			}
+			else {
 
-			_unitOfWork.NotesRepository.Update(_noteToBeEdited);
-			_unitOfWork.SaveChanges();
-			Finish();
+				_noteToBeEdited.Name = _txtNote.Text;
+				_noteToBeEdited.Content = _txtContent.Text;
+				_noteToBeEdited.ModifiedDate = DateTime.UtcNow;
+
+				_unitOfWork.NotesRepository.Update(_noteToBeEdited);
+				_unitOfWork.SaveChanges();
+				Finish();
+			}
 		}
 
 		private void AddButton_Click(object sender, EventArgs e)
 		{
-			_unitOfWork.NotesRepository.Add(new Note()
+			if (string.IsNullOrEmpty(_txtNote.Text))
 			{
-				Id = Guid.NewGuid().ToString(),
-				Name = _txtNote.Text,
-				Content = _txtContent.Text,
-				NotebookId = chosenNotebookId.ToString(),
-				CreatedDate = DateTime.UtcNow,
-				ModifiedDate = DateTime.UtcNow,
-			});
-			_unitOfWork.SaveChanges();
-			Finish();
+				Toast.MakeText(this, "Name field cannot be empty", ToastLength.Short).Show();
+			}
+			else {
+
+				_unitOfWork.NotesRepository.Add(new Note()
+				{
+					Id = Guid.NewGuid().ToString(),
+					Name = _txtNote.Text,
+					Content = _txtContent.Text,
+					NotebookId = chosenNotebookId.ToString(),
+					CreatedDate = DateTime.UtcNow,
+					ModifiedDate = DateTime.UtcNow,
+				});
+				_unitOfWork.SaveChanges();
+				Finish();
+			}
 		}
 
 		//protected override void OnDestroy()

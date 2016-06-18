@@ -24,90 +24,111 @@ namespace Repeat.GenericLibs.PCL.APICallers
 
 		public async void Add(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
-			try
+			for (int i = 0; i < 5; i++)
 			{
-				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
+				try
 				{
-					client.AddHeaders(headers);
-					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");					
-					var response = await client.PostAsync(apiRoute, stringContent);
-					if (response != null)
+					using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 					{
-						//do smth with the response
+						client.AddHeaders(headers);
+						var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
+						var response = await client.PostAsync(apiRoute, stringContent);
+						if (response != null)
+						{
+							//do smth with the response
+						}
+
+						break;
 					}
 				}
-			}
-			catch (Exception e)
-			{
+				catch (Exception e)
+				{
+					continue;
+				}
 			}
 		}
-				
+
 		public async Task<List<T>> GetList(string apiRoute, Dictionary<string, string> headers = null)
 		{
 			List<T> elements = new List<T>();
-			try
+			for (int i = 0; i < 5; i++)
 			{
-				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
+				try
 				{
-					client.AddHeaders(headers);
-					var response = await client.GetAsync(apiRoute);
-					if (response != null)
+					using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 					{
-						string str = await response.Content.ReadAsStringAsync();
-						elements = JsonConvert.DeserializeObject<List<T>>(str, _settings);
+						client.AddHeaders(headers);
+						var response = await client.GetAsync(apiRoute);
+						if (response != null)
+						{
+							string str = await response.Content.ReadAsStringAsync();
+							elements = JsonConvert.DeserializeObject<List<T>>(str, _settings);
+						}
 					}
+					break;
+				}
+				catch (Exception e)
+				{
+					continue;
 				}
 			}
-			catch (Exception e)
-			{
-			}
-
 			return elements;
 		}
 
 		public async Task<T> Get(string apiRoute, Dictionary<string, string> headers = null)
 		{
 			T element = default(T);
-			try
+			for (int i = 0; i < 5; i++)
 			{
-				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
+				try
 				{
-					client.AddHeaders(headers);
-					var response = await client.GetAsync(apiRoute);
-					if (response != null)
+					using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 					{
-						string str = await response.Content.ReadAsStringAsync();
-						element = JsonConvert.DeserializeObject<T>(str, _settings);
+						client.AddHeaders(headers);
+						var response = await client.GetAsync(apiRoute);
+						if (response != null)
+						{
+							string str = await response.Content.ReadAsStringAsync();
+							element = JsonConvert.DeserializeObject<T>(str, _settings);
+						}
 					}
+					break;
 				}
-			}
-			catch (Exception e)
-			{
+				catch (Exception e)
+				{
+					continue;
+				}
 			}
 			return element;
 		}
 
 		public async void Update(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
-			try
+			for (int i = 0; i < 5; i++)
 			{
-				using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
+				try
 				{
-					client.AddHeaders(headers);
-					var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
-					var response = await client.PutAsync(apiRoute, stringContent);
-					if (response != null)
+					using (var client = HttpClientExtensions.GetAPIClient(_apiURL))
 					{
+						client.AddHeaders(headers);
+						var stringContent = new StringContent(JsonConvert.SerializeObject(obj, _settings), Encoding.UTF8, "application/json");
+						var response = await client.PutAsync(apiRoute, stringContent);
+						if (response != null)
+						{
 
+						}
 					}
+
+					break;
+				}
+				catch (Exception e)
+				{
+					continue;
 				}
 			}
-			catch (Exception e)
-			{
-			}
 		}
-		
-		public async void Delete(string apiRoute, object id,  Dictionary<string, string> headers = null)
+
+		public async void Delete(string apiRoute, object id, Dictionary<string, string> headers = null)
 		{
 			throw new NotImplementedException();
 		}
