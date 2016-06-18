@@ -16,7 +16,9 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 		//[JsonIgnore]
 		public string Id { get; set; }
 
-		[Unique, NotNull]
+		//[Unique, NotNull]
+		[NotNull]
+		[Indexed(Name = "IX_NameAndUser", Order = 1, Unique = true)]
 		public string Name { get; set; }
 
 		[NotNull]
@@ -33,6 +35,7 @@ namespace Repeat.Mobile.PCL.DAL.Entities
 		public virtual List<Note> Notes { get; set; }
 
 		[NotNull]
+		[Indexed(Name = "IX_NameAndUser", Order = 2, Unique = true)]
 		public string UserId { get; set; }
 	}
 }

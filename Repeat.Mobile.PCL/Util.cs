@@ -43,10 +43,12 @@ namespace Repeat.Mobile.PCL
 
 			SQLiteConnection connection = GetDbConnection();
 
+			if (!Is_DatabaseSchema_Created(connection))
+			{
+				CreateDatabaseSchema(connection);
+			}
 
-			connection.CreateTable<Notebook>();
-			connection.CreateTable<Note>();
-			if (connection.Table<Notebook>().ToList().Count == 0)//check if there are 0 notebooks -> add a default one
+			if (connection.Table<Notebook>().Where(nb => nb.UserId.Equals(Session.LoggedInUser.Id)).ToList().Count == 0)//check if for current user there are 0 notebooks -> add a default one
 			{
 				connection.Insert(new Notebook()
 				{
@@ -66,6 +68,20 @@ namespace Repeat.Mobile.PCL
 				CreateDbConnection();
 			}
 			return _connection;
+		}
+
+		private static bool Is_DatabaseSchema_Created(SQLiteConnection conn)
+		{
+			var notebookTableInfo = conn.GetTableInfo("Notebook");
+			var noteTableInfo = conn.GetTableInfo("Note");
+
+			return notebookTableInfo.Count == 0 || noteTableInfo.Count == 0 ? false : true;
+		}
+		
+		private static void CreateDatabaseSchema(SQLiteConnection connection)
+		{
+			connection.CreateTable<Notebook>();
+			connection.CreateTable<Note>();
 		}
 	}
 }
