@@ -3,6 +3,7 @@ using Repeat.GenericLibs.PCL.APICallers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			_apiURL = apiURL;
 		}
 
-		public async void Add(string apiRoute, T obj, Dictionary<string, string> headers = null)
+		public async Task<bool> Add(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
 			for (int i = 0; i < 5; i++)
 			{
@@ -36,9 +37,8 @@ namespace Repeat.GenericLibs.PCL.APICallers
 						if (response != null)
 						{
 							//do smth with the response
+							return Is_ResponseStatusCode_Successfull(response.StatusCode);
 						}
-
-						break;
 					}
 				}
 				catch (Exception e)
@@ -46,6 +46,8 @@ namespace Repeat.GenericLibs.PCL.APICallers
 					continue;
 				}
 			}
+
+			return false;
 		}
 
 		public async Task<List<T>> GetList(string apiRoute, Dictionary<string, string> headers = null)
@@ -92,7 +94,6 @@ namespace Repeat.GenericLibs.PCL.APICallers
 							element = JsonConvert.DeserializeObject<T>(str, _settings);
 						}
 					}
-					break;
 				}
 				catch (Exception e)
 				{
@@ -102,7 +103,7 @@ namespace Repeat.GenericLibs.PCL.APICallers
 			return element;
 		}
 
-		public async void Update(string apiRoute, T obj, Dictionary<string, string> headers = null)
+		public async Task<bool> Update(string apiRoute, T obj, Dictionary<string, string> headers = null)
 		{
 			for (int i = 0; i < 5; i++)
 			{
@@ -115,22 +116,32 @@ namespace Repeat.GenericLibs.PCL.APICallers
 						var response = await client.PutAsync(apiRoute, stringContent);
 						if (response != null)
 						{
-
+							return Is_ResponseStatusCode_Successfull(response.StatusCode);
 						}
 					}
-
-					break;
 				}
 				catch (Exception e)
 				{
 					continue;
 				}
 			}
+
+			return false;
 		}
 
-		public async void Delete(string apiRoute, object id, Dictionary<string, string> headers = null)
+		public async Task<bool> Delete(string apiRoute, object id, Dictionary<string, string> headers = null)
 		{
 			throw new NotImplementedException();
+		}
+
+		private bool Is_ResponseStatusCode_Successfull(HttpStatusCode code)
+		{
+			if (code == HttpStatusCode.Accepted || code == HttpStatusCode.Created || code == HttpStatusCode.NoContent)
+			{
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

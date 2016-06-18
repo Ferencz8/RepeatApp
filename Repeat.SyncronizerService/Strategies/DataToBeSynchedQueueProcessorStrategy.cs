@@ -13,6 +13,9 @@ using Repeat.SyncronizerService.APICallers;
 
 namespace Repeat.SyncronizerService.Strategies
 {
+	/// <summary>
+	/// The logic of this process is incomplete.
+	/// </summary>
 	public class DataToBeSynchedQueueProcessorStrategy : IQueueProcessor<DataToBeSynched>
 	{
 		private static readonly object _object = new object();
@@ -35,12 +38,21 @@ namespace Repeat.SyncronizerService.Strategies
 					ChangeSyncStatus(unitOfWorkExternal, userLastSync, SyncStatus.Running);
 
 					RunDataSyncTask(queue, messageToBeProcessed, userLastSync);
-
 				}
 				else//the sync process is already Running for a certain device
 				{
 					//TODO::put message back on queue or use ack
 				}
+			}
+		}
+
+		private void ChangeSyncStatus(IUnitOfWork unitOfWork, UserLastSync userLastSync, SyncStatus syncstatus)
+		{
+			lock (_object)
+			{
+				userLastSync.SyncStatus = syncstatus;
+				unitOfWork.UsersLastSyncRepository.Update(userLastSync);//mark the synching status process as finished
+				unitOfWork.Save();
 			}
 		}
 
@@ -63,8 +75,8 @@ namespace Repeat.SyncronizerService.Strategies
 					await PopulateListsWithDataToBeSynced(messageToBeProcessed, userLastSync, apiCaller, notesToBeUpdated, notesToBeInserted, headers);
 
 
-					Sync_NotesToBeInserted(apiCaller, notesToBeInserted, headers);
-					Sync_NotesToBeUpdated(apiCaller, notesToBeUpdated, headers);
+					await Sync_NotesToBeInserted(apiCaller, notesToBeInserted, headers);
+					await Sync_NotesToBeUpdated(apiCaller, notesToBeUpdated, headers);
 
 					Console.ForegroundColor = ConsoleColor.Green;
 					Log.Info("END Data To Be Synched processing !");
@@ -85,32 +97,6 @@ namespace Repeat.SyncronizerService.Strategies
 			});
 		}
 
-		private void SendSyncResultReponse(IQueue queue, UserLastSync userLastSyncClone)
-		{
-			queue.SendMessage(Config.RabbitMQ_SyncResultQueue, new SyncResult()
-			{
-				UserId = userLastSyncClone.UserId,
-				Device = userLastSyncClone.Device.Name,
-				Result = true
-			});
-		}
-
-		private void Sync_NotesToBeUpdated(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, Dictionary<string, string> headers)
-		{
-			foreach (var note in notesToBeUpdated)
-			{
-				apiCaller.NoteAPICaller.Update(string.Format(Config.NotebookAPI_Notes_PUT, note.Id), note, headers);
-			}
-		}
-
-		private void Sync_NotesToBeInserted(CentralAPICaller apiCaller, List<Note> notesToBeInserted, Dictionary<string, string> headers)
-		{
-			foreach (var note in notesToBeInserted)
-			{
-				apiCaller.NoteAPICaller.Add(Config.NotebookAPI_Notes_POST, note, headers);
-			}
-		}
-
 		private async Task PopulateListsWithDataToBeSynced(DataToBeSynched messageToBeProcessed, UserLastSync userLastSync, CentralAPICaller apiCaller,
 			List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Dictionary<string, string> headers)
 		{
@@ -129,11 +115,11 @@ namespace Repeat.SyncronizerService.Strategies
 						notebook.Name += " Conflict";
 					}
 
-					apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook, headers);
+					await apiCaller.NotebookAPICaller.Add(Config.NotebookAPI_Notebooks_POST, notebook, headers);
 					continue;
 				}
 
-				SyncNotebooks(userLastSync, apiCaller, notebook, notebookApi, headers);
+				await SyncNotebooks(userLastSync, apiCaller, notebook, notebookApi, headers);
 
 				List<Note> apiNotes = await apiCaller.NotebookAPICaller.GetNotes(Config.NotebookAPI_Notebooks_GET_Notes, notebook.Id, userLastSync.LastSyncDate,
 					headers);
@@ -141,7 +127,32 @@ namespace Repeat.SyncronizerService.Strategies
 				await SyncNotes(apiCaller, notesToBeUpdated, notesToBeInserted, notebook, apiNotes, headers);
 			}
 		}
+		private async Task Sync_NotesToBeUpdated(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, Dictionary<string, string> headers)
+		{
+			foreach (var note in notesToBeUpdated)
+			{
+				await apiCaller.NoteAPICaller.Update(string.Format(Config.NotebookAPI_Notes_PUT, note.Id), note, headers);
+			}
+		}
 
+		private async Task Sync_NotesToBeInserted(CentralAPICaller apiCaller, List<Note> notesToBeInserted, Dictionary<string, string> headers)
+		{
+			foreach (var note in notesToBeInserted)
+			{
+				await apiCaller.NoteAPICaller.Add(Config.NotebookAPI_Notes_POST, note, headers);
+			}
+		}
+
+		private void SendSyncResultReponse(IQueue queue, UserLastSync userLastSyncClone)
+		{
+			queue.SendMessage(Config.RabbitMQ_SyncResultQueue, new SyncResult()
+			{
+				UserId = userLastSyncClone.UserId,
+				Device = userLastSyncClone.Device.Name,
+				Result = true
+			});
+		}
+			
 		private async Task SyncNotes(CentralAPICaller apiCaller, List<Note> notesToBeUpdated, List<Note> notesToBeInserted, Notebook notebook, List<Note> apiNotes, Dictionary<string, string> headers)
 		{
 			foreach (Note note in notebook.Notes)
@@ -194,11 +205,11 @@ namespace Repeat.SyncronizerService.Strategies
 			}
 		}
 
-		private void SyncNotebooks(UserLastSync userLastSync, CentralAPICaller apiCaller, Notebook notebook, Notebook notebookApi, Dictionary<string, string> headers)
+		private async Task SyncNotebooks(UserLastSync userLastSync, CentralAPICaller apiCaller, Notebook notebook, Notebook notebookApi, Dictionary<string, string> headers)
 		{
 			if (notebookApi.ModifiedDate < userLastSync.LastSyncDate && notebook.ModifiedDate > userLastSync.LastSyncDate)//notebook changed only in External db
 			{
-				apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
+				await apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 			}
 			else if (notebookApi.ModifiedDate > userLastSync.LastSyncDate && notebook.ModifiedDate > userLastSync.LastSyncDate)//both notebooks exist. Both, API and external Db notebook have been updated out of sync
 			{
@@ -213,25 +224,25 @@ namespace Repeat.SyncronizerService.Strategies
 					notebook.Name += " - Conflict-Deleted";
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
+					await apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 				else if (notebookApi.Deleted)
 				{
 					notebookApi.Deleted = false;
 					notebookApi.DeletedDate = null;
 					notebookApi.Name += " - Conflict-Deleted";
-					apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebookApi, headers);
+					await apiCaller.NotebookAPICaller.Update(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebookApi, headers);
 
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
+					await apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 				else//none of the notebooks got deleted
 				{
 					notebook.Name += " -Conflict";
 					notebook.Id = Guid.NewGuid();
 					notebook.Notes.ForEach(n => n.Id = Guid.NewGuid());
-					apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
+					await apiCaller.NotebookAPICaller.Add(string.Format(Config.NotebookAPI_Notebooks_PUT, notebook.Id), notebook, headers);
 				}
 			}
 		}
@@ -273,16 +284,6 @@ namespace Repeat.SyncronizerService.Strategies
 					Device = messageToBeProcessed.Device,
 				});
 			}
-		}
-
-		private void ChangeSyncStatus(IUnitOfWork unitOfWork, UserLastSync userLastSync, SyncStatus syncstatus)
-		{
-			lock (_object)
-			{
-				userLastSync.SyncStatus = syncstatus;
-				unitOfWork.UsersLastSyncRepository.Update(userLastSync);//mark the synching status process as finished
-				unitOfWork.Save();
-			}
-		}
+		}		
 	}
 }
