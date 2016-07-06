@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Repeat Notes! | </title>
+    <title>Notyx!</title>
 
     <!-- Bootstrap -->
     <link href="../lib/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
         <div class="col-md-3 left_col" style="height:100%">
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <div class="site_title"><i class="fa fa-paw"></i> <span>Repeat Notes!</span></div>
+                    <div class="site_title"><i class="fa fa-paw"></i> <span>Notyx!</span></div>
                 </div>
 
                 <div class="clearfix"></div>
@@ -58,7 +58,7 @@
                         <ul class="nav side-menu">
                             <li id="addNotebookButton"><a><i class="fa fa-edit"></i> Add Notebook</a>
                             </li>
-                            <li class="active"><a><i class="fa fa-desktop"></i> Notebooks <span
+                            <li id="notebooksList" class="active"><a><i class="fa fa-desktop"></i> Notebooks <span
                                     class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu" style="display: block;">
                                     {{#each notebooks}}
@@ -86,7 +86,7 @@
         <!-- footer content -->
         <footer>
             <div class="pull-right">
-                Repeat App by Feri
+                Notyx App by Feri
             </div>
             <div class="clearfix"></div>
         </footer>
@@ -204,9 +204,36 @@
 
 <!-- bootstrap-wysiwyg -->
 <script>
-    console.log('layout');
     $(document).ready(function () {
-        $($("ul[class='nav child_menu']").find('a:first-child')[0]).click()
+
+        $('#notebooksList').on('click', function(){
+            var $that = $(this);
+            console.log($that.attr('class'));
+
+            if($that.attr('class') == "active") {
+                $.ajax({
+                    url: "/notebooks/getNotebooks",
+                    type: "GET",
+                    success: function (data) {
+
+                        var ul = $that.find('ul');
+                        ul.html('');
+
+                        debugger;
+                        for (var nb in data.notebooks) {
+                            ul.prepend("<li><a class='notebook' id=" + data.notebooks[nb].Id + ">" + data.notebooks[nb].Name + "</a></li>");
+                        }
+                        registerNotebooksClickEvent();
+                    },
+                    error: function (xhr) {
+                        console.log(xhr);
+                    }
+                });
+            }
+        });
+
+
+        $($("ul[class='nav child_menu']").find('a:first-child')[0]).click();
 
         $("#logout").on('click', function () {
             $('#logoutForm').submit();
@@ -231,16 +258,18 @@
         });
 
 
-        $(".notebook").on('click', function () {
+        function registerNotebooksClickEvent() {
+            $(".notebook").on('click', function () {
 
-            var chosenNotebookId = $(this).attr('id');
-            var chosenNotebookName = $(this).text();
+                var chosenNotebookId = $(this).attr('id');
+                var chosenNotebookName = $(this).text();
 
-            $("ul[class='nav child_menu'] li").removeClass('active');
+                $("ul[class='nav child_menu'] li").removeClass('active');
 
-            $(this).parent().addClass('active');
-            refreshNotes(chosenNotebookId, chosenNotebookName);
-        });
+                $(this).parent().addClass('active');
+                refreshNotes(chosenNotebookId, chosenNotebookName);
+            });
+        }
 
         function refreshNotes(notebookId, notebookName) {
             $.ajax({

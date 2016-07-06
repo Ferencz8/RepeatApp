@@ -199,6 +199,8 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Diagrams\ClassDiagram_With_Method_FullSignature.cd" />
+    <Content Include="ClassDiagram1.cd" />
     <None Include="Properties\PublishProfiles\RepeatNotebooksAPI2016Testam - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\RepeatNotes - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

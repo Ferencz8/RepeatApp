@@ -59,7 +59,7 @@ namespace Repeat.Activities.Authentication
 
 		private void LoginButton_Click(object sender, EventArgs e)
 		{
-			RemoveThisFragment();
+			//RemoveThisFragment();
 
 			ShowExistingFragment(typeof(LoginFragment).Name, false);
 		}
@@ -72,7 +72,7 @@ namespace Repeat.Activities.Authentication
 			}
 			else if (_password.Text.Trim().Length < 5)
 			{
-				Toast.MakeText(Activity, "Password must be at least 5 characters", ToastLength.Short);
+				Toast.MakeText(Activity, "Password must be at least 5 characters", ToastLength.Short).Show();
 			}
 			else {
 
@@ -105,7 +105,7 @@ namespace Repeat.Activities.Authentication
 
 							mOverlayDialog.Cancel();
 
-							Toast.MakeText(Activity, "Failed to signup", ToastLength.Short);
+							Toast.MakeText(Activity, "Failed to signup", ToastLength.Short).Show();
 						});
 					}
 				});

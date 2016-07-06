@@ -12,7 +12,7 @@ using Repeat.Mobile.PCL;
 
 namespace Repeat.Mobile
 {
-	[Activity(Label = "Repeat", MainLauncher = true, Icon = "@drawable/icon")]
+	[Activity(Label = "Notyx", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : ActivityBase
 	{
 		

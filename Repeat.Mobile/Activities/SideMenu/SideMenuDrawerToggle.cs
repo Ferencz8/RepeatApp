@@ -51,7 +51,7 @@ namespace Repeat.Mobile.Activities.SideMenu
             {
                 //Left Drawer
                 base.OnDrawerClosed(drawerView);
-                mActivity.ActionBar.Title = "Notebooks";
+                mActivity.ActionBar.Title = "Notes";
             }
         }
 

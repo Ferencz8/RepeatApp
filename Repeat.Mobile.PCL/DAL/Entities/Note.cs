@@ -8,7 +8,6 @@ namespace Repeat.Mobile.PCL.DAL.Entities
     public class Note
     {
 		[PrimaryKey]
-		//[JsonIgnore]
 		public string Id { get; set; }
 
 		[ForeignKey(typeof(Notebook)), NotNull]

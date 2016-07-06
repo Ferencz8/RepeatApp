@@ -19,6 +19,7 @@ libs
 
 
 # User-specific files
+*.cd
 *.suo
 *.user
 *.userosscache

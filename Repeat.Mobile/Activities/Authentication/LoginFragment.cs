@@ -74,11 +74,11 @@ namespace Repeat.Activities.Authentication
 			
 			if (string.IsNullOrEmpty(_username.Text) || string.IsNullOrEmpty(_password.Text))
 			{
-				Toast.MakeText(Activity, "Username or password is not filled in", ToastLength.Short);
+				Toast.MakeText(Activity, "Username or password is not filled in", ToastLength.Short).Show();
 			}
 			else if(_password.Text.Trim().Length < 5)
 			{
-				Toast.MakeText(Activity, "Password must be at least 5 characters", ToastLength.Short);
+				Toast.MakeText(Activity, "Password must be at least 5 characters", ToastLength.Short).Show();
 			}
 			else {
 
@@ -109,7 +109,9 @@ namespace Repeat.Activities.Authentication
 					{
 						Activity.RunOnUiThread(() =>
 						{
-							Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short);
+							_loginProgressBar.Visibility = ViewStates.Gone;
+							mOverlayDialog.Dismiss();
+							Toast.MakeText(Activity, "Failed to authenticate", ToastLength.Short).Show();
 						});
 					}
 				});

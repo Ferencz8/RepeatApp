@@ -25,6 +25,19 @@ router.get('/', authorization.authorize, function (req, res) {
     apiCaller.getRequest(route, {'Authorization': req.cookies.token}, renderCallBack);
 });
 
+router.get('/getNotebooks', authorization.authorize, function (req, res) {
+
+    var route = notebooksRoute + "?deleted=false&userId=" + req.cookies.userId;
+    var renderCallBack = function (apiNotebooks) {
+
+        res.send( {
+            notebooks: apiNotebooks
+        });
+    };
+
+    apiCaller.getRequest(route, {'Authorization': req.cookies.token}, renderCallBack);
+});
+
 router.route('/add', authorization.authorize)
     .get(function (req, res) {
 

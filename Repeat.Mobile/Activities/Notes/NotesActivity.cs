@@ -26,7 +26,7 @@ using Repeat.Mobile;
 
 namespace Repeat.Activities.Notes
 {
-	[Activity(Label = "NotesActivity")]
+	[Activity(Label = "Notes")]
 	public class NotesActivity : Activity
 	{
 		DrawerLayout drawerLayout;

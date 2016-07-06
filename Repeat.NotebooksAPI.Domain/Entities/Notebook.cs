@@ -32,7 +32,6 @@ namespace Repeat.NotebooksAPI.Domain.Entities
 
 		[Required]
 		[MaxLength(128)]
-		//[Column(TypeName = "varchar(128)")]
 		[Index("IX_NameAndUser", 2, IsUnique = true)]
 		public string UserId { get; set; }
 	}

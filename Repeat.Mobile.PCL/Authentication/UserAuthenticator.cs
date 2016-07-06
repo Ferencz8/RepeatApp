@@ -44,7 +44,7 @@ namespace Repeat.Mobile.PCL.Authentication
 				}
 			}
 
-			return !string.IsNullOrEmpty(Session.LoggedInUser.Id);
+			return Session.LoggedInUser != null ? (!string.IsNullOrEmpty(Session.LoggedInUser.Id)) : false;
 		}
 
 		public void LogOut()

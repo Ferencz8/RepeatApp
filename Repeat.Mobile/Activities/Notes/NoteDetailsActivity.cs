@@ -11,7 +11,7 @@ using System;
 
 namespace Repeat.Mobile.Activities.Notes
 {
-	[Activity(Label = "NoteDetailsActivity")]
+	[Activity(Label = "Note Details")]
 	public class NoteDetailsActivity : Activity
 	{
 		EditText _txtNote;

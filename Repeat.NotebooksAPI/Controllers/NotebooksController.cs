@@ -81,7 +81,7 @@ namespace Repeat.NotebooksAPI.Controllers
 		public JsonResult<Notebook> Get(Guid id)
 		{
 			var notebook = _unitOfWork.NotebooksRepository.GetByID(id);
-			//temp
+
 			if (notebook != null)
 			{ notebook.Notes = new List<Note>(); }
 			return Json(notebook, _jsonSerializerSettings);

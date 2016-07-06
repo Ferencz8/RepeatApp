@@ -3,11 +3,9 @@
  */
 var express = require('express');
 var router = express.Router();
-var apiCaller = require('../services/apiCaller');
 var authenticationService = require('../services/authenticationService');
 var config = require('../common/config');
 
-var notebooksRoute = config.notebooksRoute;
 /* GET home page. */
 router.route('/')
     .get(function (req, res) {

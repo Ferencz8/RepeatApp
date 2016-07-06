@@ -54,8 +54,8 @@ namespace Repeat.Mobile.PCL
 				{
 					Id = Guid.NewGuid().ToString(),
 					Name = "First Notebook",
-					CreatedDate = DateTime.Now,
-					ModifiedDate = DateTime.Now,
+					CreatedDate = DateTime.UtcNow,
+					ModifiedDate = DateTime.UtcNow,
 					UserId = Session.LoggedInUser.Id,
 				});
 			}

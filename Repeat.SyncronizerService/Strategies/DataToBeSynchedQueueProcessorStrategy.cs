@@ -215,7 +215,7 @@ namespace Repeat.SyncronizerService.Strategies
 			{
 				if (notebook.Deleted == true && notebookApi.Deleted == true)
 				{
-					//this notes should also be synched, or they will get lost on the mobile
+					//this notes have been chosen to be deleted
 				}
 				else if (notebook.Deleted)
 				{

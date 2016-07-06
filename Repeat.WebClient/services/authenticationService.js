@@ -53,7 +53,9 @@ var authenticationService = (function () {
             if (error) {
                 // Something went wrong...
                 // Check error.name. Might just be a wrong password?
-
+                if(errorcallback !=undefined){
+                    errorcallback();
+                }
             } else {
                 // User is logged in, save result.token in session
                 if (successcallback != undefined) {
@@ -91,24 +93,11 @@ var authenticationService = (function () {
         });
     }
 
-    function refreshToken(token, succesfullRefreshCb, failedCb){
-        UserApp.Token.heartbeat(function(error, result){
-            // Handle error/result
-            if(error != undefined || result.alive == false){
-                failedCb();
-            }
-            else if(result.alive = true){
-                succesfullRefreshCb();
-            }
-        });
-    }
-
     return {
         login: login,
         logout: logout,
         signup: signup,
         authorize: authorize,
-        refreshToken: refreshToken,
     }
 })();
 
