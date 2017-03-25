@@ -1,4 +1,4 @@
-# RepeatApp - Short Description
+# RepeatApp - Note syncronization application - Short Description
 
 This is a note taking application. When the app is first istalled a "First Notebook" will be created, in which notes can be saved. Each note has to belong to a notebook. In order to distinguish different notes content they can be placed in other notebooks.
 A Notebooks has a name and a list of Notes.
@@ -9,13 +9,54 @@ I built a NotebookAPI, which will be the central database and a Syncronization S
 
 The project consists of 2 servers and 2 clients.  
 The clients are mobile (Xamarin - Android) and web (Node JS) and have the following functionalities:
+
 •	 Authentication using an External Service
+
 •	 Data stored on a local database (only for mobile client). - SQLite
+
 •	 Synchronization of data with Web API. 
+
 The servers are: 
+
 •	 Web API, which serves as a central synchronized point for data to be stored.
+
 •	 Synchronizing Service, which handles the data synchronization (C#)
 
 
-The architecture:
+
+# The architecture:
+
 ![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/L.png)
+
+
+
+# Web client 
+
+•	Login:
+
+![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/login_001.png)
+
+
+•	Add notebook:
+
+
+![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/add_notebook.png)
+
+•	Notebook/Notes view:
+
+![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/edit_n.png)
+
+
+# Mobile client
+
+•	Login :
+
+![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/failed_to_authencticate.png)
+
+
+•	Syncronization View:
+
+![alt tag](https://github.com/Ferencz8/RepeatApp/blob/Authentication_Authorization/Images/2016-06-26_1450.png)
+
+
+
